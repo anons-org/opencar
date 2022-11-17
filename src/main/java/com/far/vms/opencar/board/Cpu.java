@@ -1,10 +1,8 @@
 package com.far.vms.opencar.board;
 
 
-import com.far.vms.opencar.vm.BinFile;
 import com.far.vms.opencar.vm.StaticRes;
 
-import com.far.vms.opencar.vm.opcode.*;
 import com.far.vms.opencar.vm.opcodeType.*;
 
 public class Cpu extends CpuBase {
@@ -24,13 +22,11 @@ public class Cpu extends CpuBase {
 
     //时序电路
     public void execute() {
-        PC = predict = 0x80000;
+        PC = predict = StaticRes.krStart;
         try {
             while (true) {
                 int code = getCode();
-                //左移25位 将opcode移到最高位
-                //再右移会带符号 将高25b全部置0
-                int opcode = 0b1111111 & ((code << 25) >> 25);
+                int opcode = getOpCode();
 
                 String str = String.format("parseing code 0x%s, opcode 0x%s ", Integer.toHexString(code), Integer.toHexString(opcode));
                 System.out.print(str);

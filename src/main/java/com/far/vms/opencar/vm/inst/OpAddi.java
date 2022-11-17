@@ -1,4 +1,4 @@
-package com.far.vms.opencar.vm.opcode;
+package com.far.vms.opencar.vm.inst;
 
 import com.far.vms.opencar.board.Cpu;
 

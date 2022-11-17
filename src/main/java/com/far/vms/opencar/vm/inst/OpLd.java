@@ -1,8 +1,9 @@
-package com.far.vms.opencar.vm.opcode;
+package com.far.vms.opencar.vm.inst;
 
 import com.far.vms.opencar.board.Cpu;
+import com.far.vms.opencar.vm.StaticRes;
 
-public class OpJalr {
+public class OpLd {
 
     //操作码
     private int opcode;
@@ -24,7 +25,7 @@ public class OpJalr {
         return opcode;
     }
 
-    public OpJalr setOpcode(int opcode) {
+    public OpLd setOpcode(int opcode) {
         this.opcode = opcode;
         return this;
     }
@@ -38,35 +39,31 @@ public class OpJalr {
         return func3;
     }
 
-    public OpJalr setFunc3(int func3) {
+    public OpLd setFunc3(int func3) {
         this.func3 = func3;
         return this;
     }
 
-    public OpJalr setCtx(Cpu ctx) {
+    public OpLd setCtx(Cpu ctx) {
         this.ctx = ctx;
         return this;
     }
 
-    public OpJalr setCode(int code) {
+    public OpLd setCode(int code) {
         this.code = code;
         return this;
     }
 
     public void process() {
 
-        rd  = 0b11111 & (code >> 7);
+        rd = 0b11111 & (code >> 7);
         rs1 = 0b11111 & (code >> 15);
         imm = 0b111_111_111_111 & (code >> 20);
-        //最低位设置0
-        long addr = 0b1111_1111_1111_1111_1111_1111_1111_1111_1111_1111_1110L & (rs1 + imm);
+        long mAddr = rs1 + imm;
 
-        ctx.register.setValOfRid(rd, addr);
+        long mVal = StaticRes.bus.loadDDw(mAddr);
 
-
-
-
-
+        ctx.register.setValOfRid(rd, mVal);
 //
 //        if (Debugger.Stat.DEBUG == StaticRes.debugger.getStat()) {
 //            String info = String.format("addw : write reg val %x",v );

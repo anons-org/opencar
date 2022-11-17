@@ -41,7 +41,8 @@ public class OpenCarApplication {
             //将代码写到内存
             //代码写到内存的8k位置 如果代码很大 如何一次写入?  对unsafae代码熟悉的小伙伴分享下
             //讲代码加载到搞地质 0x80000除执行 0x80000从左往右还剩512K空间 用作硬件、bios编址、以及堆栈空间
-            long startAddr = 0x80000;
+            //注意 sbi(bios)必须从0开始
+            long startAddr = StaticRes.krStart;
             while (binProcess.available() > 0) {
                 long code = Long.reverseBytes(binProcess.readLong());
                 StaticRes.bus.storeDDw(startAddr, code);

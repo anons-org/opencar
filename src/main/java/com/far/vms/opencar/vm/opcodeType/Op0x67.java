@@ -1,9 +1,12 @@
 package com.far.vms.opencar.vm.opcodeType;
 
 import com.far.vms.opencar.board.Cpu;
-import com.far.vms.opencar.vm.opcode.OpAddw;
-import com.far.vms.opencar.vm.opcode.OpJalr;
-
+import com.far.vms.opencar.vm.inst.OpJalr;
+/*
+ * @description: jalr
+ * @author mike/Fang.J
+ * @data 2022/11/17
+*/
 public class Op0x67 implements IOpcodeTypes {
 
     @Override

@@ -6,7 +6,19 @@ import com.far.vms.opencar.board.Dram;
 import com.far.vms.opencar.board.IBus;
 import com.far.vms.opencar.debugger.Debugger;
 
+/*
+ * @description:
+ *
+ * 对于资源，因为存在并发问题，先统一管理
+ * 后续再调整
+ *
+ * @author mike/Fang.J
+ * @data 2022/11/18
+ */
 public class StaticRes {
+
+    //内核被加载到的地址
+    public static int krStart=0x80000;
 
     public static IBus bus;
 
@@ -14,16 +26,16 @@ public class StaticRes {
 
     public static Debugger debugger;
 
-    public static void init(){
+    public static void init() {
 
         debugger = new Debugger();
         //开启调试模式
-        debugger.setStat( Debugger.Stat.DEBUG );
+        debugger.setStat(Debugger.Stat.DEBUG);
         bus = new Bus();
         cpus[0] = new Cpu();
         Dram dram = new Dram();
         dram.init();
-        ((Bus)bus).setDram(dram);
+        ((Bus) bus).setDram(dram);
     }
 
 }

@@ -1,9 +1,8 @@
-package com.far.vms.opencar.vm.opcode;
+package com.far.vms.opencar.vm.inst;
 
 import com.far.vms.opencar.board.Cpu;
-import com.far.vms.opencar.vm.StaticRes;
 
-public class OpLd {
+public class OpAddw {
 
     //操作码
     private int opcode;
@@ -13,7 +12,8 @@ public class OpLd {
     //源寄存器
     private int rs1;
 
-    private int imm;
+    private int rs2;
+
     private int rd;
 
     //func4
@@ -25,7 +25,7 @@ public class OpLd {
         return opcode;
     }
 
-    public OpLd setOpcode(int opcode) {
+    public OpAddw setOpcode(int opcode) {
         this.opcode = opcode;
         return this;
     }
@@ -39,17 +39,17 @@ public class OpLd {
         return func3;
     }
 
-    public OpLd setFunc3(int func3) {
+    public OpAddw setFunc3(int func3) {
         this.func3 = func3;
         return this;
     }
 
-    public OpLd setCtx(Cpu ctx) {
+    public OpAddw setCtx(Cpu ctx) {
         this.ctx = ctx;
         return this;
     }
 
-    public OpLd setCode(int code) {
+    public OpAddw setCode(int code) {
         this.code = code;
         return this;
     }
@@ -58,12 +58,36 @@ public class OpLd {
 
         rd = 0b11111 & (code >> 7);
         rs1 = 0b11111 & (code >> 15);
-        imm = 0b111_111_111_111 & (code >> 20);
-        long mAddr = rs1 + imm;
+        rs2 = 0b11111 & (code >> 20);
 
-        long mVal = StaticRes.bus.loadDDw(mAddr);
+        long v1 = ctx.register.getValOfRid(rs1);
+        long v2 = ctx.register.getValOfRid(rs2);
 
-        ctx.register.setValOfRid(rd, mVal);
+        //保留低32位 高位全部清零
+        //如果遇到负数，JAVA类型系统会自动把64位的高32位自动补1
+        v1 = 0xffffffff & v1;
+        v2 = 0xffffffff & v2;
+
+
+        //先加 确定符号
+        //高32b 0xf3baccc4
+        //低32b 0xffffffff
+        v1 = v1 + v2;
+        /*
+
+         */
+//        if (v1 < 0) {//带符号
+//            //保留低32的同时
+//            v1 = 0xffffffff00000000L | v1;
+//        }
+//
+//
+
+        //long v =  0xffffffffL | v1  ;
+
+//
+
+        ctx.register.setValOfRid( rd, v1 );
 //
 //        if (Debugger.Stat.DEBUG == StaticRes.debugger.getStat()) {
 //            String info = String.format("addw : write reg val %x",v );

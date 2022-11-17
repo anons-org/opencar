@@ -8,7 +8,6 @@ public class Register {
     public static Map<Integer, String> regNames = new HashMap<>();
 
 
-
     public static class RegAddr {
         public static int
                 PC = 999999999,
@@ -60,6 +59,8 @@ public class Register {
     }
 
     public void setValOfRid(int rid, long val) {
+        //x0不能修改
+        if (rid == 0) return;
         regs.put(rid, val);
         int x = 01;
     }

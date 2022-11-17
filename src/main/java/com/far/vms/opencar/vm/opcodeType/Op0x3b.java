@@ -1,8 +1,7 @@
 package com.far.vms.opencar.vm.opcodeType;
 
 import com.far.vms.opencar.board.Cpu;
-import com.far.vms.opencar.vm.opcode.OpAddi;
-import com.far.vms.opencar.vm.opcode.OpAddw;
+import com.far.vms.opencar.vm.inst.OpAddw;
 
 public class Op0x3b implements IOpcodeTypes {
 

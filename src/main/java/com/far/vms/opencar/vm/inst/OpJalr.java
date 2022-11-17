@@ -1,8 +1,8 @@
-package com.far.vms.opencar.vm.opcode;
+package com.far.vms.opencar.vm.inst;
 
 import com.far.vms.opencar.board.Cpu;
 
-public class OpAddw {
+public class OpJalr {
 
     //操作码
     private int opcode;
@@ -12,8 +12,7 @@ public class OpAddw {
     //源寄存器
     private int rs1;
 
-    private int rs2;
-
+    private int imm;
     private int rd;
 
     //func4
@@ -25,7 +24,7 @@ public class OpAddw {
         return opcode;
     }
 
-    public OpAddw setOpcode(int opcode) {
+    public OpJalr setOpcode(int opcode) {
         this.opcode = opcode;
         return this;
     }
@@ -39,17 +38,17 @@ public class OpAddw {
         return func3;
     }
 
-    public OpAddw setFunc3(int func3) {
+    public OpJalr setFunc3(int func3) {
         this.func3 = func3;
         return this;
     }
 
-    public OpAddw setCtx(Cpu ctx) {
+    public OpJalr setCtx(Cpu ctx) {
         this.ctx = ctx;
         return this;
     }
 
-    public OpAddw setCode(int code) {
+    public OpJalr setCode(int code) {
         this.code = code;
         return this;
     }
@@ -58,36 +57,21 @@ public class OpAddw {
 
         rd = 0b11111 & (code >> 7);
         rs1 = 0b11111 & (code >> 15);
-        rs2 = 0b11111 & (code >> 20);
+        imm = 0b111_111_111_111 & (code >> 20);
+        //最低位设置0
+        long addr = 0b1111_1111_1111_1111_1111_1111_1111_1111_1111_1111_1110L & (rs1 + imm);
 
-        long v1 = ctx.register.getValOfRid(rs1);
-        long v2 = ctx.register.getValOfRid(rs2);
+        //得到当前PC riscv中不能直接操作PC寄存器,代码上也假装规范一下
+        //rd 为0都是丢弃
+        ctx.register.setValOfRid(rd, ctx.getPredict() - 4);
+        //addr和预测地址不一致
+        if (ctx.getPredict() != addr) {
+            //产生flush信号
+            ctx.flushReq = 1;
+            ctx.ifuPcReg = addr;
+        }
 
-        //保留低32位 高位全部清零
-        //如果遇到负数，JAVA类型系统会自动把64位的高32位自动补1
-        v1 = 0xffffffff & v1;
-        v2 = 0xffffffff & v2;
 
-
-        //先加 确定符号
-        //高32b 0xf3baccc4
-        //低32b 0xffffffff
-        v1 = v1 + v2;
-        /*
-
-         */
-//        if (v1 < 0) {//带符号
-//            //保留低32的同时
-//            v1 = 0xffffffff00000000L | v1;
-//        }
-//
-//
-
-        //long v =  0xffffffffL | v1  ;
-
-//
-
-        ctx.register.setValOfRid( rd, v1 );
 //
 //        if (Debugger.Stat.DEBUG == StaticRes.debugger.getStat()) {
 //            String info = String.format("addw : write reg val %x",v );
