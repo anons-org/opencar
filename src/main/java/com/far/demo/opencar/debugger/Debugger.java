@@ -71,6 +71,7 @@ public class Debugger {
     public void monitor() {
         String cmd = "";
         if (stat == Stat.DEBUG) {
+            System.out.println("调试模式开启!");
             Scanner scanner = new Scanner(System.in);
             while (scanner.hasNext()) {
                 String[] cmds = scanner.nextLine().split(" ");

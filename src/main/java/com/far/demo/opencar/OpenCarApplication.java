@@ -29,9 +29,8 @@ public class OpenCarApplication {
     }
 
 
-
     public static void readBin() {
-        String binFile = "E:\\AAAA_CODE\\new-eclipse-workspace\\demoall\\java-demo\\open-car\\hex\\main.bin";
+        String binFile = "E:\\AAAA_CODE\\new-eclipse-workspace\\to-github\\opencar\\hex\\main.bin";
         File memBinFile = new File(binFile);
         try {
             byte[] datas = new FileInputStream(memBinFile).readAllBytes();
@@ -39,15 +38,20 @@ public class OpenCarApplication {
             binProcess.setBufSize(8);
             binProcess.setData(datas);
             //将代码写到内存
-            //代码写到内存的8k位置 如果代码很大 如何一次写入?
+            //代码写到内存的8k位置 如果代码很大 如何一次写入?  对unsafae代码熟悉的小伙伴分享下
             //讲代码加载到搞地质 0x80000除执行 0x80000从左往右还剩512K空间 用作硬件、bios编址、以及堆栈空间
             long startAddr = 0x80000;
-            while ( binProcess.available() > 0 ){
-                StaticRes.bus.storeDDw(startAddr,binProcess.readLong());
-                startAddr+=8;
+            while (binProcess.available() > 0) {
+                long code = Long.reverseBytes(binProcess.readLong());
+                StaticRes.bus.storeDDw(startAddr, code);
+                startAddr += 8;
             }
+
+
+            //  int val = StaticRes.bus.loadDw(0x80000);
+
             Cpu ctx = StaticRes.cpus[0];
-            ctx.setCodes(binProcess);
+            // ctx.setCodes(binProcess);
             ctx.execute();
         } catch (IOException e) {
             e.printStackTrace();

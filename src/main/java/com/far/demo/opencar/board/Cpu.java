@@ -18,8 +18,11 @@ public class Cpu {
 
     //流水线上的刷新信号
     private short flushReq;
-
-    private long PC;
+    //预测地址
+    private long predict = 0;
+    private long PC = 0;
+    //上电状态
+    private boolean power = false;
 
     public Cpu() {
         register = new Register();
@@ -42,7 +45,11 @@ public class Cpu {
     }
 
 
-    //取指阶段
+    /*
+        指令是32位为什么返回Long?
+        因为long指的内存的地址...
+        如果要取指，实际是从当前的PC地址获取32位数据作为指令使用
+     */
     public long ifu() {
         return bpu();
     }
@@ -53,19 +60,29 @@ public class Cpu {
             //无条件跳转会刷新流水线
             PC = this.register.regs.get(Register.RegAddr.PC);
         } else {//静态预测为当前指令地址+4
-            PC += 4;
+            predict += 4;
         }
-        return 0;
-    }
 
+        if (power == true) {
+            if (PC + 4 == predict - 4) {
+                PC = predict - 4;
+            }else{//预测地址不一致
+
+            }
+        } else {
+            power = true;
+        }
+        return PC;
+
+    }
 
 
     //时序电路
     public void execute() {
-
+        PC = predict = 0x80000;
         try {
-            while (codes.available() > 0) {
-                int code = codes.readInt();
+            while (true) {
+                int code = StaticRes.bus.loadDw(ifu());
                 //左移25位 将opcode移到最高位
                 //再右移会带符号 将高25b全部置0
                 int opcode = 0b1111111 & ((code << 25) >> 25);

@@ -9,9 +9,9 @@
         <relativePath/> <!-- lookup parent from repository -->
     </parent>
     <groupId>com.far.demo</groupId>
-    <artifactId>open-car</artifactId>
+    <artifactId>opencar</artifactId>
     <version>0.0.1-SNAPSHOT</version>
-    <name>open-car</name>
+    <name>opencar</name>
     <description>Demo project for Spring Boot</description>
     <properties>
         <java.version>17</java.version>
