@@ -5,7 +5,7 @@
 > 人话:不用买开发板就可以在openCar上测试和跟踪软件在riscv上的运行情况。
 
 
-## openCar应该有的功能
+## openCar目标
 
 * 支持rv基础指令集 以及扩展指令集
 * 支持可视化监视和跟踪指令执行
@@ -16,11 +16,5 @@
 
 
 
-## 如何报名
-
-- [参与贡献请看的评级规则，项目编号，再报名](https://gitee.com/grateful/grateful-doc/blob/master/doc/join-condition.md)
-
-* PA1
-> 至少满足PA1-L1,请发邮件到 184377367@qq.com 主题：opencar内容: 简单介绍下自己即可
 
 

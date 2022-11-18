@@ -31,7 +31,7 @@ public class OpenCarApplication {
 
 
     public static void readBin() {
-        String binFile = "E:\\AAAA_CODE\\new-eclipse-workspace\\to-github\\opencar\\hex\\main.bin";
+        String binFile = "D:\\AAAA_WORK\\RISC-V-Tools\\os\\riscv-operating-system-mooc\\code\\os\\00-bootstrap\\kernel.bin";
         File memBinFile = new File(binFile);
         try {
             byte[] datas = new FileInputStream(memBinFile).readAllBytes();
@@ -48,10 +48,7 @@ public class OpenCarApplication {
                 StaticRes.bus.storeDDw(startAddr, code);
                 startAddr += 8;
             }
-
-
             //  int val = StaticRes.bus.loadDw(0x80000);
-
             Cpu ctx = StaticRes.cpus[0];
             // ctx.setCodes(binProcess);
             ctx.execute();

@@ -17,12 +17,23 @@ public class Register {
                 A5 = 0b01_111,
                 X0 = 0b00_000;
 
+    }
+
+    public static class CsrRegAddr {
+        public static int
+                mstatus = 0x300,//机器状态
+                mhartid = 0xF14;//0xF14;
 
     }
 
 
     //所有的寄存器
     public Map<Integer, Long> regs = new HashMap<>();
+    //控制寄存器
+    public long[] csrRegs = new long[4096];
+
+    public String[] csrRegNames = new String[4096];
+
 
     public Register() {
         //寄存器的值
@@ -42,6 +53,10 @@ public class Register {
         regs.put(RegAddr.PC, 0x0L);
 
 
+        //-------------
+        //默认1
+        csrRegs[CsrRegAddr.mhartid] = 0x01L;
+
         //寄存器名称
         regNames.put(RegAddr.X0, "x0");
         regNames.put(RegAddr.SP, "sp");
@@ -50,6 +65,10 @@ public class Register {
         //a5
         regNames.put(RegAddr.A5, "a5");
         regNames.put(RegAddr.PC, "pc");
+
+        //----------
+        csrRegNames[CsrRegAddr.mhartid] = "mhartid";
+
     }
 
     public long getValOfRid(int rid) {
@@ -58,11 +77,35 @@ public class Register {
         return val;
     }
 
+    public long getRegVal(int rid){
+        long val = regs.get(rid);
+        return val;
+    }
+
+    public void setRegVal(int rid, long val) {
+        //x0不能修改
+        if (rid == 0) return;
+        regs.put(rid, val);
+        int x = 01;
+    }
+
+
     public void setValOfRid(int rid, long val) {
         //x0不能修改
         if (rid == 0) return;
         regs.put(rid, val);
         int x = 01;
+    }
+
+    //读取csr寄存器
+    public long getCsrReg(int rid) {
+        long val = csrRegs[rid];
+        return val;
+    }
+
+    //设置控制寄存器
+    public void setCsrReg(int raddr, long val) {
+        csrRegs[raddr] = val;
     }
 
 

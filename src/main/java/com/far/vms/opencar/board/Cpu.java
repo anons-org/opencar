@@ -16,7 +16,10 @@ public class Cpu extends CpuBase {
         opct[0x13] = new Op0x13();
         opct[0x23] = new Op0x23();
         opct[0x3b] = new Op0x3b();
+        //bne
+        opct[0x63] = new Op0x63();
         opct[0x67] = new Op0x67();
+        opct[0x73] = new Op0x73();
 
     }
 
