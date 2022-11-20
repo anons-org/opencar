@@ -23,39 +23,39 @@ public class OpAddi {
     }
 
 
-    public OpAddi setCtx(Cpu ctx){
+    public OpAddi setCtx(Cpu ctx) {
         this.ctx = ctx;
         return this;
     }
 
-    public void setCode(int code) {
+    public OpAddi setCode(int code) {
         this.code = code;
-        process();
+        return this;
     }
 
 
-    public void process(){
+    public void process() {
 
         //左移27位 将opcode移到最高位
         opcode = code << 27;
         this.func3 = ((code >> 12) << 29) >> 29;
         //rs 5bit
 
-        this.rs = 0b11111 & (code >> 15) ;
+        this.rs = 0b11111 & (code >> 15);
         //rd 5bit
-        this.rd = 0b11111 & (code >> 7) ;
+        this.rd = 0b11111 & (code >> 7);
 
 
-        System.out.println(String.format("rs:%s,rd:%s",Integer.toBinaryString(rs),Integer.toBinaryString(rd)));
+        System.out.println(String.format("rs:%s,rd:%s", Integer.toBinaryString(rs), Integer.toBinaryString(rd)));
 
         //去掉右边20位数据
         imm = (code >> 20) << 20;
         //立即数移到最低位
         long immd = imm >> 20;
-        long rsVal = ctx.register.getValOfRid( rs);
+        long rsVal = ctx.register.getRegVal(rs);
         immd = rsVal + immd;
         //写入rd 64bit
-        ctx.register.setValOfRid(rd,immd);
+        ctx.register.setRegVal(rd, immd);
 
     }
 }

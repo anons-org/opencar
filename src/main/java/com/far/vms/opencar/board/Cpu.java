@@ -14,18 +14,21 @@ public class Cpu extends CpuBase {
         register = new Register();
         opct[0x03] = new Op0x03();
         opct[0x13] = new Op0x13();
+        opct[0x17] = new Op0x17();
         opct[0x23] = new Op0x23();
         opct[0x3b] = new Op0x3b();
         //bne
         opct[0x63] = new Op0x63();
         opct[0x67] = new Op0x67();
+        opct[0x6F] = new Op0x6F();
         opct[0x73] = new Op0x73();
 
     }
 
     //时序电路
     public void execute() {
-        PC = predict = StaticRes.krStart;
+
+        this.setPC(predict = StaticRes.krStart);
         try {
             while (true) {
                 int code = getCode();
@@ -34,7 +37,7 @@ public class Cpu extends CpuBase {
                 String str = String.format("parseing code 0x%s, opcode 0x%s ", Integer.toHexString(code), Integer.toHexString(opcode));
                 System.out.print(str);
 
-                if( opct[opcode]==null ) continue;
+                if (opct[opcode] == null) continue;
                 opct[opcode].eval(this, code, opcode);
                 curLine++;
                 //监测断点

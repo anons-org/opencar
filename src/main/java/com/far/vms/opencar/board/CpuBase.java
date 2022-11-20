@@ -20,6 +20,10 @@ public class CpuBase {
     //预测地址
     protected long predict = 0;
     protected long PC = 0;
+    //curPC总是存储PC的地址，而不是PC+4之后的地址
+    protected long curPC;
+
+
     //IFU模块的PC寄存器
     public long ifuPcReg;
 
@@ -65,37 +69,37 @@ public class CpuBase {
 
     //分支预测模块 返回指令地址
     public long bpu() {
+
+//        if (predict != PC + 4) {
+//            //PC被修改了 预测失败
+//            predict = PC + 4;
+//        }
+
+
         if (flushReq == 1) {//收到流水线指令刷新信号
             //无条件跳转会刷新流水线
-
             if (ifuPcReg < 0) {
                 //出现故障
                 return 0;
             }
-
             PC = ifuPcReg;
+
+//            if (predict != PC + 4) {
+//                //PC被修改了 预测失败
+//                predict = PC + 4;
+//            }
+
+
             //清楚刷新流水线信号
             flushReq = 0;
             //ifu模块的PC寄存器清0
             ifuPcReg = 0;
-            //下一个地址
-            predict = PC+4;
-
-
-        } else {//静态预测为当前指令地址+4
-            predict += 4;
         }
 
-        if (power) {
-            if (PC + 4 == predict - 4) {
-                PC = predict - 4;
-            } else {//预测地址不一致
-
-            }
-        } else {
-            power = true;
-        }
-        return PC;
+        curPC = PC;
+        PC += 4;
+        System.out.println(String.format("curPC %x",curPC));
+        return curPC;
 
     }
 
@@ -110,6 +114,17 @@ public class CpuBase {
         //左移25位 将opcode移到最高位
         //再右移会带符号 将高25b全部置0
         return 0b1111111 & ((code << 25) >> 25);
+    }
+
+
+    public void setPC(long pc) {
+        //PC可以直接改变
+        this.PC = pc;
+    }
+
+    public long getPC() {
+        //只能是curPc
+        return this.curPC;
     }
 
 }

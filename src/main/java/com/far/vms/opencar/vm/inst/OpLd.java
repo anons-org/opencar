@@ -63,7 +63,7 @@ public class OpLd {
 
         long mVal = StaticRes.bus.loadDDw(mAddr);
 
-        ctx.register.setValOfRid(rd, mVal);
+        ctx.register.setRegVal(rd, mVal);
 //
 //        if (Debugger.Stat.DEBUG == StaticRes.debugger.getStat()) {
 //            String info = String.format("addw : write reg val %x",v );

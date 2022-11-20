@@ -12,7 +12,7 @@ import java.util.Scanner;
  * @description: 本来想晚点写调试器的，没法，因为太多的寄存器和内存值需要查看和监视
  * @author mike/Fang.J
  * @data 2022/11/17
-*/
+ */
 
 public class Debugger {
 
@@ -28,6 +28,10 @@ public class Debugger {
     //状态
     private short stat;
 
+    //监视opcode执行
+    private short opcMonitor = 0x00;
+
+
     //断点所在的行 有哪些？
     List<Integer> breakLines;
 
@@ -39,7 +43,7 @@ public class Debugger {
 
 
     public Debugger() {
-        stat = Stat.NONE;
+        this.setStat(Stat.NONE);
         breakLines = new ArrayList<>();
     }
 
@@ -50,6 +54,15 @@ public class Debugger {
 
     public void setStat(short stat) {
         this.stat = stat;
+    }
+
+
+    public short getOpcMonitor() {
+        return opcMonitor;
+    }
+
+    public void setOpcMonitor(short opcMonitor) {
+        this.opcMonitor = opcMonitor;
     }
 
     //设置断点
@@ -86,7 +99,7 @@ public class Debugger {
                 } else if ("disable".equals(cmd)) {
                     stat = Stat.NONE;
                     break;
-                }  else if ("info".equals(cmd)) {
+                } else if ("info".equals(cmd)) {
                     if ("all-reg".equals(cmds[1])) {//显示所有寄存器的信息
                         Debug.printRegister(1);
                     }
@@ -94,8 +107,8 @@ public class Debugger {
                     String fmt = cmds[1];
                     long addr = Long.decode(cmds[2]);
                     Debug.printMemoryVal(addr);
-                }else if("h".equals(cmd)){
-                    Arrays.stream(this.cmdsDesc).forEach(e->{
+                } else if ("h".equals(cmd)) {
+                    Arrays.stream(this.cmdsDesc).forEach(e -> {
                         System.out.println(e);
                     });
                 }

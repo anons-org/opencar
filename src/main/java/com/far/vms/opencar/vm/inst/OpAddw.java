@@ -60,8 +60,8 @@ public class OpAddw {
         rs1 = 0b11111 & (code >> 15);
         rs2 = 0b11111 & (code >> 20);
 
-        long v1 = ctx.register.getValOfRid(rs1);
-        long v2 = ctx.register.getValOfRid(rs2);
+        long v1 = ctx.register.getRegVal(rs1);
+        long v2 = ctx.register.getRegVal(rs2);
 
         //保留低32位 高位全部清零
         //如果遇到负数，JAVA类型系统会自动把64位的高32位自动补1
@@ -87,7 +87,7 @@ public class OpAddw {
 
 //
 
-        ctx.register.setValOfRid( rd, v1 );
+        ctx.register.setRegVal( rd, v1 );
 //
 //        if (Debugger.Stat.DEBUG == StaticRes.debugger.getStat()) {
 //            String info = String.format("addw : write reg val %x",v );

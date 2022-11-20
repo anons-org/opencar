@@ -72,12 +72,12 @@ public class OpLw {
         imm = 0b111_111_111_111 & (code >> 20);
 
         //取源寄存器的值
-        long mAddr = ctx.register.getValOfRid( rs1 );
+        long mAddr = ctx.register.getRegVal( rs1 );
         //内存地址
         mAddr = mAddr + imm;
         int memVal = StaticRes.bus.loadDw(mAddr);
 
-        ctx.register.setValOfRid( rd,memVal );
+        ctx.register.setRegVal( rd,memVal );
 
         if (Debugger.Stat.DEBUG == StaticRes.debugger.getStat()) {
             String info = String.format("lw : read mem 0x%x to reg ",mAddr);

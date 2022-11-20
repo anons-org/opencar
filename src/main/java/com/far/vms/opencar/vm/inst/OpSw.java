@@ -84,12 +84,12 @@ public class OpSw {
         int immRes = imm2 | imm1;
         //立即数加上寄存器中的基地址 得到内存地址
 
-        long mAddr = ctx.register.getValOfRid( rs1 );
+        long mAddr = ctx.register.getRegVal( rs1 );
         //内存地址
         mAddr = mAddr + immRes;
 
         //rs2的数据
-        Long val = ctx.register.getValOfRid( rs2 );
+        Long val = ctx.register.getRegVal( rs2 );
         /*
             1、高32b置0
          */

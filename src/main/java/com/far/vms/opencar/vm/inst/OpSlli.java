@@ -6,11 +6,11 @@ import com.far.vms.opencar.vm.StaticRes;
 
 /*
  * @description:
- * 不等于
+ * 左移
  * @author mike/Fang.J
  * @data 2022/11/19
  */
-public class OpBne {
+public class OpSlli {
 
     //操作码
     private int opcode;
@@ -22,16 +22,13 @@ public class OpBne {
 
 
     //目标寄存器
-    private int rs2;
+    private int rd;
 
     //func4
     private int func3;
 
-
-    private int ofst1;
-
-
-    private int ofst2;
+    //移多少位 该字段6b
+    private int shamt;
 
 
     private Cpu ctx;
@@ -40,7 +37,7 @@ public class OpBne {
         return opcode;
     }
 
-    public OpBne setOpcode(int opcode) {
+    public OpSlli setOpcode(int opcode) {
         this.opcode = opcode;
         return this;
     }
@@ -54,17 +51,17 @@ public class OpBne {
         return func3;
     }
 
-    public OpBne setFunc3(int func3) {
+    public OpSlli setFunc3(int func3) {
         this.func3 = func3;
         return this;
     }
 
-    public OpBne setCtx(Cpu ctx) {
+    public OpSlli setCtx(Cpu ctx) {
         this.ctx = ctx;
         return this;
     }
 
-    public OpBne setCode(int code) {
+    public OpSlli setCode(int code) {
         this.code = code;
         return this;
     }
@@ -73,28 +70,17 @@ public class OpBne {
     public void process() {
         /**
          * rs1 5bit
-         1、移除低15位
-         2、左移后高位的5位是寄存器编号
-         3、高5位移动低5位
-         4、保留低5位其余全部置零
+
          */
         rs1 = 0b11111 & (code >> 15);
-        rs2 = 0b11111 & (code >> 20);
 
-        ofst1 = 0b11111 & (code >> 7);
-        //需要保留符号位
-        /**
-         右移25位保留 将高7位移动到低7为
-         左移5位留出空间
-         */
-
-        int imm = ((code >> 25) << 5) | (0b11111 & (code >> 7));
-        if (ctx.register.getRegVal(rs1) != ctx.register.getRegVal(rs2)) {
-            long addr = ctx.getPC() + imm;
-            ctx.setPC(addr);
-        }
-
-
+        //5b
+        rd = 0b11111 & (code >> 7);
+        //6b
+        shamt = 0b111111 & (code >> 20);
+        long v = ctx.register.getRegVal(rs1);
+        v = v << shamt;
+        ctx.register.setRegVal(rd, v);
         if (Debugger.Stat.DEBUG == StaticRes.debugger.getStat()) {
 
         }

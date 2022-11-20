@@ -63,7 +63,7 @@ public class OpJalr {
 
         //得到当前PC riscv中不能直接操作PC寄存器,代码上也假装规范一下
         //rd 为0都是丢弃
-        ctx.register.setValOfRid(rd, ctx.getPredict() - 4);
+        ctx.register.setRegVal(rd, ctx.getPredict() - 4);
         //addr和预测地址不一致
         if (ctx.getPredict() != addr) {
             //产生flush信号

@@ -6,25 +6,25 @@ import com.far.vms.opencar.vm.StaticRes;
 
 /*
  * @description:
- * CSRR 指令翻译为CSRRS
  * @author mike/Fang.J
- * @data 2022/11/18
+ * @data 2022/11/19
  */
-public class OpCsrrs {
+public class OpAuipc {
 
     //操作码
     private int opcode;
     //code
     private int code;
 
-    //源寄存器
-    private int rs1;
-    //csr寄存器
-    private int csr;
+
+    //目标寄存器
+    private int rd;
+
     //func4
     private int func3;
-    //立即数 4:0
-    private int rd;
+
+    //立即数 20b
+    private int imm;
 
 
     private Cpu ctx;
@@ -33,7 +33,7 @@ public class OpCsrrs {
         return opcode;
     }
 
-    public OpCsrrs setOpcode(int opcode) {
+    public OpAuipc setOpcode(int opcode) {
         this.opcode = opcode;
         return this;
     }
@@ -47,35 +47,37 @@ public class OpCsrrs {
         return func3;
     }
 
-    public OpCsrrs setFunc3(int func3) {
+    public OpAuipc setFunc3(int func3) {
         this.func3 = func3;
         return this;
     }
 
-    public OpCsrrs setCtx(Cpu ctx) {
+    public OpAuipc setCtx(Cpu ctx) {
         this.ctx = ctx;
         return this;
     }
 
-    public OpCsrrs setCode(int code) {
+    public OpAuipc setCode(int code) {
         this.code = code;
         return this;
     }
 
+
     public void process() {
-
+        //5b
         rd = 0b11111 & (code >> 7);
-        rs1 = 0b11111 & (code >> 15);
-        csr = 0xFFF & (code >> 20);
-        long t = ctx.register.getCSRVal(csr);
-        long t1 = ctx.register.getRegVal(rs1);
-        if (rs1 != 0) {//只有rs1不为0时，才会发生写操作
-            ctx.register.setCSRVal(csr, t | t1);
-        }
-        ctx.register.setRegVal(rd, t);
-        if (Debugger.Stat.DEBUG == StaticRes.debugger.getStat()) {
+        //20b
+        imm = 0xFFFFF & (code >> 12);
+        //左移12位 低位补0 注意此处没有补0的操作，左移的时候自动填充0了
+        imm = imm << 12;
+        //这个会有BUG...
+        long pc = ctx.getPC();
+        long result = pc + imm;
 
+        ctx.register.setRegVal(rd, result);
+        if (Debugger.Stat.DEBUG == StaticRes.debugger.getOpcMonitor()) {
 
         }
+
     }
 }
