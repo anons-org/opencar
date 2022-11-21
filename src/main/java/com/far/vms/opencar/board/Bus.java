@@ -38,11 +38,6 @@ public class Bus implements IBus {
 
     @Override
     public void storeByte(long addr, byte val) {
-
-    }
-
-    @Override
-    public void storeByte(long addr, long val) {
         //是否有监控存在
         boolean hasmm = false;
         for (IExternalDeviceMemory e : edmms) {
@@ -53,9 +48,9 @@ public class Bus implements IBus {
         //没有监控存在就要写数据到内存
         if (!hasmm){
         }
-
-
     }
+
+
 
     @Override
     public void storeDw(long addr, int val) {

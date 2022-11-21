@@ -10,7 +10,7 @@ import java.lang.reflect.Field;
  * 物理内存块
  * @author mike/Fang.J
  * @data 2022/11/17
-*/
+ */
 public class Dram implements IBus {
 
     //java堆外内存的起始地址
@@ -54,10 +54,7 @@ public class Dram implements IBus {
         unsafe.putByte(memoryAddress + addr, val);
     }
 
-    @Override
-    public void storeByte(long addr, long val) {
 
-    }
 
     //双字
     @Override
@@ -89,7 +86,6 @@ public class Dram implements IBus {
     public int loadSw(long addr) {
         return 0;
     }
-
 
 
     @Override

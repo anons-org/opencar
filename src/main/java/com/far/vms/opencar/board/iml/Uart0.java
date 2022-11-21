@@ -48,8 +48,6 @@ public class Uart0 implements IExternalDeviceMemory {
      */
 
 
-
-
     //UART0内存布局
     // UART0 0x10000000L
     private long START_ADDR = 0x10000000L;
@@ -63,7 +61,7 @@ public class Uart0 implements IExternalDeviceMemory {
     //地址映射 用于判断
     private Integer[] regsMap = new Integer[10];
     //用于存储
-    private Long[] regs = new Long[10];
+    private byte[] regs = new byte[10];
 
     //创建锁
     ReentrantLock reentrantLock = new ReentrantLock();
@@ -80,11 +78,11 @@ public class Uart0 implements IExternalDeviceMemory {
         regsMap[DLL_OFFSET] = DLL_OFFSET;
 
         //初始化寄存器数据
-        regs[IER_OFFSET] = 0L;
-        regs[ISR_OFFSET] = 0L;
+        regs[IER_OFFSET] = 0;
+        regs[ISR_OFFSET] = 0;
 
-        regs[DLL_OFFSET] = 0L;
-        regs[THR_OFFSET] = 0L;
+        regs[DLL_OFFSET] = 0;
+        regs[THR_OFFSET] = 0;
 
 //        //波特率发生器
 //        Thread btl = new Thread(() -> {
@@ -103,7 +101,7 @@ public class Uart0 implements IExternalDeviceMemory {
 
 
     @Override
-    public boolean monitorMemoryChange(long addr, long val) {
+    public boolean monitorMemoryChange(long addr, byte val) {
         Optional<Integer> findData = Arrays.stream(regsMap).filter(e -> {
             if (e == null) {
                 return false;
@@ -131,14 +129,14 @@ public class Uart0 implements IExternalDeviceMemory {
     }
 
     @Override
-    public long monitorMemoryRead(long addr) {
+    public byte monitorMemoryRead(long addr) {
         //计算差值 得到需要读取的寄存器的偏移
         v1 = addr - START_ADDR;
         return regs[v1.intValue()];
     }
 
     //处理数据
-    private void processData(int rOfst, long val) {
+    private void processData(int rOfst, byte val) {
 
     }
 

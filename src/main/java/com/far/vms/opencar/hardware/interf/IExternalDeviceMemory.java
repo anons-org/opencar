@@ -9,7 +9,7 @@ package com.far.vms.opencar.hardware.interf;
 public interface IExternalDeviceMemory {
 
     //被内存dram调用
-    public boolean monitorMemoryChange(long addr, long val);
+    public boolean monitorMemoryChange(long addr, byte val);
 
-    public long monitorMemoryRead(long addr);
+    public byte monitorMemoryRead(long addr);
 }
