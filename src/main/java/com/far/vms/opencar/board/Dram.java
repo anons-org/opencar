@@ -54,6 +54,11 @@ public class Dram implements IBus {
         unsafe.putByte(memoryAddress + addr, val);
     }
 
+    @Override
+    public void storeByte(long addr, long val) {
+
+    }
+
     //双字
     @Override
     public void storeDw(long addr, int val) {

@@ -83,13 +83,6 @@ public class CpuBase {
                 return 0;
             }
             PC = ifuPcReg;
-
-//            if (predict != PC + 4) {
-//                //PC被修改了 预测失败
-//                predict = PC + 4;
-//            }
-
-
             //清楚刷新流水线信号
             flushReq = 0;
             //ifu模块的PC寄存器清0
@@ -97,8 +90,13 @@ public class CpuBase {
         }
 
         curPC = PC;
+
+        if (curPC == 0x82028) {
+           int x=0;
+        }
+
         PC += 4;
-        System.out.println(String.format("curPC %x",curPC));
+        System.out.println(String.format("curPC %x", curPC));
         return curPC;
 
     }

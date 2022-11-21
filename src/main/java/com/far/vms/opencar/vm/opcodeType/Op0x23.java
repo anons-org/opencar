@@ -1,6 +1,7 @@
 package com.far.vms.opencar.vm.opcodeType;
 
 import com.far.vms.opencar.board.Cpu;
+import com.far.vms.opencar.vm.inst.OpSb;
 import com.far.vms.opencar.vm.inst.OpSd;
 import com.far.vms.opencar.vm.inst.OpSw;
 
@@ -23,6 +24,10 @@ public class Op0x23 implements IOpcodeTypes {
             OpSw opSw = new OpSw();
             opSw.setCtx(cpu).setFunc3(n).setCode(code).setOpcode(opcode).process();
             System.out.println("op sw");
+        } else if (n == 0x0) {
+            OpSb opSb = new OpSb();
+            opSb.setCtx(cpu).setFunc3(n).setCode(code).setOpcode(opcode).process();
+            System.out.println("op sb");
         }
     }
 

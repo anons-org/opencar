@@ -1,20 +1,32 @@
 package com.far.vms.opencar.board;
 
 
+import com.far.vms.opencar.hardware.interf.IExternalDeviceMemory;
+
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 
 /*
  * @description: 总线
  * @author mike/Fang.J
  * @data 2022/11/17
-*/
-public class Bus implements IBus{
+ */
+public class Bus implements IBus {
 
     //所有在总线注册了地址的设备
-    Map<Long,IBus> dvrMap;
+    Map<Long, IBus> dvrMap;
 
     //内存
     Dram dram;
+
+
+    List<IExternalDeviceMemory> edmms = new ArrayList<>();
+
+
+    public void addEdmm(IExternalDeviceMemory edmm) {
+        edmms.add(edmm);
+    }
 
     public Dram getDram() {
         return dram;
@@ -30,13 +42,29 @@ public class Bus implements IBus{
     }
 
     @Override
+    public void storeByte(long addr, long val) {
+        //是否有监控存在
+        boolean hasmm = false;
+        for (IExternalDeviceMemory e : edmms) {
+            if (e.monitorMemoryChange(addr, val)) {
+                hasmm = true;
+            }
+        }
+        //没有监控存在就要写数据到内存
+        if (!hasmm){
+        }
+
+
+    }
+
+    @Override
     public void storeDw(long addr, int val) {
-        dram.storeDw(addr,val);
+        dram.storeDw(addr, val);
     }
 
     @Override
     public void storeDDw(long addr, long val) {
-     dram.storeDDw(addr,val);
+        dram.storeDDw(addr, val);
     }
 
     @Override

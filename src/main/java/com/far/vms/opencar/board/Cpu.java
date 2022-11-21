@@ -3,6 +3,7 @@ package com.far.vms.opencar.board;
 
 import com.far.vms.opencar.vm.StaticRes;
 
+import com.far.vms.opencar.vm.inst.OpLui;
 import com.far.vms.opencar.vm.opcodeType.*;
 
 public class Cpu extends CpuBase {
@@ -16,6 +17,7 @@ public class Cpu extends CpuBase {
         opct[0x13] = new Op0x13();
         opct[0x17] = new Op0x17();
         opct[0x23] = new Op0x23();
+        opct[0x37] = new Op0x37();
         opct[0x3b] = new Op0x3b();
         //bne
         opct[0x63] = new Op0x63();

@@ -31,14 +31,29 @@ public class Debugger {
     //监视opcode执行
     private short opcMonitor = 0x00;
 
+    //pc中断
+
+    private List<Integer> pcBreaks = new ArrayList<>();
+
 
     //断点所在的行 有哪些？
     List<Integer> breakLines;
 
 
+    //检查断点
+    public boolean chkPcBreak(int pc) {
+
+        var chk = pcBreaks.stream().filter(e -> {
+            return pc == e;
+        }).findFirst();
+        return chk.isPresent();
+    }
+
+
     private String[] cmdsDesc = new String[]{
             "next \t\t'single step to next line",
             "disable \t'set debuger to stat=none",
+            "b pc 0xcccc \t set pc break",
     };
 
 
@@ -111,6 +126,10 @@ public class Debugger {
                     Arrays.stream(this.cmdsDesc).forEach(e -> {
                         System.out.println(e);
                     });
+                } else if ("b".equals(cmd)) {
+                    if ("pc".equals(cmds[1])) {
+
+                    }
                 }
             }
         }

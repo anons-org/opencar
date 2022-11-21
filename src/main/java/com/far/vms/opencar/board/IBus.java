@@ -4,6 +4,9 @@ public interface IBus {
     //存储数据
     public void storeByte(long addr,byte val);
 
+    //接受long但存储字节
+    public void storeByte(long addr,long val);
+
     //双字32位
     public void storeDw(long addr,int val);
 

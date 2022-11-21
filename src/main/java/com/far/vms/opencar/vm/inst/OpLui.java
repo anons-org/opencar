@@ -3,32 +3,26 @@ package com.far.vms.opencar.vm.inst;
 import com.far.vms.opencar.board.Cpu;
 import com.far.vms.opencar.debugger.Debugger;
 import com.far.vms.opencar.vm.StaticRes;
+import com.far.vms.opencar.vm.opcodeType.IOpcodeTypes;
 
 /*
  * @description:
- * 左移
+ * lui
  * @author mike/Fang.J
  * @data 2022/11/19
  */
-public class OpSlli {
+public class OpLui  {
 
     //操作码
     private int opcode;
     //code
     private int code;
 
-    //源寄存器
-    private int rs1;
-
-
     //目标寄存器
     private int rd;
 
-    //func4
-    private int func3;
-
     //移多少位 该字段6b
-    private int shamt;
+    private int imm;
 
 
     private Cpu ctx;
@@ -37,7 +31,7 @@ public class OpSlli {
         return opcode;
     }
 
-    public OpSlli setOpcode(int opcode) {
+    public OpLui setOpcode(int opcode) {
         this.opcode = opcode;
         return this;
     }
@@ -47,43 +41,33 @@ public class OpSlli {
     }
 
 
-    public int getFunc3() {
-        return func3;
-    }
-
-    public OpSlli setFunc3(int func3) {
-        this.func3 = func3;
-        return this;
-    }
-
-    public OpSlli setCtx(Cpu ctx) {
+    public OpLui setCtx(Cpu ctx) {
         this.ctx = ctx;
         return this;
     }
 
-    public OpSlli setCode(int code) {
+    public OpLui setCode(int code) {
         this.code = code;
         return this;
     }
 
 
     public void process() {
-        /**
-         * rs1 5bit
-
-         */
-        rs1 = 0b11111 & (code >> 15);
 
         //5b
         rd = 0b11111 & (code >> 7);
-        //6b
-        shamt = 0b111111 & (code >> 20);
-        long v = ctx.register.getRegVal(rs1);
-        v = v << shamt;
+        //左移12 去掉低12b 再右移12b 腾出低位12b
+        imm = (code >> 12) << 12;
+
+        long v = 0xFFFFFFFFL & imm;
         ctx.register.setRegVal(rd, v);
+
+
         if (Debugger.Stat.DEBUG == StaticRes.debugger.getOpcMonitor()) {
 
         }
 
     }
+
+
 }
