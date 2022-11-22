@@ -16,7 +16,7 @@ public class Op0x6F implements IOpcodeTypes {
         int n;
         String fn3s;
         //func3
-        n = 0b011 & (code >> 12);
+        n = 0b111 & (code >> 12);
 
         OpJal opJal = new OpJal();
         opJal.setCtx(cpu).setFunc3(n).setCode(code).setOpcode(opcode).process();

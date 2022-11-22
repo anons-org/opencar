@@ -56,7 +56,8 @@ public class Uart0 implements IExternalDeviceMemory {
     private int THR_OFFSET = 0;
     private int DLL_OFFSET = 0;
     private int IER_OFFSET = 1;
-    private int ISR_OFFSET = 1;
+    private int ISR_OFFSET = 2;
+    private int LCR_OFFSET = 3;
 
     //地址映射 用于判断
     private Integer[] regsMap = new Integer[10];
@@ -76,6 +77,7 @@ public class Uart0 implements IExternalDeviceMemory {
         regsMap[ISR_OFFSET] = ISR_OFFSET;
         regsMap[THR_OFFSET] = THR_OFFSET;
         regsMap[DLL_OFFSET] = DLL_OFFSET;
+        regsMap[LCR_OFFSET] = LCR_OFFSET;
 
         //初始化寄存器数据
         regs[IER_OFFSET] = 0;
@@ -83,20 +85,8 @@ public class Uart0 implements IExternalDeviceMemory {
 
         regs[DLL_OFFSET] = 0;
         regs[THR_OFFSET] = 0;
+        regs[LCR_OFFSET] = 0;
 
-//        //波特率发生器
-//        Thread btl = new Thread(() -> {
-//            //死循环
-//            while (true) {
-//                try {
-//                    Thread.sleep(500);
-//                } catch (InterruptedException e) {
-//                    e.printStackTrace();
-//                }
-//            }
-//
-//        });
-//        btl.start();
     }
 
 
@@ -133,6 +123,24 @@ public class Uart0 implements IExternalDeviceMemory {
         //计算差值 得到需要读取的寄存器的偏移
         v1 = addr - START_ADDR;
         return regs[v1.intValue()];
+    }
+
+    @Override
+    public boolean isMonitorRead() {
+        return true;
+    }
+
+    @Override
+    public boolean isMeMonitorAddr(long addr) {
+
+        Optional<Integer> findData = Arrays.stream(regsMap).filter(e -> {
+            if (e == null) {
+                return false;
+            }
+            return START_ADDR + e == addr;
+        }).findFirst();
+
+        return findData.isPresent();
     }
 
     //处理数据

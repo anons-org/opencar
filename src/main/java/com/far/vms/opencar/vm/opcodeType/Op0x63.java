@@ -16,7 +16,7 @@ public class Op0x63 implements IOpcodeTypes {
         int n;
         String fn3s;
         //func3
-        n = 0b011 & (code >> 12);
+        n = 0b111 & (code >> 12);
 
         if(n==0x1){//bne
             OpBne opBne = new OpBne();

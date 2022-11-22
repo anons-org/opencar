@@ -11,6 +11,17 @@ public class Cpu extends CpuBase {
 
     public IOpcodeTypes[] opct = new IOpcodeTypes[256];
 
+
+    private InstParser instParser;
+
+    public InstParser getInstParser() {
+        return instParser;
+    }
+
+    public void setInstParser(InstParser instParser) {
+        this.instParser = instParser;
+    }
+
     public Cpu() {
         register = new Register();
         opct[0x03] = new Op0x03();
@@ -24,6 +35,7 @@ public class Cpu extends CpuBase {
         opct[0x67] = new Op0x67();
         opct[0x6F] = new Op0x6F();
         opct[0x73] = new Op0x73();
+        instParser = new InstParser();
 
     }
 

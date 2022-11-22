@@ -11,7 +11,7 @@ public class Op0x37 implements IOpcodeTypes {
         int n;
         String fn3s;
         //func3
-        n = 0b011 & (code >> 12);
+        n = 0b111 & (code >> 12);
         OpLui opLui = new OpLui();
         opLui.setCtx(cpu).setCode(code).setOpcode(opcode).process();
         System.out.println("op opLui");

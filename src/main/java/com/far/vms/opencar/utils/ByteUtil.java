@@ -13,11 +13,11 @@ public class ByteUtil {
         return buffer.array();
     }
 
-    public static long bytesToLong(byte[] bytes) {
-        buffer.put(bytes, 0, bytes.length);
-        buffer.flip();//need flip
-        return buffer.getLong();
-    }
+//    public static long bytesToLong(byte[] bytes) {
+//        buffer.put(bytes, 0, bytes.length);
+//        buffer.flip();//need flip
+//        return buffer.getLong();
+//    }
 
 
     public static int bytesToInt(byte[] a) {

@@ -17,7 +17,7 @@ public class Op0x17 implements IOpcodeTypes {
         int n;
         String fn3s;
         //func3
-        n = 0b011 & (code >> 12);
+        n = 0b111 & (code >> 12);
         fn3s = String.format("fn3  0x%s ", Integer.toHexString(n));
         System.out.println(fn3s);
         OpAuipc opAuipc = new OpAuipc();

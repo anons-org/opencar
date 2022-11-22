@@ -14,15 +14,13 @@ import java.util.Map;
  */
 public class Bus implements IBus {
 
+
     //所有在总线注册了地址的设备
     Map<Long, IBus> dvrMap;
-
     //内存
     Dram dram;
 
-
     List<IExternalDeviceMemory> edmms = new ArrayList<>();
-
 
     public void addEdmm(IExternalDeviceMemory edmm) {
         edmms.add(edmm);
@@ -38,7 +36,8 @@ public class Bus implements IBus {
 
     @Override
     public void storeByte(long addr, byte val) {
-        //是否有监控存在
+
+        //是否有监控存在 有监控存在表示有设备注册到了该地址
         boolean hasmm = false;
         for (IExternalDeviceMemory e : edmms) {
             if (e.monitorMemoryChange(addr, val)) {
@@ -46,10 +45,26 @@ public class Bus implements IBus {
             }
         }
         //没有监控存在就要写数据到内存
-        if (!hasmm){
+        if (!hasmm) {
+
+            dram.storeByte(addr, val);
         }
     }
 
+    @Override
+    public byte loadByte(long addr) {
+
+        //是否有监控存在 有监控存在表示有设备注册到了该地址
+        boolean hasmm = false;
+
+        for (IExternalDeviceMemory e : edmms) {
+            if (e.isMeMonitorAddr(addr)) {
+                return e.monitorMemoryRead(addr);
+            }
+        }
+        return dram.loadByte(addr);
+
+    }
 
 
     @Override

@@ -10,7 +10,7 @@ public class Op0x3b implements IOpcodeTypes {
         int n;
         String fn3s;
         //func3
-        n = 0b011 & (code >> 12);
+        n = 0b111 & (code >> 12);
         OpAddw opAddw = new OpAddw();
         opAddw.setCtx(cpu).setFunc3(n).setCode(code).setOpcode(opcode).process();
         System.out.println("op addw");
