@@ -1,10 +1,9 @@
 package com.far.vms.opencar.board;
 
 
-import com.far.vms.opencar.vm.StaticRes;
+import com.far.vms.opencar.instruct.StaticRes;
 
-import com.far.vms.opencar.vm.inst.OpLui;
-import com.far.vms.opencar.vm.opcodeType.*;
+import com.far.vms.opencar.instruct.opcodeType.*;
 
 public class Cpu extends CpuBase {
 
@@ -24,9 +23,11 @@ public class Cpu extends CpuBase {
 
     public Cpu() {
         register = new Register();
+        register.setCtx(this);
         opct[0x03] = new Op0x03();
         opct[0x13] = new Op0x13();
         opct[0x17] = new Op0x17();
+        opct[0x1b] = new Op0x1B();
         opct[0x23] = new Op0x23();
         opct[0x37] = new Op0x37();
         opct[0x3b] = new Op0x3b();
@@ -48,7 +49,7 @@ public class Cpu extends CpuBase {
                 int code = getCode();
                 int opcode = getOpCode();
 
-                String str = String.format("parseing code 0x%s, opcode 0x%s ", Integer.toHexString(code), Integer.toHexString(opcode));
+                String str = String.format("curPc:0x%x \t parseing code 0x%s, opcode 0x%s ", getCurPC(),Integer.toHexString(code), Integer.toHexString(opcode));
                 System.out.print(str);
 
                 if (opct[opcode] == null) continue;

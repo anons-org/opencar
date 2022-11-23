@@ -1,8 +1,8 @@
 package com.far.vms.opencar;
 
-import com.far.vms.opencar.vm.BinFile;
+import com.far.vms.opencar.instruct.BinFile;
 import com.far.vms.opencar.board.Cpu;
-import com.far.vms.opencar.vm.StaticRes;
+import com.far.vms.opencar.instruct.StaticRes;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 

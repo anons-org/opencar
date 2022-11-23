@@ -1,7 +1,6 @@
 package com.far.vms.opencar.debugger;
 
-import com.far.vms.opencar.board.Register;
-import com.far.vms.opencar.vm.StaticRes;
+import com.far.vms.opencar.instruct.StaticRes;
 
 import java.util.Arrays;
 
@@ -18,8 +17,8 @@ public class Debug {
         Arrays.stream(StaticRes.cpus).forEach(e -> {
             if (e != null) {
                 e.register.regs.forEach((k, v) -> {
-                    String s = String.format("%s=%s", Register.regNames.get(k), v);
-                    System.out.println(s);
+//                    String s = String.format("%s=%s", Register.regNames.get(k), v);
+//                    System.out.println(s);
                 });
             }
         });

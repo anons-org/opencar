@@ -1,16 +1,27 @@
 package com.far.vms.opencar.board;
 
+import com.far.vms.opencar.instruct.StaticRes;
+
 import java.util.HashMap;
 import java.util.Map;
 
 public class Register {
 
-    public static Map<Integer, String> regNames = new HashMap<>();
+    //当前寄存器所属的cpu；
+    private Cpu ctx;
 
+    private Map<Integer, String> regNames = new HashMap<>();
+
+
+    public void setCtx(Cpu ctx) {
+        this.ctx = ctx;
+    }
 
     public static class RegAddr {
         public static int
                 PC = 999999999,
+        //用于返回的寄存器
+        RA = 0b00_001,
                 SP = 0b00_010,
         //x0
         T0 = 0b00_101,
@@ -39,6 +50,9 @@ public class Register {
 
     public Register() {
         //寄存器的值
+
+        regs.put(RegAddr.RA, 0L);
+
         //sp 初始化为32 以为栈是向地址方向开辟的
         regs.put(0b00_010, 32L);
         //x0?
@@ -63,15 +77,17 @@ public class Register {
         csrRegs[CsrRegAddr.mhartid] = 0x00L;
 
         //寄存器名称
-        regNames.put(RegAddr.X0, "<x0>");
-        regNames.put(RegAddr.SP, "<sp>");
-        regNames.put(RegAddr.S0, "<s0>");
-        regNames.put(RegAddr.A4, "<a4>");
+        regNames.put(RegAddr.X0, "x0|zero");
+        regNames.put(RegAddr.SP, "sp");
+        regNames.put(RegAddr.S0, "s0");
+        regNames.put(RegAddr.A4, "a4");
         //a5
-        regNames.put(RegAddr.A5, "<a5>");
-        regNames.put(RegAddr.PC, "<pc>");
+        regNames.put(RegAddr.A5, "a5");
+        regNames.put(RegAddr.PC, "pc");
 
-        regNames.put(RegAddr.T0,"<t0|x5>");
+        regNames.put(RegAddr.T0, "t0|x5");
+
+        regNames.put(RegAddr.RA, "ra");
 
         //----------
         csrRegNames[CsrRegAddr.mhartid] = "mhartid";
@@ -98,6 +114,7 @@ public class Register {
     public void setRegVal(int rid, long val) {
         //x0不能修改
         if (rid == 0) return;
+        StaticRes.debugger.onWriteReg(ctx, rid, val);
         regs.put(rid, val);
         int x = 01;
     }
@@ -118,10 +135,15 @@ public class Register {
 
     //设置控制寄存器
     public void setCSRVal(int raddr, long val) {
-
-
         csrRegs[raddr] = val;
     }
 
 
+    public Map<Integer, String> getRegNames() {
+        return regNames;
+    }
+
+    public void setRegNames(Map<Integer, String> regNames) {
+        this.regNames = regNames;
+    }
 }

@@ -1,8 +1,8 @@
 package com.far.vms.opencar.board;
 
 
-import com.far.vms.opencar.vm.BinFile;
-import com.far.vms.opencar.vm.StaticRes;
+import com.far.vms.opencar.instruct.BinFile;
+import com.far.vms.opencar.instruct.StaticRes;
 
 public class CpuBase {
 
@@ -91,12 +91,17 @@ public class CpuBase {
 
         curPC = PC;
 
-        if (curPC == 0x82028) {
-           int x=0;
+        if (curPC == 0x820cc) {
+            int sdasd = 1;
+            System.out.println(sdasd);
         }
 
+
+        if (curPC == 0x82038) {
+            int x = 0;
+            System.out.println(x);
+        }
         PC += 4;
-        System.out.println(String.format("curPC %x", curPC));
         return curPC;
 
     }
@@ -125,4 +130,11 @@ public class CpuBase {
         return this.curPC;
     }
 
+    public long getCurPC() {
+        return curPC;
+    }
+
+    public void setCurPC(long curPC) {
+        this.curPC = curPC;
+    }
 }

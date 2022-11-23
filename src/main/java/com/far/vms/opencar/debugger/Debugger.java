@@ -1,5 +1,7 @@
 package com.far.vms.opencar.debugger;
 
+import com.far.vms.opencar.board.Cpu;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -14,7 +16,8 @@ import java.util.Scanner;
  * @data 2022/11/17
  */
 
-public class Debugger {
+public class Debugger implements IDebuger {
+
 
     public static class Stat {
         //没有开启调试
@@ -29,7 +32,8 @@ public class Debugger {
     private short stat;
 
     //监视opcode执行
-    private short opcMonitor = 0x00;
+    private boolean opcMonitor = false;
+
 
     //pc中断
 
@@ -38,6 +42,10 @@ public class Debugger {
 
     //断点所在的行 有哪些？
     List<Integer> breakLines;
+
+
+    //寄存器写断点，用于监视寄存器写入
+    List<String> monitorRegWrite = new ArrayList<>();
 
 
     //检查断点
@@ -72,11 +80,11 @@ public class Debugger {
     }
 
 
-    public short getOpcMonitor() {
+    public boolean isOpcMonitor() {
         return opcMonitor;
     }
 
-    public void setOpcMonitor(short opcMonitor) {
+    public void setOpcMonitor(boolean opcMonitor) {
         this.opcMonitor = opcMonitor;
     }
 
@@ -90,6 +98,33 @@ public class Debugger {
     public void singleStep() {
         //?思路？
     }
+
+
+    //添加需要监视写操作的寄存器
+    public void addRegWriteOf(String rName) {
+        monitorRegWrite.add(rName);
+    }
+
+    //删除监视写操作的寄存器
+    public void removeRegWriteOf(String rname) {
+
+    }
+
+
+    @Override
+    public void onWriteReg(Cpu ctx, int rid, long val) {
+
+        //找出name
+        String rname = ctx.getRegister().getRegNames().get(rid);
+
+        if (monitorRegWrite.contains(rname)) {
+            int x = 11;
+            System.out.println(x + "有修改");
+        }
+
+        int xxx = 1;
+    }
+
 
     /**
      * @param
