@@ -15,7 +15,8 @@
 * 支持rv机器码反汇编
 * 硬件支持:
   - 串口
-    > 链接：https://pan.baidu.com/s/1bjR84lC-w3SL-SPsKtLqXQ?pwd=brp8 提取码：brp8
+    > 链接：https://pan.baidu.com/s/1bjR84lC-w3SL-SPsKtLqXQ?pwd=brp8 
+      - 提取码：brp8
     > dll 文件需要放到win/system32下
   - 网络 
   - 硬盘
