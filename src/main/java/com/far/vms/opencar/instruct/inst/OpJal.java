@@ -62,7 +62,7 @@ public class OpJal extends OpBase<OpJal> {
         //存储跳转指令之后的地址,因为jal 常被用做调用子程序，子程序返回时，需要从
         //jal指令之后的指令开始执行
         ctx.register.setRegVal(rd, curPc + 4);
-        if (Debugger.Stat.DEBUG == StaticRes.debugger.getOpcMonitor()) {
+        if (StaticRes.debugger.isOpcMonitor()) {
             String s = String.format("jal target addr to %x", targetAddr);
             System.out.println(s);
         }

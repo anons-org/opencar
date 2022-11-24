@@ -68,7 +68,7 @@ public class OpLd {
 
         ctx.register.setRegVal(rd, mVal);
 
-        if (Debugger.Stat.DEBUG == StaticRes.debugger.getOpcMonitor()) {
+        if (StaticRes.debugger.isOpcMonitor()) {
             String info = String.format("read and load mem 0x%x val:%x", mAddr, mVal);
             System.out.println(info);
         }

@@ -75,7 +75,7 @@ public class OpAuipc {
         long result = pc + imm;
 
         ctx.register.setRegVal(rd, result);
-        if (Debugger.Stat.DEBUG == StaticRes.debugger.getOpcMonitor()) {
+        if (StaticRes.debugger.isOpcMonitor()) {
 
         }
 

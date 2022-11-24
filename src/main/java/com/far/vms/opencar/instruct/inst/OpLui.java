@@ -62,7 +62,7 @@ public class OpLui  {
         ctx.register.setRegVal(rd, v);
 
 
-        if (Debugger.Stat.DEBUG == StaticRes.debugger.getOpcMonitor()) {
+        if (StaticRes.debugger.isOpcMonitor()) {
 
         }
 

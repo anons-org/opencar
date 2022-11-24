@@ -34,7 +34,13 @@ public class OpenCarApplication {
         String binFile = "D:\\AAAA_WORK\\RISC-V-Tools\\os\\riscv-operating-system-mooc\\code\\os\\01-helloRVOS\\build\\kernel.bin";
         File memBinFile = new File(binFile);
         try {
-            byte[] datas = new FileInputStream(memBinFile).readAllBytes();
+            //byte[] datas = new FileInputStream(memBinFile).readAllBytes();
+            Long fLen = memBinFile.length();
+            byte[] datas = new byte[fLen.intValue()];
+
+            FileInputStream fin = new FileInputStream(memBinFile);
+            fin.read(datas);
+            fin.close();
             BinFile binProcess = new BinFile();
             binProcess.setBufSize(8);
             binProcess.setData(datas);

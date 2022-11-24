@@ -93,7 +93,7 @@ public class OpSd {
 
         StaticRes.bus.storeDDw(mAddr, val);
 
-        if (Debugger.Stat.DEBUG == StaticRes.debugger.getOpcMonitor()) {
+        if (StaticRes.debugger.isOpcMonitor()) {
             String info = String.format("write mem 0x%x val:%x", mAddr, val);
             System.out.println(info);
         }

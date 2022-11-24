@@ -81,7 +81,7 @@ public class OpSlli {
         long v = ctx.register.getRegVal(rs1);
         v = v << shamt;
         ctx.register.setRegVal(rd, v);
-        if (Debugger.Stat.DEBUG == StaticRes.debugger.getOpcMonitor()) {
+        if (StaticRes.debugger.isOpcMonitor()) {
 
         }
 

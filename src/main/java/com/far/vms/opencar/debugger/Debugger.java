@@ -2,10 +2,7 @@ package com.far.vms.opencar.debugger;
 
 import com.far.vms.opencar.board.Cpu;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Scanner;
+import java.util.*;
 
 
 
@@ -51,7 +48,7 @@ public class Debugger implements IDebuger {
     //检查断点
     public boolean chkPcBreak(int pc) {
 
-        var chk = pcBreaks.stream().filter(e -> {
+        Optional<Integer> chk = pcBreaks.stream().filter(e -> {
             return pc == e;
         }).findFirst();
         return chk.isPresent();

@@ -87,7 +87,7 @@ public class OpSb {
 
         StaticRes.bus.storeByte(tAddr, rs2Val);
 
-        if (Debugger.Stat.DEBUG == StaticRes.debugger.getOpcMonitor()) {
+        if (StaticRes.debugger.isOpcMonitor()) {
             String info = String.format("sb : write mem 0x%x", tAddr);
             System.out.println(info);
         }
