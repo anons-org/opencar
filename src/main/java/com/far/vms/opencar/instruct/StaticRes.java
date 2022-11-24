@@ -5,7 +5,7 @@ import com.far.vms.opencar.board.Cpu;
 import com.far.vms.opencar.board.Dram;
 import com.far.vms.opencar.board.IBus;
 
-import com.far.vms.opencar.board.iml.Uart0;
+import com.far.vms.opencar.board.Uart0;
 import com.far.vms.opencar.debugger.Debugger;
 
 /*

@@ -1,4 +1,4 @@
-package com.far.vms.opencar.board.iml;
+package com.far.vms.opencar.board;
 
 import com.far.vms.opencar.hardware.interf.IExternalDeviceMemory;
 import com.far.vms.opencar.hardware.uart.Uart;
@@ -52,7 +52,7 @@ public class Uart0 implements IExternalDeviceMemory {
     // UART0 0x10000000L
     private long START_ADDR = 0x10000000L;
 
-    //寄存器地址
+    //寄存器偏移
     private int THR_OFFSET = 0;
     private int DLL_OFFSET = 0;
     private int IER_OFFSET = 1;
@@ -100,14 +100,13 @@ public class Uart0 implements IExternalDeviceMemory {
         }).findFirst();
 
         if (findData.isPresent()) {
+            //偏移号
             int rOfst = findData.get();
             try {
-                if (reentrantLock.tryLock(30, TimeUnit.MILLISECONDS)) {
-                    reentrantLock.lock();
-                    regs[rOfst] = val;
-                    processData(rOfst, val);
-                }
-            } catch (InterruptedException e) {
+                //多核情况下会抢占资源
+                reentrantLock.lock();
+                processWriteData(rOfst, val);
+            } catch (Exception e) {
                 e.printStackTrace();
             } finally {
                 reentrantLock.unlock();
@@ -144,7 +143,18 @@ public class Uart0 implements IExternalDeviceMemory {
     }
 
     //处理数据
-    private void processData(int rOfst, byte val) {
+    private void processWriteData(int rOfst, byte val) {
+
+        if (rOfst == 0) {
+            regs[rOfst] = val;
+            System.out.println( String.format("uart0 on write to ofs=%d val=%d<%s>",rOfst,val,val) );
+        } else if (rOfst == 1) {
+            regs[rOfst] = val;
+        } else if (rOfst == 2) {
+            regs[rOfst] = val;
+        } else if (rOfst == 3) {// LCR 设置就行，无需做什么操作
+            regs[rOfst] = val;
+        }
 
     }
 

@@ -91,7 +91,7 @@ public class CpuBase {
 
         curPC = PC;
 
-        if (curPC == 0x820cc) {
+        if (curPC == 0x8213c) {
             int sdasd = 1;
             System.out.println(sdasd);
         }
