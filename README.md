@@ -7,11 +7,16 @@
 
 ## openCar目标
 
-* 支持rv基础指令集 以及I M D F 扩展指令集
+* 支持rvI M D F A指令集
 * 支持可视化监视和跟踪指令执行
 * 支持gdb指令调试，后期支持在可视化IDE中操作(变量、堆栈、内存、线程、断点)
 * 支持rv机器码反汇编
-* 硬件支持:串口,网络,硬盘，LCD
+* 硬件支持:
+  - 串口
+    > 链接：https://pan.baidu.com/s/1bjR84lC-w3SL-SPsKtLqXQ?pwd=brp8 提取码：brp8
+  - 网络 
+  - 硬盘
+  - LCD
 
 
 
