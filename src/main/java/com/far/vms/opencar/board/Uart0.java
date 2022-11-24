@@ -50,14 +50,15 @@ public class Uart0 implements IExternalDeviceMemory {
 
     //UART0内存布局
     // UART0 0x10000000L
-    private long START_ADDR = 0x10000000L;
+    private final long START_ADDR = 0x10000000L;
 
     //寄存器偏移
-    private int THR_OFFSET = 0;
-    private int DLL_OFFSET = 0;
-    private int IER_OFFSET = 1;
-    private int ISR_OFFSET = 2;
-    private int LCR_OFFSET = 3;
+    private final int THR_OFFSET = 0;
+    private final int DLL_OFFSET = 0;
+    private final int IER_OFFSET = 1;
+    private final int ISR_OFFSET = 2;
+    private final int LCR_OFFSET = 3;
+    private final int LSR_OFFSET = 5;
 
     //地址映射 用于判断
     private Integer[] regsMap = new Integer[10];
@@ -78,6 +79,7 @@ public class Uart0 implements IExternalDeviceMemory {
         regsMap[THR_OFFSET] = THR_OFFSET;
         regsMap[DLL_OFFSET] = DLL_OFFSET;
         regsMap[LCR_OFFSET] = LCR_OFFSET;
+        regsMap[LSR_OFFSET] = LSR_OFFSET;
 
         //初始化寄存器数据
         regs[IER_OFFSET] = 0;
@@ -86,6 +88,7 @@ public class Uart0 implements IExternalDeviceMemory {
         regs[DLL_OFFSET] = 0;
         regs[THR_OFFSET] = 0;
         regs[LCR_OFFSET] = 0;
+        regs[LSR_OFFSET] = 0;
 
     }
 
@@ -121,6 +124,11 @@ public class Uart0 implements IExternalDeviceMemory {
     public byte monitorMemoryRead(long addr) {
         //计算差值 得到需要读取的寄存器的偏移
         v1 = addr - START_ADDR;
+
+
+        processReadData(v1.intValue());
+
+
         return regs[v1.intValue()];
     }
 
@@ -131,14 +139,12 @@ public class Uart0 implements IExternalDeviceMemory {
 
     @Override
     public boolean isMeMonitorAddr(long addr) {
-
         Optional<Integer> findData = Arrays.stream(regsMap).filter(e -> {
             if (e == null) {
                 return false;
             }
             return START_ADDR + e == addr;
         }).findFirst();
-
         return findData.isPresent();
     }
 
@@ -147,15 +153,34 @@ public class Uart0 implements IExternalDeviceMemory {
 
         if (rOfst == 0) {
             regs[rOfst] = val;
-            System.out.println( String.format("uart0 on write to ofs=%d val=%d<%s>",rOfst,val,val) );
+            System.out.println(String.format("uart0 on write to ofs=%d val=%d<%s>", rOfst, val, val));
         } else if (rOfst == 1) {
             regs[rOfst] = val;
         } else if (rOfst == 2) {
             regs[rOfst] = val;
         } else if (rOfst == 3) {// LCR 设置就行，无需做什么操作
             regs[rOfst] = val;
+        } else if (rOfst == 5) {// LSR
+            regs[rOfst] = val;
         }
 
     }
+
+    private void processReadData(int rOfst) {
+
+        if (rOfst == 0) {
+            System.out.println(String.format("uart0 on read to ofs=%d", rOfst));
+        } else if (rOfst == 1) {
+            System.out.println(String.format("uart0 on read to ofs=%d", rOfst));
+        } else if (rOfst == 2) {
+            System.out.println(String.format("uart0 on read to ofs=%d", rOfst));
+        } else if (rOfst == 3) {// LCR 设置就行，无需做什么操作
+            System.out.println(String.format("uart0 on read to ofs=%d", rOfst));
+        } else if (rOfst == 5) {// LSR
+            System.out.println(String.format("uart0 on read to ofs=%d", rOfst));
+        }
+
+    }
+
 
 }

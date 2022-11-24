@@ -3,7 +3,7 @@ package com.far.vms.opencar.instruct.opcodeType;
 public class InstParser {
 
 
-    private int[] INST_TYPES = new int[256] ;
+    private int[] INST_TYPES = new int[256];
 
     //包装解码后的code
     private int[] opcodeWrappers;
@@ -82,7 +82,32 @@ public class InstParser {
                 break;
             case INST_TYPE_ENUM.R:
                 break;
-            case INST_TYPE_ENUM.B:
+            case INST_TYPE_ENUM.B://1100011
+
+                //imm1 先只拿4b
+                opcodeWrappers[1] = 0b1111 & code >> 8;
+
+                //rs1 右移15位 留5位
+                opcodeWrappers[3] = 0b11111 & code >> 15;
+
+                //rs2
+                opcodeWrappers[4] = 0b11111 & code >> 20;
+
+
+                //imm2 右移25b 保留6b
+                opcodeWrappers[5] = 0b111111 & code >> 25;
+                //存储了10:1
+                opcodeWrappers[1] = opcodeWrappers[5] << 4 | opcodeWrappers[1];
+                //清空备用
+                opcodeWrappers[5] = 0;
+                //右移7b保留1b 再左移10b 留出10个空间 再和之前的imm合并
+                opcodeWrappers[5] = ((0b1 & code >> 7) << 10) | opcodeWrappers[1];
+                opcodeWrappers[1] = opcodeWrappers[5];
+                //保留1b 再保留11个空间
+                opcodeWrappers[5] = ((0b1 & code >> 31) << 11) | opcodeWrappers[1];
+                //完成imm1
+                opcodeWrappers[1] = opcodeWrappers[5];
+
                 break;
             case INST_TYPE_ENUM.J:
                 break;

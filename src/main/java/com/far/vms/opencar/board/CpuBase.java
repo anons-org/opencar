@@ -96,6 +96,13 @@ public class CpuBase {
             System.out.println(sdasd);
         }
 
+        if (curPC == 0x82160) {
+            StaticRes.debugger.onDbgCmd("");
+
+        }
+
+
+
 
         if (curPC == 0x82038) {
             int x = 0;

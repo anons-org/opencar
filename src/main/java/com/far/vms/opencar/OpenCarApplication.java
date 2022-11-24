@@ -1,5 +1,7 @@
 package com.far.vms.opencar;
 
+import com.far.vms.opencar.debugger.Debug;
+import com.far.vms.opencar.debugger.Debugger;
 import com.far.vms.opencar.instruct.BinFile;
 import com.far.vms.opencar.board.Cpu;
 import com.far.vms.opencar.instruct.StaticRes;
@@ -7,6 +9,8 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 import java.io.*;
+import java.util.Arrays;
+import java.util.Scanner;
 
 
 @SpringBootApplication
@@ -14,8 +18,26 @@ public class OpenCarApplication {
 
 
     public static void main(String[] args) {
+
+
+//        new Thread(()->{
+//            Scanner scanner = new Scanner(System.in);
+//            while (scanner.hasNext()) {
+//                System.out.println(scanner.nextLine());
+//                String[] cmds = scanner.nextLine().split(" ");
+//
+//            }
+//        }).start();
+
         StaticRes.init();
         readBin();
+
+
+
+
+
+
+
         //永不停机
         new Thread(() -> {
             while (true) {

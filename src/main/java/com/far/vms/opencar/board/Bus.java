@@ -55,9 +55,8 @@ public class Bus implements IBus {
     public byte loadByte(long addr) {
 
         //是否有监控存在 有监控存在表示有设备注册到了该地址
-        boolean hasmm = false;
-
         for (IExternalDeviceMemory e : edmms) {
+            //是否需要监控
             if (e.isMeMonitorAddr(addr)) {
                 return e.monitorMemoryRead(addr);
             }

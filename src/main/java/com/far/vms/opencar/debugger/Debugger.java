@@ -56,8 +56,8 @@ public class Debugger implements IDebuger {
 
 
     private String[] cmdsDesc = new String[]{
-            "next \t\t'single step to next line",
-            "disable \t'set debuger to stat=none",
+            "next \t\t\t'single step to next line",
+            "disable \t\t'set debuger to stat=none",
             "b pc 0xcccc \t set pc break",
     };
 
@@ -123,6 +123,49 @@ public class Debugger implements IDebuger {
     }
 
 
+    public void onDbgCmd(String startInf) {
+        String cmd = "";
+
+        if (startInf.equals("")) {
+            System.out.println("onDbgCmd is triggered to enter debug mode! Enter 'h to view all debug instructions");
+        } else {
+            System.out.println(startInf + ", Enter 'h to view all debug instructions");
+        }
+
+
+        Scanner scanner = new Scanner(System.in);
+        while (scanner.hasNext()) {
+            String[] cmds = scanner.nextLine().split(" ");
+            cmd = cmds[0];
+            if ("next".equals(cmd)) {
+                //跳出循环 执行下一段代码
+                break;
+            } else if ("delete".equals(cmd)) {//清除所有断点
+
+            } else if ("disable".equals(cmd)) {
+                stat = Stat.NONE;
+                break;
+            } else if ("info".equals(cmd)) {
+                if ("all-reg".equals(cmds[1])) {//显示所有寄存器的信息
+                    Debug.printRegister(1);
+                }
+            } else if ("x".equals(cmds[0])) {// x /nfu <addr>
+                String fmt = cmds[1];
+                long addr = Long.decode(cmds[2]);
+                Debug.printMemoryVal(addr);
+            } else if ("h".equals(cmd)) {
+                Arrays.stream(this.cmdsDesc).forEach(e -> {
+                    System.out.println(e);
+                });
+            } else if ("b".equals(cmd)) {
+                if ("pc".equals(cmds[1])) {
+
+                }
+            }
+        }
+    }
+
+
     /**
      * @param
      * @description: 代码实现简单，后期优化..
@@ -132,38 +175,42 @@ public class Debugger implements IDebuger {
      */
     public void monitor() {
         String cmd = "";
+
         if (stat == Stat.DEBUG) {
-            System.out.println("调试模式开启!");
-            Scanner scanner = new Scanner(System.in);
-            while (scanner.hasNext()) {
-                String[] cmds = scanner.nextLine().split(" ");
-                cmd = cmds[0];
-                if ("next".equals(cmd)) {
-                    //跳出循环 执行下一段代码
-                    break;
-                } else if ("delete".equals(cmd)) {//清除所有断点
 
-                } else if ("disable".equals(cmd)) {
-                    stat = Stat.NONE;
-                    break;
-                } else if ("info".equals(cmd)) {
-                    if ("all-reg".equals(cmds[1])) {//显示所有寄存器的信息
-                        Debug.printRegister(1);
-                    }
-                } else if ("x".equals(cmds[0])) {// x /nfu <addr>
-                    String fmt = cmds[1];
-                    long addr = Long.decode(cmds[2]);
-                    Debug.printMemoryVal(addr);
-                } else if ("h".equals(cmd)) {
-                    Arrays.stream(this.cmdsDesc).forEach(e -> {
-                        System.out.println(e);
-                    });
-                } else if ("b".equals(cmd)) {
-                    if ("pc".equals(cmds[1])) {
+            onDbgCmd("Start pause to enter debugging mode");
 
-                    }
-                }
-            }
+//            System.out.println("调试模式开启!");
+//            Scanner scanner = new Scanner(System.in);
+//            while (scanner.hasNext()) {
+//                String[] cmds = scanner.nextLine().split(" ");
+//                cmd = cmds[0];
+//                if ("next".equals(cmd)) {
+//                    //跳出循环 执行下一段代码
+//                    break;
+//                } else if ("delete".equals(cmd)) {//清除所有断点
+//
+//                } else if ("disable".equals(cmd)) {
+//                    stat = Stat.NONE;
+//                    break;
+//                } else if ("info".equals(cmd)) {
+//                    if ("all-reg".equals(cmds[1])) {//显示所有寄存器的信息
+//                        Debug.printRegister(1);
+//                    }
+//                } else if ("x".equals(cmds[0])) {// x /nfu <addr>
+//                    String fmt = cmds[1];
+//                    long addr = Long.decode(cmds[2]);
+//                    Debug.printMemoryVal(addr);
+//                } else if ("h".equals(cmd)) {
+//                    Arrays.stream(this.cmdsDesc).forEach(e -> {
+//                        System.out.println(e);
+//                    });
+//                } else if ("b".equals(cmd)) {
+//                    if ("pc".equals(cmds[1])) {
+//
+//                    }
+//                }
+//            }
         }
     }
 
