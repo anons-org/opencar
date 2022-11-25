@@ -33,11 +33,6 @@ public class OpenCarApplication {
         readBin();
 
 
-
-
-
-
-
         //永不停机
         new Thread(() -> {
             while (true) {

@@ -16,7 +16,8 @@ public class Op0x03 implements IOpcodeTypes {
 
         int[] ops = ctx.getInstParser().decode(opcode, code);
 
-        fn3s = String.format("fn3  0x%s ", Integer.toHexString(n));
+        fn3s = String.format("fn3  0x%s ", Integer.toHexString(n) );
+
         System.out.println(fn3s);
         if (n == 0x02) {//lw
             OpLw lw = new OpLw();
@@ -27,11 +28,11 @@ public class Op0x03 implements IOpcodeTypes {
             ld.setCode(code).setCtx(ctx).setFunc3(n).setOpcode(opcode).process();
             System.out.println("op ld");
         } else if (n == 0x04) {//I 型
-            opLbu(ops,ctx);
+            opLbu(ops, ctx);
         }
     }
 
-    public void opLbu(int[] ops,Cpu ctx){
+    public void opLbu(int[] ops, Cpu ctx) {
         int rd, rs1, imm;
         rd = ops[1];
         rs1 = ops[3];
@@ -40,8 +41,8 @@ public class Op0x03 implements IOpcodeTypes {
         long loadAdr = ctx.register.getRegVal(rs1) + imm;
         System.out.println(String.format("lbu from mem addr 0x%x", loadAdr));
         byte v = StaticRes.bus.loadByte(loadAdr);
-        long tv = v >>> 56;
-        ctx.register.setRegVal(rd, tv);
+
+        ctx.register.setRegVal(rd, v);
         System.out.println("op lbu......");
     }
 

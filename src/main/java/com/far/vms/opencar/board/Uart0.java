@@ -88,7 +88,8 @@ public class Uart0 implements IExternalDeviceMemory {
         regs[DLL_OFFSET] = 0;
         regs[THR_OFFSET] = 0;
         regs[LCR_OFFSET] = 0;
-        regs[LSR_OFFSET] = 0;
+        //默认随时可以发数据的状态
+        regs[LSR_OFFSET] = 0b00100000;
 
     }
 
@@ -124,11 +125,7 @@ public class Uart0 implements IExternalDeviceMemory {
     public byte monitorMemoryRead(long addr) {
         //计算差值 得到需要读取的寄存器的偏移
         v1 = addr - START_ADDR;
-
-
         processReadData(v1.intValue());
-
-
         return regs[v1.intValue()];
     }
 
@@ -156,11 +153,15 @@ public class Uart0 implements IExternalDeviceMemory {
             System.out.println(String.format("uart0 on write to ofs=%d val=%d<%s>", rOfst, val, val));
         } else if (rOfst == 1) {
             regs[rOfst] = val;
+            System.out.println(String.format("uart0 on write to ofs=%d val=%d<%s>", rOfst, val, val));
         } else if (rOfst == 2) {
             regs[rOfst] = val;
+            System.out.println(String.format("uart0 on write to ofs=%d val=%d<%s>", rOfst, val, val));
         } else if (rOfst == 3) {// LCR 设置就行，无需做什么操作
             regs[rOfst] = val;
+            System.out.println(String.format("uart0 on write to ofs=%d val=%d<%s>", rOfst, val, val));
         } else if (rOfst == 5) {// LSR
+            System.out.println(String.format("uart0 on write to ofs=%d val=%d<%s>", rOfst, val, val));
             regs[rOfst] = val;
         }
 

@@ -48,7 +48,6 @@ public class Cpu extends CpuBase {
             while (true) {
                 int code = getCode();
                 int opcode = getOpCode();
-
                 String str = String.format("curPc:0x%x \t parseing code 0x%s, opcode 0x%s ", getCurPC(),Integer.toHexString(code), Integer.toHexString(opcode));
                 System.out.print(str);
 

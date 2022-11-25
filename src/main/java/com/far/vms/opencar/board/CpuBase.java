@@ -91,23 +91,30 @@ public class CpuBase {
 
         curPC = PC;
 
-        if (curPC == 0x8213c) {
-            int sdasd = 1;
-            System.out.println(sdasd);
+//        if (curPC == 0x8213c) {
+//            int sdasd = 1;
+//            System.out.println(sdasd);
+//        }
+
+        if (curPC == 0x82154) {
+            StaticRes.debugger.onDbgCmd("0x82154 onDbgCmd ");
         }
 
-        if (curPC == 0x82160) {
-            StaticRes.debugger.onDbgCmd("");
-
-        }
-
-
-
-
-        if (curPC == 0x82038) {
-            int x = 0;
-            System.out.println(x);
-        }
+//        if (curPC == 0x8215c) {
+//            StaticRes.debugger.onDbgCmd("");
+//
+//        }
+//
+//
+//        if (curPC == 0x82160) {
+//            StaticRes.debugger.onDbgCmd("");
+//        }
+//
+//
+//        if (curPC == 0x82038) {
+//            int x = 0;
+//            System.out.println(x);
+//        }
         PC += 4;
         return curPC;
 

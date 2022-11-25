@@ -7,7 +7,7 @@ import com.far.vms.opencar.instruct.inst.OpBne;
  * @description: bne
  * @author mike/Fang.J
  * @data 2022/11/17
-*/
+ */
 public class Op0x63 implements IOpcodeTypes {
 
     @Override
@@ -19,7 +19,7 @@ public class Op0x63 implements IOpcodeTypes {
 
         int[] ops = ctx.getInstParser().decode(opcode, code);
 
-        if(n==0x1){//bne
+        if (n == 0x1) {//bne
 
             int rs1, rs2, imm1;
 
@@ -28,13 +28,9 @@ public class Op0x63 implements IOpcodeTypes {
             rs2 = ops[4];
 
 
-            if( ctx.getRegister().getRegVal(rs1) != ctx.getRegister().getRegVal(rs2)  ){
-                int xxx=1;
+            if (ctx.getRegister().getRegVal(rs1) != ctx.getRegister().getRegVal(rs2)) {
+                ctx.setPC(ctx.getPC() + imm1);
             }
-
-
-
-
 
 
 //            OpBne opBne = new OpBne();

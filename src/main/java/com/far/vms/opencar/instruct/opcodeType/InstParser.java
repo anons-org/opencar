@@ -94,20 +94,44 @@ public class InstParser {
                 opcodeWrappers[4] = 0b11111 & code >> 20;
 
 
-                //imm2 右移25b 保留6b
-                opcodeWrappers[5] = 0b111111 & code >> 25;
-                //存储了10:1
-                opcodeWrappers[1] = opcodeWrappers[5] << 4 | opcodeWrappers[1];
-                //清空备用
-                opcodeWrappers[5] = 0;
-                //右移7b保留1b 再左移10b 留出10个空间 再和之前的imm合并
-                opcodeWrappers[5] = ((0b1 & code >> 7) << 10) | opcodeWrappers[1];
-                opcodeWrappers[1] = opcodeWrappers[5];
-                //保留1b 再保留11个空间
-                opcodeWrappers[5] = ((0b1 & code >> 31) << 11) | opcodeWrappers[1];
-                //完成imm1
-                opcodeWrappers[1] = opcodeWrappers[5];
+//                //imm2 右移25b 保留6b
+//                opcodeWrappers[5] = 0b111_111 & code >> 25;
+//                //存储了10:1
+//                opcodeWrappers[1] = (opcodeWrappers[5] << 4) | opcodeWrappers[1];
+//                //清空备用
+//                opcodeWrappers[5] = 0;
+//                //右移7b保留1b 再左移10b 留出10个空间 再和之前的imm合并
+//                opcodeWrappers[5] = ((0b1 & code >> 7) << 10) | opcodeWrappers[1];
+//                opcodeWrappers[1] = opcodeWrappers[5];
+//                //保留1b 再保留11个空间
+//                opcodeWrappers[5] = ((0b1 & code >> 31) << 11) | opcodeWrappers[1];
+//                //完成imm1
+//                opcodeWrappers[1] = opcodeWrappers[5];
 
+
+                //左移25b 保留6b 再右移 4b 留出低4位的4个空间
+                opcodeWrappers[5] = (0b111_111 & code >> 25) << 4;     // ((code >> 25) & 0x3f) << 5
+                //合并为10b
+                opcodeWrappers[1] = opcodeWrappers[1] | opcodeWrappers[5];
+                //合并为11b
+                opcodeWrappers[1] = opcodeWrappers[1] | (((code >> 7) & 0b1) << 10);
+                opcodeWrappers[5] = 0;
+                //移到12b的位置
+                opcodeWrappers[5] = (0b1 & (code >> 31)) << 11;
+                //0b00....1  合并为12b立即数
+                opcodeWrappers[1] = opcodeWrappers[1] | opcodeWrappers[5];
+                //移到最高处，再带符号移回来 <如果12b的最高位不是1 前面20位也还都是0>
+                opcodeWrappers[1] = (opcodeWrappers[1] << 20) >> 20;
+                //保证地址是2 的倍数
+                opcodeWrappers[1] = opcodeWrappers[1] << 1;
+
+
+             //  opcodeWrappers[1] = (((((0b1 & (code >> 31)) << 11) | opcodeWrappers[1]) << 20) >> 20) << 1;
+
+//https://www.cnblogs.com/gaozhenyu/p/14166473.html 借鉴 此博客
+//                opcodeWrappers[1] = ((0b1 & code >> 7) << 11) | opcodeWrappers[1];
+//                int test = (((code >> 8) & 0xf) << 1) | (((code >> 25) & 0x3f) << 5) | (((code >> 7) & 0x1) << 11) | ((code >> 20) & 0xfffff000);
+//                test = 0x82160 + 0xff;
                 break;
             case INST_TYPE_ENUM.J:
                 break;
