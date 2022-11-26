@@ -63,7 +63,6 @@ public class CpuBase {
     如果要取指，实际是从当前的PC地址获取32位数据作为指令使用
  */
     public long ifu() {
-
         return bpu();
     }
 
@@ -96,19 +95,30 @@ public class CpuBase {
 //            System.out.println(sdasd);
 //        }
 
-        if (curPC == 0x82154) {
-            StaticRes.debugger.onDbgCmd("0x82154 onDbgCmd ");
+        if (curPC == 0x82160) {
+            int x =1;
+            //StaticRes.debugger.onDbgCmd("82160 onDbgCmd ");
         }
 
-//        if (curPC == 0x8215c) {
-//            StaticRes.debugger.onDbgCmd("");
+
+
+
+        if (curPC == 0x820e0) {
+           int x=1;
+
+        }
+        if (curPC == 0x82110) {
+            int x=1;
+
+        }
+
+
+
 //
-//        }
 //
-//
-//        if (curPC == 0x82160) {
-//            StaticRes.debugger.onDbgCmd("");
-//        }
+        if (curPC == 0x820d0) {
+            int x=1;
+        }
 //
 //
 //        if (curPC == 0x82038) {

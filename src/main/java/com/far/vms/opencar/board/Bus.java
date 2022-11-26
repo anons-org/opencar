@@ -40,13 +40,13 @@ public class Bus implements IBus {
         //是否有监控存在 有监控存在表示有设备注册到了该地址
         boolean hasmm = false;
         for (IExternalDeviceMemory e : edmms) {
-            if (e.monitorMemoryChange(addr, val)) {
+            if (e.isMeMonitorAddr(addr)) {
+                e.monitorMemoryChange(addr, val);
                 hasmm = true;
             }
         }
         //没有监控存在就要写数据到内存
         if (!hasmm) {
-
             dram.storeByte(addr, val);
         }
     }

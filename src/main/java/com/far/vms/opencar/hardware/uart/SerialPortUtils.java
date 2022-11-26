@@ -1,7 +1,6 @@
 package com.far.vms.opencar.hardware.uart;
 
 
-
 import gnu.io.CommPortIdentifier;
 import gnu.io.PortInUseException;
 import gnu.io.SerialPort;
@@ -15,6 +14,7 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.math.BigDecimal;
 import java.math.BigInteger;
+import java.nio.charset.StandardCharsets;
 import java.util.Enumeration;
 import java.util.Objects;
 import java.util.TooManyListenersException;
@@ -24,7 +24,7 @@ import java.util.TooManyListenersException;
  */
 // 注：串口操作类一定要继承SerialPortEventListener
 
-public class SerialPortUtils implements SerialPortEventListener{
+public class SerialPortUtils implements SerialPortEventListener {
     // 检测系统中可用的通讯端口类
     private CommPortIdentifier commPortId;
     // 枚举类型
@@ -100,12 +100,20 @@ public class SerialPortUtils implements SerialPortEventListener{
         this.tvocConcentration = tvocConcentration;
     }
 
+
+    public interface IUartEvent {
+        //串口准备好接受数据
+        public void onRecvReady();
+    }
+
+
     /**
      * 初始化串口
+     *
+     * @throws
      * @Description: TODO
      * @param: paramConfig 存放串口连接必要参数的对象（会在下方给出类代码）
      * @return: void
-     * @throws
      */
 
     public void init(ParamConfig paramConfig) {
@@ -124,6 +132,7 @@ public class SerialPortUtils implements SerialPortEventListener{
                     isExsist = true;
                     // 打开串口
                     try {
+
                         this.serialPort = (SerialPort) commPortId.open(paramConfig.getSerialNumber(), 2000);
                         // 设置串口监听
                         this.serialPort.addEventListener(this);
@@ -183,6 +192,7 @@ public class SerialPortUtils implements SerialPortEventListener{
 
     /**
      * 读取串口返回信息
+     *
      * @return: void
      */
     public void readComm() {
@@ -207,9 +217,10 @@ public class SerialPortUtils implements SerialPortEventListener{
 
     /**
      * 发送信息到串口
+     *
+     * @throws
      * @param: data
      * @return: void
-     * @throws
      */
     public void sendComm(String data) {
         byte[] writerBuffer = null;
@@ -229,12 +240,27 @@ public class SerialPortUtils implements SerialPortEventListener{
         }
     }
 
+
+    public void sendComm(byte data) {
+        try {
+            this.outputStream = this.serialPort.getOutputStream();
+            this.outputStream.write(data);
+            this.outputStream.flush();
+        } catch (NullPointerException e) {
+            throw new RuntimeException("找不到串口。");
+        } catch (IOException e) {
+            throw new RuntimeException("发送信息到串口时发生IO异常");
+        }
+    }
+
+
     /**
      * 关闭串口
+     *
+     * @throws
      * @Description: 关闭串口
      * @param:
      * @return: void
-     * @throws
      */
     public void closeSerialPort() {
         if (this.serialPort != null) {
@@ -285,6 +311,7 @@ public class SerialPortUtils implements SerialPortEventListener{
 
     /**
      * Hex字符串转byte
+     *
      * @param inHex 待转换的Hex字符串
      * @return 转换后的byte
      */
@@ -294,6 +321,7 @@ public class SerialPortUtils implements SerialPortEventListener{
 
     /**
      * hex字符串转byte数组
+     *
      * @param inHex 待转换的Hex字符串
      * @return 转换后的byte数组结果
      */
@@ -319,6 +347,7 @@ public class SerialPortUtils implements SerialPortEventListener{
 
     /**
      * 数组转换成十六进制字符串
+     *
      * @param bArray
      * @return HexString
      */
@@ -327,7 +356,7 @@ public class SerialPortUtils implements SerialPortEventListener{
         String sTemp;
         for (int i = 0; i < bArray.length; i++) {
             sTemp = Integer.toHexString(0xFF & bArray[i]);
-            if (sTemp.length() < 2){
+            if (sTemp.length() < 2) {
                 sb.append(0);
             }
             sb.append(sTemp.toUpperCase());
@@ -337,33 +366,91 @@ public class SerialPortUtils implements SerialPortEventListener{
 
     /**
      * 处理从机返回值
+     *
      * @param
      * @throws InterruptedException
      */
-    public void ProcessingReturnedData(){
-        if(Objects.isNull(this.dataHex)) return;
-        this.setMachineAddr(covert(this.dataHex.substring(0,2),1) < 10 ? "0"+(int)covert(this.dataHex.substring(0,2),1) : (int)covert(this.dataHex.substring(0,2),1)+"");
-        this.setHumidity(covert(this.dataHex.substring(6,10),0.1));
-        this.setTemperature(covert(this.dataHex.substring(10,14),0.1));
-        this.setTvocConcentration(covert(this.dataHex.substring(30,34),1));
+    public void ProcessingReturnedData() {
+        if (Objects.isNull(this.dataHex)) return;
+        this.setMachineAddr(covert(this.dataHex.substring(0, 2), 1) < 10 ? "0" + (int) covert(this.dataHex.substring(0, 2), 1) : (int) covert(this.dataHex.substring(0, 2), 1) + "");
+        this.setHumidity(covert(this.dataHex.substring(6, 10), 0.1));
+        this.setTemperature(covert(this.dataHex.substring(10, 14), 0.1));
+        this.setTvocConcentration(covert(this.dataHex.substring(30, 34), 1));
     }
 
     /**
      * 把十六进制字符串转十进制数值，然后乘以单位转化率
+     *
      * @param content
      * @return
      */
-    public static double covert(String content, double rate){
-        BigDecimal bd = new BigDecimal(new BigInteger(content, 16).doubleValue()*rate);
+    public static double covert(String content, double rate) {
+        BigDecimal bd = new BigDecimal(new BigInteger(content, 16).doubleValue() * rate);
         return bd.setScale(4, BigDecimal.ROUND_HALF_UP).doubleValue();
     }
 
-    public static void main(String[] args) throws InterruptedException {
+
+
+    public static void testVt100(){
         // 实例化串口操作类对象
         SerialPortUtils serialPort = new SerialPortUtils();
         // 创建串口必要参数接收类并赋值，赋值串口号，波特率，校验位，数据位，停止位
         ParamConfig paramConfig = new ParamConfig("COM1", 9600, 0, 8, 1);
-        try{
+        try {
+            /*
+            rintf("\033[2J"); //清屏
+            printf("\033[28;34H"); //光标移动到(34,28)的位置
+            printf("\033[42;31m");//显示绿色背景，红色字体
+            printf("hello world! welcome!\n");
+            printf("\033[?25l"); //隐藏光标
+            printf("\033[0m"); //当我们使用其他的控制码后,别忘了关闭属性
+            */
+
+            String s = "\033[2J\033[?25h";
+
+
+            // 初始化设置,打开串口，开始监听读取串口数据
+            serialPort.init(paramConfig);
+            // 调用串口操作类的sendComm方法发送数据到串口
+            byte [] data = s.getBytes(StandardCharsets.US_ASCII);
+
+            for(byte e : data){
+                serialPort.sendComm(e);
+            }
+
+
+            Thread.sleep(2000);
+
+
+
+            Thread waitThread = new Thread(() -> {
+                while (true) {
+                    try {
+                        Thread.sleep(100000);
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+                }
+            });
+            waitThread.start();
+            waitThread.join();
+
+            // 关闭串口
+            serialPort.closeSerialPort();
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            System.out.println(e.getMessage());
+        }
+    }
+
+    public static void test(){
+
+        // 实例化串口操作类对象
+        SerialPortUtils serialPort = new SerialPortUtils();
+        // 创建串口必要参数接收类并赋值，赋值串口号，波特率，校验位，数据位，停止位
+        ParamConfig paramConfig = new ParamConfig("COM1", 9600, 0, 8, 1);
+        try {
             // 初始化设置,打开串口，开始监听读取串口数据
             serialPort.init(paramConfig);
             // 调用串口操作类的sendComm方法发送数据到串口
@@ -378,8 +465,8 @@ public class SerialPortUtils implements SerialPortEventListener{
             System.out.println("TVOC浓度：" + serialPort.getTvocConcentration());
 
 
-            Thread waitThread  = new Thread(()->{
-                while (true){
+            Thread waitThread = new Thread(() -> {
+                while (true) {
                     try {
                         Thread.sleep(100000);
                     } catch (InterruptedException e) {
@@ -393,11 +480,15 @@ public class SerialPortUtils implements SerialPortEventListener{
             // 关闭串口
             serialPort.closeSerialPort();
 
-        }catch (Exception e){
+        } catch (Exception e) {
             e.printStackTrace();
             System.out.println(e.getMessage());
         }
 
+    }
+
+    public static void main(String[] args) {
+        testVt100();
     }
 
 }
