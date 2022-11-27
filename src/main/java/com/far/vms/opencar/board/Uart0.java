@@ -2,7 +2,8 @@ package com.far.vms.opencar.board;
 
 import com.far.vms.opencar.hardware.interf.IExternalDeviceMemory;
 import com.far.vms.opencar.hardware.uart.ParamConfig;
-import com.far.vms.opencar.hardware.uart.SerialPortUtils;
+import com.far.vms.opencar.hardware.uart.SerialPortManager;
+
 import com.far.vms.opencar.hardware.uart.Uart;
 
 import java.io.BufferedInputStream;
@@ -14,12 +15,15 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.ReentrantLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
-public class Uart0 implements IExternalDeviceMemory, SerialPortUtils.IUartEvent {
+public class Uart0 implements IExternalDeviceMemory{
 
     //UART0内存布局0x10000000L
     private final long START_ADDR = 0x10000000L;
     //串口工具
-    private SerialPortUtils serialPortUtils;
+    // private SerialPortUtils serialPortUtils;
+
+
+    private SerialPortManager serialPortManager;
 
 
     //寄存器偏移
@@ -30,6 +34,9 @@ public class Uart0 implements IExternalDeviceMemory, SerialPortUtils.IUartEvent 
     private final int ISR_OFFSET = 2;
     private final int LCR_OFFSET = 3;
     private final int LSR_OFFSET = 5;
+
+    //发送缓冲
+    private byte[] writeBuffer;
 
 
     //地址映射 用于判断
@@ -43,11 +50,6 @@ public class Uart0 implements IExternalDeviceMemory, SerialPortUtils.IUartEvent 
     private Long v1;
 
 
-    //串口已准备好接受数据
-    @Override
-    public void onRecvReady() {
-
-    }
 
     //dlab状态
     private static class DLAB_STAT {
@@ -60,8 +62,6 @@ public class Uart0 implements IExternalDeviceMemory, SerialPortUtils.IUartEvent 
 
     private RegMode regData;
 
-    //thr写入指针
-    private int thrWIdx = 0;
 
     public class RegMode {
 
@@ -82,20 +82,17 @@ public class Uart0 implements IExternalDeviceMemory, SerialPortUtils.IUartEvent 
     public Uart0() {
 
 
-        serialPortUtils = new SerialPortUtils();
+        // serialPortUtils = new SerialPortUtils();
+
+        serialPortManager = new SerialPortManager();
+
+
         System.out.println("Start Connecting the serial port. COM1");
-        ParamConfig paramConfig = new ParamConfig("COM1", 9600, 0, 8, 1);
-        try {
-            // 初始化设置,打开串口，开始监听读取串口数据
-            serialPortUtils.init(paramConfig);
-            // 调用串口操作类的sendComm方法发送数据到串口
 
-        } catch (Exception e) {
-            e.printStackTrace();
-            throw new RuntimeException(e);
-        }
-
+        serialPortManager.openPort("COM1", 9600);
         System.out.println("Serial port connected successfully");
+        //发送缓冲只有一字节，多字节发送 接口还没写好
+        writeBuffer = new byte[1];
         regData = new RegMode();
 
         //设置初始值
@@ -167,10 +164,12 @@ public class Uart0 implements IExternalDeviceMemory, SerialPortUtils.IUartEvent 
 
         if (rOfst == 0) {
             if (DLAB == DLAB_STAT.ZEOR) {
-                //应先设置LSR状态为不可继续发送数据，但rxtx 好像不支持回传信号
-                addDataToTHR(val);
-                serialPortUtils.sendComm(val);
-
+                //应先设置LSR状态为不可继续发送数据
+                regData.LSR = 0;
+                //此处执行完了，再修改状态LSR状态
+                writeBuffer[0] = val;
+                serialPortManager.sendToPort(writeBuffer);
+                regData.LSR = 1 << 5;
             } else {
                 regData.DLL = val;
             }
@@ -227,11 +226,6 @@ public class Uart0 implements IExternalDeviceMemory, SerialPortUtils.IUartEvent 
         throw new RuntimeException("uart0 addr error");
     }
 
-    public void addDataToTHR(byte d) {
-        //需要改变LSR状态 让C语言等待发送
-        if (thrWIdx > regData.THR.length - 1) return;
-        regData.THR[thrWIdx++] = d;
-    }
 
     public static void main(String[] args) {
 

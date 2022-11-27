@@ -5,6 +5,7 @@ import com.fazecast.jSerialComm.SerialPortDataListener;
 import com.fazecast.jSerialComm.SerialPortEvent;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -13,8 +14,14 @@ public class SerialPortManager {
 
     private SerialPort serialPort;
 
+    //四字节缓冲
+    private byte[] dataBuffer = new byte[4];
+    //缓冲索引
+    private int bufIdx = 0;
+
+
     //查找所有可用端口
-    public  List<String> findPorts() {
+    public List<String> findPorts() {
         // 获得当前所有可用串口
         SerialPort[] serialPorts = SerialPort.getCommPorts();
         List<String> portNameList = new ArrayList<String>();
@@ -63,7 +70,7 @@ public class SerialPortManager {
      *
      * @param serialPort 待关闭的串口对象
      */
-    public  void closePort(SerialPort serialPort) {
+    public void closePort(SerialPort serialPort) {
         if (serialPort != null && serialPort.isOpen()) {
             serialPort.closePort();
         }
@@ -72,15 +79,30 @@ public class SerialPortManager {
     /**
      * 往串口发送数据
      *
-
-     * @param content    待发送数据
+     * @param content 待发送数据
      */
-    public  void sendToPort( byte[] content) {
+    public int sendToPort(byte[] content) {
         if (!serialPort.isOpen()) {
-            return;
+            //串口没有打开
+            return -2;
         }
-        serialPort.writeBytes(content, content.length);
+        return serialPort.writeBytes(content, content.length);
     }
+
+    //只发送一个字节
+    public void sendByteToPort(byte content) {
+        if (!serialPort.isOpen()) {
+            return ;
+        }
+        if (bufIdx + 1 >= dataBuffer.length) {
+            bufIdx = 0;
+            sendToPort(dataBuffer);
+            dataBuffer[bufIdx++] = content;
+        } else {
+            dataBuffer[bufIdx++] = content;
+        }
+    }
+
 
     /**
      * 从串口读取数据
@@ -88,7 +110,7 @@ public class SerialPortManager {
      * @param serialPort 当前已建立连接的SerialPort对象
      * @return 读取到的数据
      */
-    public  byte[] readFromPort(SerialPort serialPort) {
+    public byte[] readFromPort(SerialPort serialPort) {
         byte[] reslutData = null;
         try {
             if (!serialPort.isOpen()) {
@@ -128,7 +150,7 @@ public class SerialPortManager {
                 public void serialEvent(SerialPortEvent event) {
                     String data = "";
                     if (event.getEventType() != SerialPort.LISTENING_EVENT_DATA_AVAILABLE) {
-                        System.out.println("event "+event.getEventType());
+                        System.out.println("event " + event.getEventType());
                         return;//判断事件的类型
                     }
                     while (serialPort.bytesAvailable() != 0) {
