@@ -1,15 +1,21 @@
 package com.far.vms.opencar;
 
+import com.far.vms.opencar.complier.Parser;
 import com.far.vms.opencar.ui.SettingDatas;
 import com.far.vms.opencar.utils.ShellUtil;
+import com.sun.javafx.event.EventDispatchChainImpl;
 import javafx.application.Application;
+import javafx.beans.InvalidationListener;
+import javafx.beans.Observable;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
+import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
+import javafx.event.EventType;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Node;
@@ -17,11 +23,16 @@ import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
+import javafx.scene.input.KeyCode;
+import javafx.scene.input.KeyCodeCombination;
+import javafx.scene.input.KeyCombination;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
+import javafx.scene.paint.Color;
+import javafx.scene.shape.Circle;
 import javafx.stage.DirectoryChooser;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
@@ -47,34 +58,39 @@ public class OpenCarWindos extends Application {
     TabPane tabGroupConsole = null;
 
     TextArea buildConsole = null;
-
     TextArea sysConsole = null;
-
 
     private SettingDatas settingDatas;
 
 
+    private short codeLineNumber = 1;
+
     public class CodeData {
 
-
-        private String line;
-
-
+        private short lineNum;
+        private Circle circle;
         private String codeLine;
 
-
-        public CodeData(String line, String codeLine) {
-            this.line = line;
+        public CodeData(short lineNum, Circle circle, String codeLine) {
+            this.circle = circle;
             this.codeLine = codeLine;
+            this.lineNum = lineNum;
         }
 
-
-        public String getLine() {
-            return line;
+        public short getLineNum() {
+            return lineNum;
         }
 
-        public void setLine(String line) {
-            this.line = line;
+        public void setLineNum(short lineNum) {
+            this.lineNum = lineNum;
+        }
+
+        public Circle getCircle() {
+            return circle;
+        }
+
+        public void setCircle(Circle circle) {
+            this.circle = circle;
         }
 
         public String getCodeLine() {
@@ -88,16 +104,11 @@ public class OpenCarWindos extends Application {
 
 
     public static void main(String[] args) {
-
-        String kr = "D:\\AAAA_WORK\\RISC-V-Tools\\os\\riscv-operating-system-mooc\\code\\os\\01-helloRVOS\\build\\kernel-img.img";
-        String buildTool = "D:\\AAAA_WORK\\RISC-V-Tools\\riscv64-unknown-elf-toolchain-10.2.0-2020.12.8-x86_64-w64-mingw32\\bin\\riscv64-unknown-elf-objdump.exe";
-
-        ShellUtil.runShell(buildTool, new String[]{buildTool,kr ,"-d"}, cmdInf -> {
-            System.out.println(cmdInf);
-            return 0;
-        });
-
         launch(args);
+    }
+
+    public short getCodeLineNumber() {
+        return this.codeLineNumber++;
     }
 
 
@@ -140,12 +151,6 @@ public class OpenCarWindos extends Application {
             settingDatas.setGccBinPath(selectedDirectory.getPath());
             String sl = settingDatas.getGccBinPath() + "\\riscv64-unknown-elf-objdump.exe";
 
-
-//            for (String filer : selectedDirectory.list()) {
-//
-//
-//                sysConsole.appendText(filer + "\n");
-//            }
         });
     }
 
@@ -170,22 +175,25 @@ public class OpenCarWindos extends Application {
         for (var e : scrollPane) {
             if (e instanceof ScrollPane) {
                 ScrollPane scrollPane1 = ((ScrollPane) e);
-                tv = (TableView) ((AnchorPane) scrollPane1.getContent()).lookup("#text-edit");
-                btnBinSelect = (Button) ((AnchorPane) scrollPane1.getContent()).lookup("#btnBinSelect");
-                btnGccPath = (Button) ((AnchorPane) scrollPane1.getContent()).lookup("#btnGccPath");
-                tabGroupConsole = (TabPane) ((AnchorPane) scrollPane1.getContent()).lookup("#groupConsole");
+
+
+//
+//                btnBinSelect = (Button) ((AnchorPane) scrollPane1.getContent()).lookup("#btnBinSelect");
+//                btnGccPath = (Button) ((AnchorPane) scrollPane1.getContent()).lookup("#btnGccPath");
+//                tabGroupConsole = (TabPane) ((AnchorPane) scrollPane1.getContent()).lookup("#groupConsole");
+            } else if (e instanceof AnchorPane) {
+                tv = (TableView) e.lookup("#text-edit");
+                int xx = 1;
+
             }
         }
 
 
-        initSelectFileGroup(primaryStage);
-
-        initTabGroupConsole();
-
+//        initSelectFileGroup(primaryStage);
+//
+//        initTabGroupConsole();
 
         settingDatas = new SettingDatas();
-
-
         TableView finalTv = tv;
         tv.widthProperty().addListener(new ChangeListener<Number>() {
             @Override
@@ -201,26 +209,71 @@ public class OpenCarWindos extends Application {
                 }
             }
         });
+        //设置为只能单选
+        tv.getSelectionModel().setSelectionMode(SelectionMode.SINGLE);
+        //设置点击方法
 
 
-        ObservableList<CodeData> data = FXCollections.observableArrayList(
-                new CodeData("1", "sd t0,(1)a0"),
-                new CodeData("2", "ld t0,(1)a0")
-        );
+        tv.setRowFactory(tview -> {
+            TableRow<CodeData> row = new TableRow<>();
+            row.setOnMouseClicked(event -> {
+                //  System.out.println(event.getClickCount() % 2 + "次");
+                // 点击两次 且 row不为空
+//                ObservableList<TablePosition> cells = finalTv1.getSelectionModel().;
+//                for (TablePosition<?, ?> cell : cells) {
+//                    System.out.println(cell.getColumn());
+//                }// for
+
+
+                if (event.getClickCount() % 1 == 0 && (!row.isEmpty())) {
+                    CodeData rowData = row.getItem();
+
+                    if (!Parser.canBreakForCode(rowData.getCodeLine())) {
+                        System.out.println("这数据不能下断点!" + rowData.getCodeLine());
+                        return;
+                    }
+
+                    if (rowData.getCircle().isVisible()) {
+                        rowData.getCircle().setVisible(false);
+                    } else {
+                        rowData.getCircle().setVisible(true);
+                    }
+                }
+            });
+            return row;
+        });
+
+
+        ObservableList<CodeData> data = FXCollections.observableArrayList();
+        String kr = "D:\\AAAA_WORK\\RISC-V-Tools\\os\\riscv-operating-system-mooc\\code\\os\\01-helloRVOS\\build\\kernel-img.img";
+        String buildTool = "D:\\AAAA_WORK\\RISC-V-Tools\\riscv64-unknown-elf-toolchain-10.2.0-2020.12.8-x86_64-w64-mingw32\\bin\\riscv64-unknown-elf-objdump.exe";
+
+
+        ShellUtil.runShell(buildTool, new String[]{buildTool, kr, "-d"}, cmdInf -> {
+            data.add(new CodeData(getCodeLineNumber(), getCircle(), cmdInf));
+            //  System.out.println(cmdInf);
+            return 0;
+        });
+
 
         // https://blog.csdn.net/m0_58015306/article/details/123033003
         //创建表格的列
-        TableColumn<String, String> lineCol = new TableColumn<>("line");
-        TableColumn<String, String> codeCol = new TableColumn<>("codeLine");
+        TableColumn lineNum = new TableColumn<>("lineNum");
+        TableColumn lineCol = new TableColumn<>("circle");
+        TableColumn codeCol = new TableColumn<>("codeLine");
+
 
         //将表格的列和类的属性进行绑定
-        lineCol.setCellValueFactory(new PropertyValueFactory<>("line"));
+
+        lineNum.setCellValueFactory(new PropertyValueFactory<>("lineNum"));
+        lineCol.setCellValueFactory(new PropertyValueFactory<>("circle"));
         codeCol.setCellValueFactory(new PropertyValueFactory<>("codeLine"));
         //添加到tableview
-        tv.getColumns().addAll(lineCol, codeCol);
+        tv.getColumns().addAll(lineNum, lineCol, codeCol);
         tv.setItems(data);
-        lineCol.setPrefWidth(tv.getPrefWidth() * 0.05);
-        codeCol.setPrefWidth(tv.getPrefWidth() * 0.6);
+        lineNum.setPrefWidth(tv.getPrefWidth() * 0.05);
+        lineCol.setPrefWidth(tv.getPrefWidth() * 0.02);
+        codeCol.setPrefWidth(tv.getPrefWidth() * 1.2);
         var ok = tv.getColumns().size();
 
 
@@ -238,19 +291,27 @@ public class OpenCarWindos extends Application {
 //        });
 
 
-//        Pane header = (Pane)tv.lookup("")
-//        if(header!=null && header.isVisible()) {
-//            header.setMaxHeight(0);
-//            header.setMinHeight(0);
-//            header.setPrefHeight(0);
-//            header.setVisible(false);
-//            header.setManaged(false);
-//        }
-
         //禁止调整窗口大小
         primaryStage.setResizable(false);
         primaryStage.setTitle("opencar riscv64 emulation - dev version");
-        primaryStage.setScene(new Scene(root, 1280, 768));
+        primaryStage.setScene(new Scene(root, 1280, 840));
+
+        KeyCombination ctrl_c = new KeyCodeCombination(KeyCode.C, KeyCombination.CONTROL_DOWN);
+        KeyCombination kb_f6 = new KeyCodeCombination(KeyCode.F6);
+        KeyCombination kb_f5 = new KeyCodeCombination(KeyCode.F5);
+        primaryStage.getScene().getAccelerators().put(kb_f6, () -> {
+            System.out.println("快捷键F6");
+            System.out.println(Thread.currentThread().getName());
+        });
+
+        primaryStage.getScene().getAccelerators().put(kb_f5, () -> {
+            System.out.println("快捷键F5");
+            System.out.println(Thread.currentThread().getName());
+        });
+
+
+
+        //primaryStage.setMaximized(true);
         primaryStage.show();
 
 //
@@ -271,5 +332,19 @@ public class OpenCarWindos extends Application {
 //        root.getChildren().add(btn);
 //        primaryStage.setScene(new Scene(root, 300, 250));
 //        primaryStage.show();
+    }
+
+    public Circle getCircle() {
+        Color c = Color.rgb(199, 84, 80);
+        Circle circle = new Circle();
+        //Setting the properties of the circle
+        circle.setCenterX(1.0f);
+        circle.setCenterY(1.0f);
+        circle.setRadius(5.0f);
+        circle.setFill(c);
+        //新圆形默认是隐藏的
+        circle.setVisible(false);
+        return circle;
+
     }
 }
