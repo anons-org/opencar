@@ -20,11 +20,11 @@ public class Register {
     public static class RegAddr {
         public static int
                 PC = 999999999,
-        //用于返回的寄存器
-        RA = 0b00_001,
+                //用于返回的寄存器
+                RA = 0b00_001,
                 SP = 0b00_010,
-        //x0
-        T0 = 0b00_101,
+                //x0
+                T0 = 0b00_101,
                 S0 = 0b01_000,
                 A4 = 0b01_110,
                 A5 = 0b01_111,
@@ -34,9 +34,15 @@ public class Register {
 
     public static class CsrRegAddr {
         public static int
-                mstatus = 0x300,//机器状态
+                mstatus = 0x300,//机器状态 MRW
+                mie = 0x304,//机器中断使能
+                mtvec = 0x305,//机器陷进处理者基地址
+                mscratch = 0x340,
+                mepc = 0x341,//机器异常程序计数器?
+                mcause = 0x342,//机器陷进类型
+                mtval = 0x343,//机器陷进类型的具体原因的辅助信息
+                mip = 0x344,//等待执行的中断
                 mhartid = 0xF14;//0xF14;
-
     }
 
 
@@ -58,13 +64,13 @@ public class Register {
         //x0?
         regs.put(RegAddr.X0, 0x0L);
         regs.put(0x78000000, 0x0L);
-        //s0 谢特那这个是啥？
+        //s0
         regs.put(0b01_000, 0x0L);
         //a4
         regs.put(RegAddr.A4, 0x0L);
 
         //a5
-        regs.put(0b01_111, 0x0L);
+        regs.put(RegAddr.A5, 0x0L);
         //t0|x5
         regs.put(RegAddr.T0, 0x0L);
 
@@ -74,7 +80,7 @@ public class Register {
 
         //-------------
         //默认1
-        csrRegs[CsrRegAddr.mhartid] = 0x00L;
+
 
         //寄存器名称
         regNames.put(RegAddr.X0, "x0|zero");
@@ -89,10 +95,21 @@ public class Register {
 
         regNames.put(RegAddr.RA, "ra");
 
-        //----------
-        csrRegNames[CsrRegAddr.mhartid] = "mhartid";
+
+        initCsrReg();
 
     }
+
+    void initCsrReg() {
+        csrRegs[CsrRegAddr.mhartid] = 0x00L;
+        csrRegs[CsrRegAddr.mcause] = 0x00L;
+        csrRegs[CsrRegAddr.mepc] = 0x00L;
+        csrRegs[CsrRegAddr.mtvec] = 0x00L;
+        //默认打开M模式的全局中断
+        csrRegs[CsrRegAddr.mie] = 0b00000000_00000000_00000000_00001000;
+        csrRegNames[CsrRegAddr.mhartid] = "mhartid";
+    }
+
 
 //    public long getValOfRid(int rid) {
 //        //取出rs寄存器的数据... 此处要改...

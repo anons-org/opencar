@@ -13,7 +13,7 @@ import java.util.Arrays;
 import java.util.Scanner;
 
 
-@SpringBootApplication
+//@SpringBootApplication
 public class OpenCarApplication {
 
 

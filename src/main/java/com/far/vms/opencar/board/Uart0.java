@@ -95,7 +95,7 @@ public class Uart0 implements IExternalDeviceMemory{
         writeBuffer = new byte[1];
         regData = new RegMode();
 
-        //设置初始值
+        //设置初始值 这些值用于计算偏移
         regsMap[IER_OFFSET] = IER_OFFSET;
         regsMap[ISR_OFFSET] = ISR_OFFSET;
         regsMap[THR_OFFSET] = THR_OFFSET;
