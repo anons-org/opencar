@@ -1,4 +1,4 @@
-package com.far.vms.opencar.ui;
+package com.far.vms.opencar.ui.entity;
 
 /*
  * @description: 用于保存UI界面需要保存的记录

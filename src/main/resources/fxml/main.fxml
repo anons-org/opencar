@@ -1,0 +1,296 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!--
+  Copyright (c) 2015, 2019, Gluon and/or its affiliates.
+  All rights reserved. Use is subject to license terms.
+
+  This file is available and licensed under the following license:
+
+  Redistribution and use in source and binary forms, with or without
+  modification, are permitted provided that the following conditions
+  are met:
+
+  - Redistributions of source code must retain the above copyright
+    notice, this list of conditions and the following disclaimer.
+  - Redistributions in binary form must reproduce the above copyright
+    notice, this list of conditions and the following disclaimer in
+    the documentation and/or other materials provided with the distribution.
+  - Neither the name of Oracle Corporation nor the names of its
+    contributors may be used to endorse or promote products derived
+    from this software without specific prior written permission.
+
+  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+  "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
+  LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
+  A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
+  OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
+  SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT
+  LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
+  DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+  THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+  (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
+  OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+-->
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.Menu?>
+<?import javafx.scene.control.MenuBar?>
+<?import javafx.scene.control.MenuItem?>
+<?import javafx.scene.control.ScrollPane?>
+<?import javafx.scene.control.SeparatorMenuItem?>
+<?import javafx.scene.control.SplitPane?>
+<?import javafx.scene.control.Tab?>
+<?import javafx.scene.control.TabPane?>
+<?import javafx.scene.control.TableColumn?>
+<?import javafx.scene.control.TableView?>
+<?import javafx.scene.control.TextArea?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.Pane?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.text.Font?>
+
+<VBox id="vbox" prefHeight="768.0" prefWidth="1280.0" xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1">
+  <children>
+    <MenuBar id="mBar" VBox.vgrow="NEVER">
+      <menus>
+        <Menu mnemonicParsing="false" style="fx-font-color: red;" text="文件">
+          <items>
+            <MenuItem mnemonicParsing="false" text="New" />
+            <MenuItem mnemonicParsing="false" text="Open…" />
+            <Menu mnemonicParsing="false" text="Open Recent" />
+            <SeparatorMenuItem mnemonicParsing="false" />
+            <MenuItem mnemonicParsing="false" text="Close" />
+            <MenuItem mnemonicParsing="false" text="Save" />
+            <MenuItem mnemonicParsing="false" text="Save As…" />
+            <MenuItem id="mFileSet" mnemonicParsing="false" text="设置" />
+            <SeparatorMenuItem mnemonicParsing="false" />
+            <MenuItem mnemonicParsing="false" text="Preferences…" />
+            <SeparatorMenuItem mnemonicParsing="false" />
+            <MenuItem mnemonicParsing="false" text="Quit" />
+          </items>
+        </Menu>
+        <Menu mnemonicParsing="false" text="编辑">
+          <items>
+            <MenuItem mnemonicParsing="false" text="Undo" />
+            <MenuItem mnemonicParsing="false" text="Redo" />
+            <SeparatorMenuItem mnemonicParsing="false" />
+            <MenuItem mnemonicParsing="false" text="Cut" />
+            <MenuItem mnemonicParsing="false" text="Copy" />
+            <MenuItem mnemonicParsing="false" text="Paste" />
+            <MenuItem mnemonicParsing="false" text="Delete" />
+            <SeparatorMenuItem mnemonicParsing="false" />
+            <MenuItem mnemonicParsing="false" text="Select All" />
+            <MenuItem mnemonicParsing="false" text="Unselect All" />
+          </items>
+        </Menu>
+        <Menu mnemonicParsing="false" text="帮助">
+          <items>
+            <MenuItem mnemonicParsing="false" text="About MyHelloApp" />
+          </items>
+        </Menu>
+      </menus>
+    </MenuBar>
+    <SplitPane id="spbox" dividerPositions="0.5211267605633803" focusTraversable="true" prefHeight="-1.0" prefWidth="-1.0" VBox.vgrow="ALWAYS">
+      <items>
+        <AnchorPane id="leftAp" maxWidth="691.0" prefHeight="807.0" prefWidth="691.0">
+               <children>
+                  <TabPane layoutX="-1.0" layoutY="43.0" prefHeight="713.0" prefWidth="704.0" tabClosingPolicy="UNAVAILABLE">
+                    <tabs>
+                      <Tab text="反汇编">
+                           <content>
+                              <TableView id="text-edit" prefHeight="705.0" prefWidth="704.0" />
+                           </content>
+                        </Tab>
+                    </tabs>
+                  </TabPane>
+                  <HBox id="hbox" layoutX="-6.0" layoutY="9.0" prefHeight="38.0" prefWidth="443.0">
+                     <children>
+                        <Button contentDisplay="CENTER" mnemonicParsing="false" prefHeight="23.0" prefWidth="69.0" text="运行(F5)">
+                           <HBox.margin>
+                              <Insets left="10.0" />
+                           </HBox.margin>
+                        </Button>
+                        <Button contentDisplay="CENTER" mnemonicParsing="false" prefHeight="23.0" prefWidth="71.0" text="单步(F6)">
+                           <HBox.margin>
+                              <Insets left="20.0" />
+                           </HBox.margin>
+                        </Button>
+                        <Button contentDisplay="CENTER" mnemonicParsing="false" prefHeight="23.0" prefWidth="73.0" text="禁用断点">
+                           <HBox.margin>
+                              <Insets left="25.0" />
+                           </HBox.margin>
+                        </Button>
+                        <Button contentDisplay="CENTER" mnemonicParsing="false" prefHeight="23.0" prefWidth="75.0" text="启用断点">
+                           <HBox.margin>
+                              <Insets left="20.0" />
+                           </HBox.margin>
+                        </Button>
+                        <Button contentDisplay="CENTER" mnemonicParsing="false" prefHeight="23.0" prefWidth="64.0" text="删除断点">
+                           <HBox.margin>
+                              <Insets left="20.0" />
+                           </HBox.margin>
+                        </Button>
+                     </children>
+                  </HBox>
+               </children></AnchorPane>
+        <ScrollPane id="scp" prefHeight="715.0" prefWidth="565.0">
+          <content>
+            <AnchorPane id="Content" maxWidth="10.0" minHeight="-1.0" minWidth="-1.0" prefHeight="715.0" prefWidth="10.0">
+              <children>
+                        <TabPane layoutX="1.0" maxWidth="569.0" prefHeight="781.0" prefWidth="561.0" tabClosingPolicy="UNAVAILABLE">
+                          <tabs>
+                            <Tab text="PC">
+                              <content>
+                                <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
+                                       <children>
+                                          <Label layoutX="14.0" layoutY="66.0" text="通用寄存器" underline="true">
+                                             <font>
+                                                <Font size="14.0" />
+                                             </font>
+                                          </Label>
+                                          <TextField layoutX="40.0" layoutY="32.0" prefHeight="23.0" prefWidth="176.0">
+                                             <font>
+                                                <Font size="13.0" />
+                                             </font>
+                                          </TextField>
+                                          <Label layoutX="14.0" layoutY="36.0" text="PC" underline="true">
+                                             <font>
+                                                <Font size="14.0" />
+                                             </font>
+                                          </Label>
+                                          <TableView layoutX="8.0" layoutY="89.0" prefHeight="589.0" prefWidth="248.0">
+                                            <columns>
+                                              <TableColumn prefWidth="75.0" text="C1" />
+                                              <TableColumn prefWidth="75.0" text="C2" />
+                                            </columns>
+                                          </TableView>
+                                          <Label layoutX="270.0" layoutY="66.0" text="控制寄存器(CSR)" underline="true">
+                                             <font>
+                                                <Font size="14.0" />
+                                             </font>
+                                          </Label>
+                                          <TableView layoutX="270.0" layoutY="89.0" prefHeight="581.0" prefWidth="248.0">
+                                             <columns>
+                                                <TableColumn prefWidth="76.0" text="C1" />
+                                                <TableColumn prefWidth="74.0" text="C2" />
+                                             </columns>
+                                          </TableView>
+                                       </children></AnchorPane>
+                              </content>
+                            </Tab>
+                              <Tab text="内存和寄存器断点">
+                                 <content>
+                                    <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="303.0" prefWidth="141.0">
+                                       <children>
+                                          <TableView layoutY="35.0" prefHeight="243.0" prefWidth="199.0">
+                                            <columns>
+                                              <TableColumn prefWidth="61.0" text="C1" />
+                                              <TableColumn prefWidth="89.0" text="C2" />
+                                            </columns>
+                                          </TableView>
+                                          <TableView layoutX="232.0" layoutY="35.0" prefHeight="243.0" prefWidth="150.0">
+                                             <columns>
+                                                <TableColumn prefWidth="75.0" text="C1" />
+                                                <TableColumn prefWidth="75.0" text="C2" />
+                                             </columns>
+                                          </TableView>
+                                       </children>
+                                    </AnchorPane>
+                                 </content>
+                              </Tab>
+                            <Tab text="内存查看">
+                              <content>
+                                <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="367.0" prefWidth="340.0">
+                                       <children>
+                                          <Label layoutX="14.0" layoutY="47.0" text="内存地址" />
+                                          <Label layoutX="213.0" layoutY="47.0" text="几个单元" />
+                                          <TextField layoutX="69.0" layoutY="43.0" prefHeight="23.0" prefWidth="135.0" />
+                                          <TextField layoutX="268.0" layoutY="43.0" prefHeight="23.0" prefWidth="29.0" />
+                                          <Label layoutX="15.0" layoutY="7.0" text="查看内存仅在断点状态下有效" underline="true" />
+                                       </children></AnchorPane>
+                              </content>
+                            </Tab>
+                              <Tab text="中断">
+                                 <content>
+                                    <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="367.0" prefWidth="340.0">
+                                       <children>
+                                          <Label layoutX="14.0" layoutY="47.0" text="内存地址" />
+                                          <Label layoutX="213.0" layoutY="47.0" text="几个单元" />
+                                          <TextField layoutX="69.0" layoutY="43.0" prefHeight="23.0" prefWidth="135.0" />
+                                          <TextField layoutX="268.0" layoutY="43.0" prefHeight="23.0" prefWidth="29.0" />
+                                          <Label layoutX="15.0" layoutY="7.0" text="查看各个特权下的中断信号" underline="true" />
+                                       </children>
+                                    </AnchorPane>
+                                 </content>
+                              </Tab>
+                              <Tab text="网卡数据">
+                                 <content>
+                                    <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="367.0" prefWidth="340.0">
+                                       <children>
+                                          <Label layoutX="14.0" layoutY="47.0" text="内存地址" />
+                                          <Label layoutX="213.0" layoutY="47.0" text="几个单元" />
+                                          <TextField layoutX="69.0" layoutY="43.0" prefHeight="23.0" prefWidth="135.0" />
+                                          <TextField layoutX="268.0" layoutY="43.0" prefHeight="23.0" prefWidth="29.0" />
+                                          <Label layoutX="15.0" layoutY="7.0" text="查看各个特权下的中断信号" underline="true" />
+                                       </children>
+                                    </AnchorPane>
+                                 </content>
+                              </Tab>
+                              <Tab text="控制台">
+                                 <content>
+                                    <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="752.0" prefWidth="505.0">
+                                       <children>
+                                          <TabPane id="groupConsole" layoutX="21.0" layoutY="150.0" prefHeight="200.0" prefWidth="453.0" tabClosingPolicy="UNAVAILABLE">
+                                            <tabs>
+                                              <Tab text="编译">
+                                                <content>
+                                                  <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="171.0" prefWidth="284.0">
+                                                         <children>
+                                                            <TextArea id="txtBuild" layoutX="6.0" layoutY="9.0" prefHeight="153.0" prefWidth="390.0" text="bd" wrapText="true" />
+                                                         </children>
+                                                      </AnchorPane>
+                                                </content>
+                                              </Tab>
+                                              <Tab text="控制台">
+                                                <content>
+                                                  <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
+                                                         <children>
+                                                            <TextArea id="txtSys" prefHeight="153.0" prefWidth="390.0" text="sys" wrapText="true" />
+                                                         </children>
+                                                      </AnchorPane>
+                                                </content>
+                                              </Tab>
+                                            </tabs>
+                                          </TabPane>
+                                          <Label layoutX="24.0" layoutY="109.0" text="Gcc-riscv" underline="true" />
+                                          <Label layoutX="27.0" layoutY="77.0" text="progBin" underline="true" />
+                                          <TextField id="txtGccPath" layoutX="86.0" layoutY="108.0" prefHeight="23.0" prefWidth="274.0" />
+                                          <TextField id="txtBinFile" layoutX="86.0" layoutY="73.0" prefHeight="23.0" prefWidth="274.0" />
+                                       </children>
+                                    </AnchorPane>
+                                 </content>
+                              </Tab>
+                          </tabs>
+                        </TabPane>
+              </children>
+            </AnchorPane>
+          </content>
+        </ScrollPane>
+      </items>
+    </SplitPane>
+    <HBox id="HBox" alignment="CENTER_LEFT" prefHeight="37.0" prefWidth="1280.0" spacing="5.0" VBox.vgrow="NEVER">
+      <children>
+        <Label id="txtAlertMssage" maxHeight="1.7976931348623157E308" maxWidth="-1.0" text="info" textFill="#111111" HBox.hgrow="ALWAYS" />
+        <Pane prefHeight="15.0" prefWidth="102.0" HBox.hgrow="ALWAYS" />
+        <Label maxWidth="-1.0" text="Right status" HBox.hgrow="NEVER" />
+      </children>
+      <padding>
+        <Insets bottom="3.0" left="3.0" right="3.0" top="3.0" />
+      </padding>
+    </HBox>
+  </children>
+</VBox>

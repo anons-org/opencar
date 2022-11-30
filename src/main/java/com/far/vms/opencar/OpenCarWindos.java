@@ -1,24 +1,17 @@
 package com.far.vms.opencar;
 
 import com.far.vms.opencar.complier.Parser;
-import com.far.vms.opencar.ui.SettingDatas;
+import com.far.vms.opencar.ui.entity.SettingDatas;
+import com.far.vms.opencar.ui.SettingUI;
 import com.far.vms.opencar.utils.ShellUtil;
-import com.sun.javafx.event.EventDispatchChainImpl;
 import javafx.application.Application;
-import javafx.beans.InvalidationListener;
-import javafx.beans.Observable;
-import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
-import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
-import javafx.event.EventType;
-import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
-import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
@@ -26,25 +19,22 @@ import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyCodeCombination;
 import javafx.scene.input.KeyCombination;
-import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.AnchorPane;
+import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
-import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Circle;
+import javafx.scene.text.Font;
 import javafx.stage.DirectoryChooser;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
-import javafx.scene.web.HTMLEditor;
-import javafx.util.Callback;
 
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.net.URL;
+import java.nio.file.Path;
 import java.util.Arrays;
-import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 
@@ -60,10 +50,19 @@ public class OpenCarWindos extends Application {
     TextArea buildConsole = null;
     TextArea sysConsole = null;
 
+    //底部信息提示
+    Label txtAlertMessage;
+
+
     private SettingDatas settingDatas;
 
 
+    //代码行编号
     private short codeLineNumber = 1;
+
+
+    private Parent rootMain;
+
 
     public class CodeData {
 
@@ -155,38 +154,89 @@ public class OpenCarWindos extends Application {
     }
 
 
+    public void initMenuBarEvent() {
+
+        //绑定菜单事件
+        MenuBar menuBar = (MenuBar) rootMain.lookup("#mBar");//#ta是textarea的id号
+
+        OpenCarWindos ctx = this;
+
+        menuBar.getMenus().forEach(e -> {
+            e.getItems().forEach(e2 -> {
+                if ("mFileSet".equals(e2.getId())) {
+                    e2.setOnAction(new EventHandler<ActionEvent>() {
+                        @Override
+                        public void handle(ActionEvent event) {
+                            try {
+                                SettingUI.create().createFxmlStage(ctx);
+                            } catch (IOException e) {
+                                e.printStackTrace();
+                            }
+                        }
+                    });
+                }
+            });
+        });
+
+    }
+
+
     @Override
     public void start(Stage primaryStage) {
 
-        Parent root = null;
+
+//       URL path = this.getClass().getClassLoader().getResource("fxml/main.fxml"); // 注意路径不带/开头
+//        var tttt =path.getFile();
+
+        String path1 = System.getProperty("user.dir");
+        System.out.println("1.获取项目的路径 = " + path1);
+
+        //* 3. 获取Jar包所在路径
+        String path3 = System.getProperty("user.dir");
+        System.out.println("3.获取Jar包所在路径 = " + path3);
+        //* 4. 获取Jar包路径
+        String path4 = Run.class.getProtectionDomain().getCodeSource().getLocation().getFile();
+        String path4_1 = Run.class.getProtectionDomain().getCodeSource().getLocation().getPath();//两个是相同的
+
+        System.out.println("4.获取Jar包路径 = " + path4);
+        System.out.println("4.获取Jar包路径 = " + path4_1);
+
+
         try {
-            File file = new File("C:\\Users\\mike\\Desktop\\jfx-view\\main.fxml");
-            root = FXMLLoader.load(file.toURI().toURL());
+            //  File file = new File("C:\\Users\\mike\\Desktop\\jfx-view\\main.fxml");
+            URL path = this.getClass().getClassLoader().getResource("fxml/main.fxml"); // 注意路径不带/开头
+            File file = new File(path.getFile());
+            rootMain = FXMLLoader.load(file.toURI().toURL());
         } catch (IOException e) {
             e.printStackTrace();
         }
 
-        VBox vBox = (VBox) root.lookup("#vbox");//#ta是textarea的id号
-        SplitPane splitPane = (SplitPane) root.lookup("#spbox");//#ta是textarea的id号
+        VBox vBox = (VBox) rootMain.lookup("#vbox");//#ta是textarea的id号
+
+        vBox.getChildren().forEach(e -> {
+            if (e instanceof HBox) {
+                txtAlertMessage = (Label) e.lookup("#txtAlertMssage");
+            }
+        });
+
+
+        SplitPane splitPane = (SplitPane) rootMain.lookup("#spbox");//#ta是textarea的id号
         var scrollPane = splitPane.getItems();
         TableView tv = null;
-
 
         for (var e : scrollPane) {
             if (e instanceof ScrollPane) {
                 ScrollPane scrollPane1 = ((ScrollPane) e);
 
-
-//
 //                btnBinSelect = (Button) ((AnchorPane) scrollPane1.getContent()).lookup("#btnBinSelect");
 //                btnGccPath = (Button) ((AnchorPane) scrollPane1.getContent()).lookup("#btnGccPath");
 //                tabGroupConsole = (TabPane) ((AnchorPane) scrollPane1.getContent()).lookup("#groupConsole");
             } else if (e instanceof AnchorPane) {
                 tv = (TableView) e.lookup("#text-edit");
                 int xx = 1;
-
             }
         }
+        initMenuBarEvent();
 
 
 //        initSelectFileGroup(primaryStage);
@@ -294,7 +344,7 @@ public class OpenCarWindos extends Application {
         //禁止调整窗口大小
         primaryStage.setResizable(false);
         primaryStage.setTitle("opencar riscv64 emulation - dev version");
-        primaryStage.setScene(new Scene(root, 1280, 840));
+        primaryStage.setScene(new Scene(rootMain, 1280, 840));
 
         KeyCombination ctrl_c = new KeyCodeCombination(KeyCode.C, KeyCombination.CONTROL_DOWN);
         KeyCombination kb_f6 = new KeyCodeCombination(KeyCode.F6);
@@ -308,7 +358,6 @@ public class OpenCarWindos extends Application {
             System.out.println("快捷键F5");
             System.out.println(Thread.currentThread().getName());
         });
-
 
 
         //primaryStage.setMaximized(true);
@@ -346,5 +395,10 @@ public class OpenCarWindos extends Application {
         circle.setVisible(false);
         return circle;
 
+    }
+
+
+    public void setTxtAlertMessage(String message) {
+        this.txtAlertMessage.setText(message);
     }
 }

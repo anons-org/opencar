@@ -32,6 +32,13 @@
 - 在opencar上开发一款NES模拟器
 
 
+## 运行
+- java11
+```js
+ ./java --module-path javafx-sdk-16\lib --add-modules javafx.controls,javafx.fxml -jar opencar-0.0.1-SNAPSHOT.jar
+```
+
+
 
 
 

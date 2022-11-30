@@ -5,8 +5,7 @@ import com.far.vms.opencar.debugger.Debugger;
 import com.far.vms.opencar.instruct.BinFile;
 import com.far.vms.opencar.board.Cpu;
 import com.far.vms.opencar.instruct.StaticRes;
-import org.springframework.boot.SpringApplication;
-import org.springframework.boot.autoconfigure.SpringBootApplication;
+
 
 import java.io.*;
 import java.util.Arrays;
@@ -43,7 +42,7 @@ public class OpenCarApplication {
                 }
             }
         }).start();
-        SpringApplication.run(OpenCarApplication.class, args);
+
     }
 
 
