@@ -1,7 +1,9 @@
 package com.far.vms.opencar.ui;
 
+import cn.hutool.core.util.StrUtil;
 import com.far.vms.opencar.OpenCarWindos;
 import com.far.vms.opencar.ui.entity.SettingDatas;
+import com.far.vms.opencar.utils.EnvUtil;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.fxml.FXMLLoader;
@@ -33,13 +35,13 @@ public class SettingUI {
 
     private Stage stage;
 
-    private SettingDatas settingDatas;
-
-
     //gccbin 选择目录
     Button btnGccPathSelect;
 
     OpenCarWindos ctx;
+
+    //gccpath用
+    DirectoryChooser directoryChooser = new DirectoryChooser();
 
 
     public static SettingUI create() {
@@ -79,14 +81,11 @@ public class SettingUI {
      */
     public void createFxmlStage(final OpenCarWindos ctx) throws IOException {
         stage = new Stage();
-        URL path = this.getClass().getClassLoader().getResource("fxml/settingUI.fxml"); // 注意路径不带/开头
-        File file = new File(path.getFile());
+        //   URL path = this.getClass().getClassLoader().getResource("fxml/settingUI.fxml"); // 注意路径不带/开头
+        File file = new File(EnvUtil.appAtPath + "/config/fxml/settingUI.fxml");
         settingUIRoot = FXMLLoader.load(file.toURI().toURL());
-
         this.ctx = ctx;
-        settingDatas = new SettingDatas();
         initControl();
-
         stage.setTitle("new Stage");
         stage.setScene(new Scene(settingUIRoot, 640, 480));
         stage.show();
@@ -104,12 +103,22 @@ public class SettingUI {
         });
 
         OpenCarWindos openCarWindos = ctx;
+        //设置默认
+
+
+        if (!StrUtil.isEmpty(openCarWindos.getSettingDatas().getBuild().getGccPath())) {
+            File defaultGccPathFile = new File(openCarWindos.getSettingDatas().getBuild().getGccPath());
+            directoryChooser.setInitialDirectory(defaultGccPathFile);
+        }
 
         btnGccPathSelect.setOnAction(new EventHandler<ActionEvent>() {
             @Override
             public void handle(ActionEvent event) {
+
                 //https://baijiahao.baidu.com/s?id=1719456091310997930&wfr=spider&for=pc
-                DirectoryChooser directoryChooser = new DirectoryChooser();
+                // DirectoryChooser directoryChooser = new DirectoryChooser();
+
+                //directoryChooser.setInitialDirectory();
                 File selectedDirectory = directoryChooser.showDialog(stage);
 
                 if (Objects.isNull(selectedDirectory)) return;
@@ -122,12 +131,9 @@ public class SettingUI {
                     openCarWindos.setTxtAlertMessage("没有找到gcc编译组件...");
                     return;
                 }
-
                 openCarWindos.setTxtAlertMessage("选择完成");
-
-                settingDatas.setGccBinPath(selectedDirectory.getPath());
-//                String sl = settingDatas.getGccBinPath() + "\\riscv64-unknown-elf-objdump.exe";
-
+                ctx.getSettingDatas().getBuild().setGccPath(selectedDirectory.getPath());
+                ctx.saveSettingData();
             }
         });
 

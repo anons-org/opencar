@@ -1,8 +1,13 @@
 package com.far.vms.opencar;
 
+import cn.hutool.core.io.FileUtil;
+import cn.hutool.json.JSONUtil;
 import com.far.vms.opencar.complier.Parser;
 import com.far.vms.opencar.ui.entity.SettingDatas;
 import com.far.vms.opencar.ui.SettingUI;
+import com.far.vms.opencar.ui.main.TopToolBar;
+import com.far.vms.opencar.utils.EnvUtil;
+import com.far.vms.opencar.utils.PathUtil;
 import com.far.vms.opencar.utils.ShellUtil;
 import javafx.application.Application;
 import javafx.beans.value.ChangeListener;
@@ -30,9 +35,9 @@ import javafx.stage.DirectoryChooser;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 
-import java.io.File;
-import java.io.IOException;
+import java.io.*;
 import java.net.URL;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
 import java.util.Arrays;
 import java.util.Objects;
@@ -53,6 +58,8 @@ public class OpenCarWindos extends Application {
     //底部信息提示
     Label txtAlertMessage;
 
+    private TopToolBar topToolBar;
+
 
     private SettingDatas settingDatas;
 
@@ -63,6 +70,30 @@ public class OpenCarWindos extends Application {
 
     private Parent rootMain;
 
+
+    Stage primaryStage;
+
+    public Stage getPrimaryStage() {
+        return primaryStage;
+    }
+
+
+
+    public Parent getRootMain() {
+        return rootMain;
+    }
+
+    public void setRootMain(Parent rootMain) {
+        this.rootMain = rootMain;
+    }
+
+    public SettingDatas getSettingDatas() {
+        return settingDatas;
+    }
+
+    public void setSettingDatas(SettingDatas settingDatas) {
+        this.settingDatas = settingDatas;
+    }
 
     public class CodeData {
 
@@ -117,99 +148,46 @@ public class OpenCarWindos extends Application {
     }
 
 
-    public void initSelectFileGroup(Stage primaryStage) {
-        FileChooser fileChooser = new FileChooser();
-        fileChooser.getExtensionFilters().addAll(
-                new FileChooser.ExtensionFilter("image Files", "*.img")
-//                ,new FileChooser.ExtensionFilter("HTML Files", "*.htm")
-        );
-
-
-        btnBinSelect.setOnAction(e -> {
-            File selectedFile = fileChooser.showOpenDialog(primaryStage);
-            settingDatas.setProgBinFile(selectedFile.getPath());
-        });
-
-        //https://baijiahao.baidu.com/s?id=1719456091310997930&wfr=spider&for=pc
-        DirectoryChooser directoryChooser = new DirectoryChooser();
-
-        btnGccPath.setOnAction(e -> {
-            File selectedDirectory = directoryChooser.showDialog(primaryStage);
-
-            if (Objects.isNull(selectedDirectory)) return;
-            //查找GCC相关的文件 需要注意linux和windonws的情况
-            Optional<String> binPath = Arrays.stream(selectedDirectory.list()).filter(findFile -> {
-                return findFile.equals("riscv64-unknown-elf-objdump.exe");
-            }).findFirst();
-
-            if (!binPath.isPresent()) {
-                sysConsole.appendText("没有找到gcc的bin目录!");
-                return;
-            }
-
-            settingDatas.setGccBinPath(selectedDirectory.getPath());
-            String sl = settingDatas.getGccBinPath() + "\\riscv64-unknown-elf-objdump.exe";
-
-        });
-    }
-
-
-    public void initMenuBarEvent() {
-
-        //绑定菜单事件
-        MenuBar menuBar = (MenuBar) rootMain.lookup("#mBar");//#ta是textarea的id号
-
-        OpenCarWindos ctx = this;
-
-        menuBar.getMenus().forEach(e -> {
-            e.getItems().forEach(e2 -> {
-                if ("mFileSet".equals(e2.getId())) {
-                    e2.setOnAction(new EventHandler<ActionEvent>() {
-                        @Override
-                        public void handle(ActionEvent event) {
-                            try {
-                                SettingUI.create().createFxmlStage(ctx);
-                            } catch (IOException e) {
-                                e.printStackTrace();
-                            }
-                        }
-                    });
-                }
-            });
-        });
-
-    }
-
-
     @Override
     public void start(Stage primaryStage) {
+
+        primaryStage = primaryStage;
+
+        EnvUtil.initEvn();
+
+        EnvUtil.loadConf(this);
+
+
+//        InputStream is = this.getClass().getResourceAsStream("/fxml/main.fxml");
+//        BufferedReader br = new BufferedReader(new InputStreamReader(is));
+//        String s = "";
+//        try {
+//            while ((s = br.readLine()) != null)
+//                System.out.println(s);
+//        } catch (IOException e) {
+//            e.printStackTrace();
+//        }
 
 
 //       URL path = this.getClass().getClassLoader().getResource("fxml/main.fxml"); // 注意路径不带/开头
 //        var tttt =path.getFile();
 
-        String path1 = System.getProperty("user.dir");
-        System.out.println("1.获取项目的路径 = " + path1);
 
-        //* 3. 获取Jar包所在路径
-        String path3 = System.getProperty("user.dir");
-        System.out.println("3.获取Jar包所在路径 = " + path3);
-        //* 4. 获取Jar包路径
-        String path4 = Run.class.getProtectionDomain().getCodeSource().getLocation().getFile();
-        String path4_1 = Run.class.getProtectionDomain().getCodeSource().getLocation().getPath();//两个是相同的
-
-        System.out.println("4.获取Jar包路径 = " + path4);
-        System.out.println("4.获取Jar包路径 = " + path4_1);
-
+        String mainfxml = EnvUtil.appAtPath + "/config/fxml/main.fxml";
 
         try {
-            //  File file = new File("C:\\Users\\mike\\Desktop\\jfx-view\\main.fxml");
-            URL path = this.getClass().getClassLoader().getResource("fxml/main.fxml"); // 注意路径不带/开头
-            File file = new File(path.getFile());
+
+            File file = new File(mainfxml);
             rootMain = FXMLLoader.load(file.toURI().toURL());
         } catch (IOException e) {
             e.printStackTrace();
         }
+
+
+        topToolBar = new TopToolBar();
+
+        topToolBar.setCtx(this).initControl();
+
 
         VBox vBox = (VBox) rootMain.lookup("#vbox");//#ta是textarea的id号
 
@@ -236,14 +214,13 @@ public class OpenCarWindos extends Application {
                 int xx = 1;
             }
         }
-        initMenuBarEvent();
 
 
 //        initSelectFileGroup(primaryStage);
 //
 //        initTabGroupConsole();
 
-        settingDatas = new SettingDatas();
+
         TableView finalTv = tv;
         tv.widthProperty().addListener(new ChangeListener<Number>() {
             @Override
@@ -277,12 +254,10 @@ public class OpenCarWindos extends Application {
 
                 if (event.getClickCount() % 1 == 0 && (!row.isEmpty())) {
                     CodeData rowData = row.getItem();
-
                     if (!Parser.canBreakForCode(rowData.getCodeLine())) {
                         System.out.println("这数据不能下断点!" + rowData.getCodeLine());
                         return;
                     }
-
                     if (rowData.getCircle().isVisible()) {
                         rowData.getCircle().setVisible(false);
                     } else {
@@ -401,4 +376,18 @@ public class OpenCarWindos extends Application {
     public void setTxtAlertMessage(String message) {
         this.txtAlertMessage.setText(message);
     }
+
+    /**
+     * @param
+     * @description: 保存配置
+     * @return: void
+     * @author mike/Fang.J
+     * @data 2022/12/1
+     */
+    public void saveSettingData() {
+        String filePath = EnvUtil.appAtPath + "/config/setting.json";
+        String data = JSONUtil.toJsonStr(settingDatas);
+        FileUtil.writeString(data, filePath, StandardCharsets.UTF_8);
+    }
+
 }

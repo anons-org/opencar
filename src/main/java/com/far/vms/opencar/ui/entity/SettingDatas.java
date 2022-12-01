@@ -7,23 +7,51 @@ package com.far.vms.opencar.ui.entity;
  */
 public class SettingDatas {
 
-    private String gccBinPath;
-    //程序文件
-    private String progBinFile;
+    private Build build;
 
-    public String getGccBinPath() {
-        return gccBinPath;
+
+    public static class Build {
+        String gccPath;
+        String progFile;
+        //调试程序的目录
+        String progFilePath;
+
+        public String getProgFilePath() {
+            return progFilePath;
+        }
+
+        public void setProgFilePath(String progFilePath) {
+            this.progFilePath = progFilePath;
+        }
+
+        public String getGccPath() {
+            return gccPath;
+        }
+
+        public void setGccPath(String gccPath) {
+            this.gccPath = gccPath;
+        }
+
+        public String getProgFile() {
+            return progFile;
+        }
+
+        public void setProgFile(String progFile) {
+            this.progFile = progFile;
+        }
     }
 
-    public void setGccBinPath(String gccBinPath) {
-        this.gccBinPath = gccBinPath;
+
+    public Build getBuild() {
+        return build;
     }
 
-    public String getProgBinFile() {
-        return progBinFile;
+    public void setBuild(Build build) {
+        this.build = build;
     }
 
-    public void setProgBinFile(String progBinFile) {
-        this.progBinFile = progBinFile;
+    public static Build getModeBuild() {
+        return new Build();
     }
+
 }
