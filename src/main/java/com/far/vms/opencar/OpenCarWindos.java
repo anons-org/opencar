@@ -3,8 +3,10 @@ package com.far.vms.opencar;
 import cn.hutool.core.io.FileUtil;
 import cn.hutool.json.JSONUtil;
 import com.far.vms.opencar.complier.Parser;
+import com.far.vms.opencar.debugger.Debugger;
 import com.far.vms.opencar.ui.entity.SettingDatas;
 import com.far.vms.opencar.ui.SettingUI;
+import com.far.vms.opencar.ui.main.DebugBtns;
 import com.far.vms.opencar.ui.main.TopToolBar;
 import com.far.vms.opencar.utils.EnvUtil;
 import com.far.vms.opencar.utils.PathUtil;
@@ -59,6 +61,7 @@ public class OpenCarWindos extends Application {
     Label txtAlertMessage;
 
     private TopToolBar topToolBar;
+    private DebugBtns debugBtns;
 
 
     private SettingDatas settingDatas;
@@ -73,10 +76,24 @@ public class OpenCarWindos extends Application {
 
     Stage primaryStage;
 
+
+    ObservableList<CodeData> editorData = FXCollections.observableArrayList();
+
+
+    Debugger debugger;
+
+
+    public Debugger getDebugger() {
+        return debugger;
+    }
+
+    public void setDebugger(Debugger debugger) {
+        this.debugger = debugger;
+    }
+
     public Stage getPrimaryStage() {
         return primaryStage;
     }
-
 
 
     public Parent getRootMain() {
@@ -188,6 +205,9 @@ public class OpenCarWindos extends Application {
 
         topToolBar.setCtx(this).initControl();
 
+        debugBtns = new DebugBtns();
+        debugBtns.setCtx(this).initControl();
+
 
         VBox vBox = (VBox) rootMain.lookup("#vbox");//#ta是textarea的id号
 
@@ -255,13 +275,15 @@ public class OpenCarWindos extends Application {
                 if (event.getClickCount() % 1 == 0 && (!row.isEmpty())) {
                     CodeData rowData = row.getItem();
                     if (!Parser.canBreakForCode(rowData.getCodeLine())) {
-                        System.out.println("这数据不能下断点!" + rowData.getCodeLine());
+                        setTxtAlertMessage("此处不能设置断点,因为该行代码不是指令");
                         return;
                     }
                     if (rowData.getCircle().isVisible()) {
                         rowData.getCircle().setVisible(false);
+                        this.getDebugger().removeBreak(row.getIndex() + 1);
                     } else {
                         rowData.getCircle().setVisible(true);
+                        this.getDebugger().addBreak(row.getIndex() + 1);
                     }
                 }
             });
@@ -269,16 +291,16 @@ public class OpenCarWindos extends Application {
         });
 
 
-        ObservableList<CodeData> data = FXCollections.observableArrayList();
-        String kr = "D:\\AAAA_WORK\\RISC-V-Tools\\os\\riscv-operating-system-mooc\\code\\os\\01-helloRVOS\\build\\kernel-img.img";
-        String buildTool = "D:\\AAAA_WORK\\RISC-V-Tools\\riscv64-unknown-elf-toolchain-10.2.0-2020.12.8-x86_64-w64-mingw32\\bin\\riscv64-unknown-elf-objdump.exe";
-
-
-        ShellUtil.runShell(buildTool, new String[]{buildTool, kr, "-d"}, cmdInf -> {
-            data.add(new CodeData(getCodeLineNumber(), getCircle(), cmdInf));
-            //  System.out.println(cmdInf);
-            return 0;
-        });
+//        ObservableList<CodeData> data = FXCollections.observableArrayList();
+//        String kr = "D:\\AAAA_WORK\\RISC-V-Tools\\os\\riscv-operating-system-mooc\\code\\os\\01-helloRVOS\\build\\kernel-img.img";
+//        String buildTool = "D:\\AAAA_WORK\\RISC-V-Tools\\riscv64-unknown-elf-toolchain-10.2.0-2020.12.8-x86_64-w64-mingw32\\bin\\riscv64-unknown-elf-objdump.exe";
+//
+//
+//        ShellUtil.runShell(buildTool, new String[]{buildTool, kr, "-d"}, cmdInf -> {
+//            data.add(new CodeData(getCodeLineNumber(), getCircle(), cmdInf));
+//            //  System.out.println(cmdInf);
+//            return 0;
+//        });
 
 
         // https://blog.csdn.net/m0_58015306/article/details/123033003
@@ -295,7 +317,7 @@ public class OpenCarWindos extends Application {
         codeCol.setCellValueFactory(new PropertyValueFactory<>("codeLine"));
         //添加到tableview
         tv.getColumns().addAll(lineNum, lineCol, codeCol);
-        tv.setItems(data);
+        tv.setItems(editorData);
         lineNum.setPrefWidth(tv.getPrefWidth() * 0.05);
         lineCol.setPrefWidth(tv.getPrefWidth() * 0.02);
         codeCol.setPrefWidth(tv.getPrefWidth() * 1.2);
@@ -389,5 +411,42 @@ public class OpenCarWindos extends Application {
         String data = JSONUtil.toJsonStr(settingDatas);
         FileUtil.writeString(data, filePath, StandardCharsets.UTF_8);
     }
+
+
+    public void addCode(String filePath) {
+
+        String buildTool = settingDatas.getBuild().getGccPath() + "\\riscv64-unknown-elf-objdump.exe";
+
+        ShellUtil.runShell(buildTool, new String[]{buildTool, filePath, "-d"}, cmdInf -> {
+            editorData.add(new CodeData(getCodeLineNumber(), getCircle(), cmdInf));
+            //  System.out.println(cmdInf);
+            return 0;
+        });
+
+    }
+
+
+    public void buildElfToBin() {
+
+        String buildTool = settingDatas.getBuild().getGccPath() + "\\riscv64-unknown-elf-objcopy.exe";
+        String elfFile = settingDatas.getBuild().getProgFilePath() + "/" + settingDatas.getBuild().getProgName() + "." + settingDatas.getBuild().getProgSufix();
+        String outFile = settingDatas.getBuild().getProgFilePath() + "/" + settingDatas.getBuild().getProgName() + ".bin";
+        ShellUtil.runShell(buildTool, new String[]{buildTool,
+                "-I",
+                "elf64-littleriscv",
+                elfFile,
+                "-g",
+                "-S",
+                "-O",
+                "binary",
+                outFile
+
+        }, cmdInf -> {
+            System.out.println(cmdInf);
+            return 0;
+        });
+
+    }
+
 
 }

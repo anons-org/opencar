@@ -60,8 +60,9 @@
         <Menu mnemonicParsing="false" style="fx-font-color: red;" text="文件">
           <items>
             <MenuItem mnemonicParsing="false" text="New" />
-            <MenuItem id="open" mnemonicParsing="false" text="Open…" />
-            <Menu mnemonicParsing="false" text="Open Recent" />
+            <MenuItem id="open" mnemonicParsing="false" text="打开调试文件" />
+                  <MenuItem id="openProgFile" mnemonicParsing="false" text="打开执行文件" />
+            <Menu mnemonicParsing="false" text="openMenu" />
             <SeparatorMenuItem mnemonicParsing="false" />
             <MenuItem mnemonicParsing="false" text="Close" />
             <MenuItem mnemonicParsing="false" text="Save" />
@@ -107,11 +108,16 @@
                         </Tab>
                     </tabs>
                   </TabPane>
-                  <HBox id="hbox" layoutX="-6.0" layoutY="9.0" prefHeight="38.0" prefWidth="443.0">
+                  <HBox id="hbox" layoutX="-6.0" layoutY="9.0" prefHeight="38.0" prefWidth="688.0">
                      <children>
-                        <Button contentDisplay="CENTER" mnemonicParsing="false" prefHeight="23.0" prefWidth="69.0" text="运行(F5)">
+                        <Button contentDisplay="CENTER" mnemonicParsing="false" prefHeight="23.0" prefWidth="108.0" text="直接运行ELF(F5)">
                            <HBox.margin>
                               <Insets left="10.0" />
+                           </HBox.margin>
+                        </Button>
+                        <Button id="buildBinAndRun" contentDisplay="CENTER" mnemonicParsing="false" prefHeight="23.0" prefWidth="103.0" text="生成bin再运行">
+                           <HBox.margin>
+                              <Insets left="20.0" />
                            </HBox.margin>
                         </Button>
                         <Button contentDisplay="CENTER" mnemonicParsing="false" prefHeight="23.0" prefWidth="71.0" text="单步(F6)">

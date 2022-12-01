@@ -2,8 +2,12 @@ package com.far.vms.opencar.ui.main;
 
 import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.core.util.StrUtil;
+import com.far.vms.opencar.OpenCarApplication;
 import com.far.vms.opencar.OpenCarWindos;
 import com.far.vms.opencar.ui.SettingUI;
+import com.far.vms.opencar.utils.ShellUtil;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.scene.control.MenuBar;
@@ -47,7 +51,7 @@ public class TopToolBar {
                             System.out.println("选择文件");
                             //打开选择镜像的窗口
                             FileChooser fileChooser = new FileChooser();
-                            if(!StrUtil.isEmpty(ctx.getSettingDatas().getBuild().getProgFilePath())){
+                            if (!StrUtil.isEmpty(ctx.getSettingDatas().getBuild().getProgFilePath())) {
                                 fileChooser.setInitialDirectory(new File(ctx.getSettingDatas().getBuild().getProgFilePath()));
                             }
 
@@ -59,8 +63,32 @@ public class TopToolBar {
 
                             if (selectedFile == null) return;
                             String pt = selectedFile.getParent();
+
+
+                            String[] pathArs = selectedFile.getPath().replaceAll("\\\\", "\\/").split("\\/");
+                            String fileName = pathArs[pathArs.length-1];
+                            pathArs = fileName.split("\\.");
+                            fileName =  pathArs[0];
+                            String fileSuifx = pathArs[pathArs.length-1];
                             ctx.getSettingDatas().getBuild().setProgFilePath(pt);
+                            ctx.getSettingDatas().getBuild().setProgName(fileName);
+                            ctx.getSettingDatas().getBuild().setProgSufix(fileSuifx);
                             ctx.saveSettingData();
+                            ctxmain.addCode(selectedFile.getPath());
+
+
+//                            ObservableList<OpenCarWindos.CodeData> data = FXCollections.observableArrayList();
+//                       //     String kr = "D:\\AAAA_WORK\\RISC-V-Tools\\os\\riscv-operating-system-mooc\\code\\os\\01-helloRVOS\\build\\kernel-img.img";
+//                            String buildTool = "D:\\AAAA_WORK\\RISC-V-Tools\\riscv64-unknown-elf-toolchain-10.2.0-2020.12.8-x86_64-w64-mingw32\\bin\\riscv64-unknown-elf-objdump.exe";
+//
+//
+//                            ShellUtil.runShell(buildTool, new String[]{buildTool, selectedFile.getPath(), "-d"}, cmdInf -> {
+//                                data.add(new OpenCarWindos.CodeData(getCodeLineNumber(), getCircle(), cmdInf));
+//                                //  System.out.println(cmdInf);
+//                                return 0;
+//                            });
+
+
                         }
                     });
                 } else if ("mFileSet".equals(e2.getId())) {
@@ -74,6 +102,35 @@ public class TopToolBar {
                             }
                         }
                     });
+                } else if ("openProgFile".equals(e2.getId())) {
+                    //打开执行文件 启动模拟器
+                    e2.setOnAction(new EventHandler<ActionEvent>() {
+                        @Override
+                        public void handle(ActionEvent event) {
+
+                            FileChooser fileChooser = new FileChooser();
+//                            if (!StrUtil.isEmpty(ctx.getSettingDatas().getBuild().getProgFilePath())) {
+//                                fileChooser.setInitialDirectory(new File(ctx.getSettingDatas().getBuild().getProgFilePath()));
+//                            }
+
+                            fileChooser.getExtensionFilters().addAll(new FileChooser.ExtensionFilter("elf or image file", "*.*"));
+                            File selectedFile = fileChooser.showOpenDialog(ctx.getPrimaryStage());
+
+                            if (selectedFile == null) return;
+//                            String pt = selectedFile.getParent();
+//                            ctx.getSettingDatas().getBuild().setProgFilePath(pt);
+//                            ctx.saveSettingData();
+//
+//                            ctxmain.addCode(selectedFile.getPath());
+
+                            new Thread(() -> {
+                                OpenCarApplication.run(ctx, selectedFile.getPath());
+                            }).start();
+
+                            System.out.println("openProgFile");
+                        }
+                    });
+
                 }
             });
         });

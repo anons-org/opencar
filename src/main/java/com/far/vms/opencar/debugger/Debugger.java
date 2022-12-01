@@ -37,7 +37,7 @@ public class Debugger implements IDebuger {
     private List<Integer> pcBreaks = new ArrayList<>();
 
 
-    //断点所在的行 有哪些？
+    //断点所在的行 有哪些？ 记录 调式器发送过来的断点
     List<Integer> breakLines;
 
 
@@ -65,6 +65,9 @@ public class Debugger implements IDebuger {
     public Debugger() {
         this.setStat(Stat.NONE);
         breakLines = new ArrayList<>();
+
+
+
     }
 
 
@@ -88,6 +91,16 @@ public class Debugger implements IDebuger {
     //设置断点
     public void setBreak(int line) {
         breakLines.add(line);
+    }
+
+
+    public void addBreak(int line) {
+        breakLines.add(line);
+    }
+
+
+    public void removeBreak(int line) {
+        breakLines.remove(line);
     }
 
 
@@ -133,36 +146,46 @@ public class Debugger implements IDebuger {
         }
 
 
-        Scanner scanner = new Scanner(System.in);
-        while (scanner.hasNext()) {
-            String[] cmds = scanner.nextLine().split(" ");
-            cmd = cmds[0];
-            if ("next".equals(cmd)) {
-                //跳出循环 执行下一段代码
-                break;
-            } else if ("delete".equals(cmd)) {//清除所有断点
+        while (stat == Stat.DEBUG){
 
-            } else if ("disable".equals(cmd)) {
-                stat = Stat.NONE;
-                break;
-            } else if ("info".equals(cmd)) {
-                if ("all-reg".equals(cmds[1])) {//显示所有寄存器的信息
-                    Debug.printRegister(1);
-                }
-            } else if ("x".equals(cmds[0])) {// x /nfu <addr>
-                String fmt = cmds[1];
-                long addr = Long.decode(cmds[2]);
-                Debug.printMemoryVal(addr);
-            } else if ("h".equals(cmd)) {
-                Arrays.stream(this.cmdsDesc).forEach(e -> {
-                    System.out.println(e);
-                });
-            } else if ("b".equals(cmd)) {
-                if ("pc".equals(cmds[1])) {
-
-                }
-            }
         }
+
+
+
+
+//        Scanner scanner = new Scanner(System.in);
+//        while (scanner.hasNext()) {
+//            String[] cmds = scanner.nextLine().split(" ");
+//            cmd = cmds[0];
+//            if ("next".equals(cmd)) {
+//                //跳出循环 执行下一段代码
+//                break;
+//            } else if ("delete".equals(cmd)) {//清除所有断点
+//
+//            } else if ("disable".equals(cmd)) {
+//                stat = Stat.NONE;
+//                break;
+//            } else if ("info".equals(cmd)) {
+//                if ("all-reg".equals(cmds[1])) {//显示所有寄存器的信息
+//                    Debug.printRegister(1);
+//                }
+//            } else if ("x".equals(cmds[0])) {// x /nfu <addr>
+//                String fmt = cmds[1];
+//                long addr = Long.decode(cmds[2]);
+//                Debug.printMemoryVal(addr);
+//            } else if ("h".equals(cmd)) {
+//                Arrays.stream(this.cmdsDesc).forEach(e -> {
+//                    System.out.println(e);
+//                });
+//            } else if ("b".equals(cmd)) {
+//                if ("pc".equals(cmds[1])) {
+//
+//                }
+//            }
+//        }
+//
+
+
     }
 
 

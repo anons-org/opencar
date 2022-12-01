@@ -12,25 +12,15 @@ import java.util.Arrays;
 import java.util.Scanner;
 
 
-//@SpringBootApplication
 public class OpenCarApplication {
 
 
-    public static void main(String[] args) {
+    public static void run(final OpenCarWindos ctx, String progFile) {
 
-
-//        new Thread(()->{
-//            Scanner scanner = new Scanner(System.in);
-//            while (scanner.hasNext()) {
-//                System.out.println(scanner.nextLine());
-//                String[] cmds = scanner.nextLine().split(" ");
-//
-//            }
-//        }).start();
 
         StaticRes.init();
-        readBin();
-
+        ctx.setDebugger(StaticRes.debugger);
+        readBin(progFile);
 
         //永不停机
         new Thread(() -> {
@@ -43,11 +33,42 @@ public class OpenCarApplication {
             }
         }).start();
 
+
     }
 
+//    public static void main(String[] args) {
+//
+//
+////        new Thread(()->{
+////            Scanner scanner = new Scanner(System.in);
+////            while (scanner.hasNext()) {
+////                System.out.println(scanner.nextLine());
+////                String[] cmds = scanner.nextLine().split(" ");
+////
+////            }
+////        }).start();
+//
+//        StaticRes.init();
+//        readBin(args[0]);
+//
+//
+//        //永不停机
+//        new Thread(() -> {
+//            while (true) {
+//                try {
+//                    Thread.sleep(100000);
+//                } catch (InterruptedException e) {
+//                    e.printStackTrace();
+//                }
+//            }
+//        }).start();
+//
+//    }
 
-    public static void readBin() {
-        String binFile = "D:\\AAAA_WORK\\RISC-V-Tools\\os\\riscv-operating-system-mooc\\code\\os\\01-helloRVOS\\build\\kernel.bin";
+
+    public static void readBin(String progFile) {
+        //   String binFile = "D:\\AAAA_WORK\\RISC-V-Tools\\os\\riscv-operating-system-mooc\\code\\os\\01-helloRVOS\\build\\kernel.bin";
+        String binFile = progFile;
         File memBinFile = new File(binFile);
         try {
             //byte[] datas = new FileInputStream(memBinFile).readAllBytes();

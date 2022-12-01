@@ -16,6 +16,26 @@ public class SettingDatas {
         //调试程序的目录
         String progFilePath;
 
+        String progName;
+        //后缀
+        String progSufix;
+
+        public String getProgName() {
+            return progName;
+        }
+
+        public void setProgName(String progName) {
+            this.progName = progName;
+        }
+
+        public String getProgSufix() {
+            return progSufix;
+        }
+
+        public void setProgSufix(String progSufix) {
+            this.progSufix = progSufix;
+        }
+
         public String getProgFilePath() {
             return progFilePath;
         }
