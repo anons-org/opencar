@@ -168,7 +168,7 @@
                                                 <Font size="14.0" />
                                              </font>
                                           </Label>
-                                          <TableView layoutX="8.0" layoutY="89.0" prefHeight="589.0" prefWidth="248.0">
+                                          <TableView layoutX="8.0" layoutY="89.0" prefHeight="580.0" prefWidth="248.0">
                                             <columns>
                                               <TableColumn prefWidth="75.0" text="C1" />
                                               <TableColumn prefWidth="75.0" text="C2" />

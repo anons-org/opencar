@@ -1,23 +1,22 @@
 package com.far.vms.opencar;
 
 import cn.hutool.core.io.FileUtil;
+import cn.hutool.core.util.StrUtil;
 import cn.hutool.json.JSONUtil;
 import com.far.vms.opencar.complier.Parser;
-import com.far.vms.opencar.debugger.Debugger;
+import com.far.vms.opencar.debugger.server.DServer;
 import com.far.vms.opencar.ui.entity.SettingDatas;
-import com.far.vms.opencar.ui.SettingUI;
 import com.far.vms.opencar.ui.main.DebugBtns;
 import com.far.vms.opencar.ui.main.TopToolBar;
+import com.far.vms.opencar.ui.DchUtil;
 import com.far.vms.opencar.utils.EnvUtil;
-import com.far.vms.opencar.utils.PathUtil;
-import com.far.vms.opencar.utils.ShellUtil;
+import com.far.vms.opencar.ui.ShellUtil;
+import com.far.vms.opencar.utils.exception.FarException;
 import javafx.application.Application;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
-import javafx.event.ActionEvent;
-import javafx.event.EventHandler;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
@@ -32,18 +31,11 @@ import javafx.scene.layout.Pane;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Circle;
-import javafx.scene.text.Font;
-import javafx.stage.DirectoryChooser;
-import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 
 import java.io.*;
-import java.net.URL;
 import java.nio.charset.StandardCharsets;
-import java.nio.file.Path;
-import java.util.Arrays;
 import java.util.Objects;
-import java.util.Optional;
 
 
 public class OpenCarWindos extends Application {
@@ -60,10 +52,28 @@ public class OpenCarWindos extends Application {
     //底部信息提示
     Label txtAlertMessage;
 
+
     private TopToolBar topToolBar;
+
+
     private DebugBtns debugBtns;
 
 
+    /**
+     * @description: 调试工具
+     * @param null
+     * @return:
+     * @author mike/Fang.J
+     * @data 2022/12/3
+     */
+    private DchUtil dchUtil;
+
+
+    /**
+     * 用于存储设置
+     *
+     * @data 2022/12/3
+     */
     private SettingDatas settingDatas;
 
 
@@ -80,15 +90,12 @@ public class OpenCarWindos extends Application {
     ObservableList<CodeData> editorData = FXCollections.observableArrayList();
 
 
-    Debugger debugger;
-
-
-    public Debugger getDebugger() {
-        return debugger;
+    public DchUtil getDchUtil() {
+        return dchUtil;
     }
 
-    public void setDebugger(Debugger debugger) {
-        this.debugger = debugger;
+    public void setDchUtil(DchUtil dchUtil) {
+        this.dchUtil = dchUtil;
     }
 
     public Stage getPrimaryStage() {
@@ -175,6 +182,28 @@ public class OpenCarWindos extends Application {
         EnvUtil.loadConf(this);
 
 
+        DServer.startDserver();
+
+
+        Thread sThread = new Thread(() -> {
+            try {
+                //等待server启动完成
+                while (true) {
+                    if (DServer.farSockServer.isStartComplete()) break;
+                    Thread.sleep(1000);
+                }
+            } catch (InterruptedException e) {
+                throw new FarException(FarException.Code.CRASH, "等待启动时异常", e);
+            }
+        });
+        sThread.start();
+        try {
+            sThread.join();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+
+
 //        InputStream is = this.getClass().getResourceAsStream("/fxml/main.fxml");
 //        BufferedReader br = new BufferedReader(new InputStreamReader(is));
 //        String s = "";
@@ -193,7 +222,6 @@ public class OpenCarWindos extends Application {
         String mainfxml = EnvUtil.appAtPath + "/config/fxml/main.fxml";
 
         try {
-
             File file = new File(mainfxml);
             rootMain = FXMLLoader.load(file.toURI().toURL());
         } catch (IOException e) {
@@ -259,8 +287,6 @@ public class OpenCarWindos extends Application {
         //设置为只能单选
         tv.getSelectionModel().setSelectionMode(SelectionMode.SINGLE);
         //设置点击方法
-
-
         tv.setRowFactory(tview -> {
             TableRow<CodeData> row = new TableRow<>();
             row.setOnMouseClicked(event -> {
@@ -280,10 +306,10 @@ public class OpenCarWindos extends Application {
                     }
                     if (rowData.getCircle().isVisible()) {
                         rowData.getCircle().setVisible(false);
-                        this.getDebugger().removeBreak(row.getIndex() + 1);
+                        this.getDchUtil().addPcBreakLine("xxx", row.getIndex() + 1);
                     } else {
                         rowData.getCircle().setVisible(true);
-                        this.getDebugger().addBreak(row.getIndex() + 1);
+                        this.getDchUtil().addPcBreakLine("xxx", row.getIndex() + 1);
                     }
                 }
             });
@@ -413,7 +439,12 @@ public class OpenCarWindos extends Application {
     }
 
 
-    public void addCode(String filePath) {
+    public boolean addCode(String filePath) {
+
+        if (!EnvUtil.hasGccPath(this)) {
+            setTxtAlertMessage("需要先设置gcc的目录!");
+            return false;
+        }
 
         String buildTool = settingDatas.getBuild().getGccPath() + "\\riscv64-unknown-elf-objdump.exe";
 
@@ -423,14 +454,31 @@ public class OpenCarWindos extends Application {
             return 0;
         });
 
+        return true;
+
     }
 
 
     public void buildElfToBin() {
 
+
+        if (Objects.isNull(settingDatas) || Objects.isNull(settingDatas.getBuild())) {
+            setTxtAlertMessage("还没有设置编译配置!");
+            return;
+        }
+
+
+        if (StrUtil.isEmpty(settingDatas.getBuild().getProgFilePath())) {
+            setTxtAlertMessage("需要先选择调式程序!");
+            return;
+        }
+
+
         String buildTool = settingDatas.getBuild().getGccPath() + "\\riscv64-unknown-elf-objcopy.exe";
         String elfFile = settingDatas.getBuild().getProgFilePath() + "/" + settingDatas.getBuild().getProgName() + "." + settingDatas.getBuild().getProgSufix();
         String outFile = settingDatas.getBuild().getProgFilePath() + "/" + settingDatas.getBuild().getProgName() + ".bin";
+
+
         ShellUtil.runShell(buildTool, new String[]{buildTool,
                 "-I",
                 "elf64-littleriscv",
@@ -445,6 +493,9 @@ public class OpenCarWindos extends Application {
             System.out.println(cmdInf);
             return 0;
         });
+
+        setTxtAlertMessage("bin编译完成!");
+
 
     }
 

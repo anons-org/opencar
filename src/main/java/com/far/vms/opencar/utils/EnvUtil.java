@@ -1,6 +1,8 @@
 package com.far.vms.opencar.utils;
 
 import cn.hutool.core.io.FileUtil;
+import cn.hutool.core.util.ObjectUtil;
+import cn.hutool.json.JSONException;
 import cn.hutool.json.JSONUtil;
 import com.far.vms.opencar.OpenCarWindos;
 import com.far.vms.opencar.ui.entity.SettingDatas;
@@ -24,8 +26,31 @@ public class EnvUtil {
      */
     public static void loadConf(final OpenCarWindos ctx) {
         String data = FileUtil.readUtf8String(EnvUtil.appAtPath + "/config/setting.json");
-        SettingDatas cnf = JSONUtil.toBean(data, SettingDatas.class);
-        ctx.setSettingDatas(cnf);
+        SettingDatas cnf;
+        try {
+            cnf = JSONUtil.toBean(data, SettingDatas.class);
+            ctx.setSettingDatas(cnf);
+        } catch (JSONException e) {
+            //设置一个空的配置
+            cnf = new SettingDatas();
+            cnf.setBuild(SettingDatas.getModeBuild());
+            ctx.setSettingDatas(cnf);
+            e.printStackTrace();
+        }
+
     }
+
+
+    public static boolean hasGccPath(final OpenCarWindos ctx) {
+
+        //检查是否配置了gcc的路径
+
+        return !(ObjectUtil.isNull(ctx.getSettingDatas())
+                || ObjectUtil.isEmpty(ctx.getSettingDatas().getBuild())
+                || ObjectUtil.isEmpty(ctx.getSettingDatas().getBuild().getGccPath())
+        );
+
+    }
+
 
 }

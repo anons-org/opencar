@@ -2,6 +2,7 @@ package com.far.vms.opencar;
 
 import com.far.vms.opencar.debugger.Debug;
 import com.far.vms.opencar.debugger.Debugger;
+import com.far.vms.opencar.debugger.server.DServer;
 import com.far.vms.opencar.instruct.BinFile;
 import com.far.vms.opencar.board.Cpu;
 import com.far.vms.opencar.instruct.StaticRes;
@@ -15,21 +16,21 @@ import java.util.Scanner;
 public class OpenCarApplication {
 
 
-    public static void run(final OpenCarWindos ctx, String progFile) {
+    public static void run(String progFile) {
 
 
         StaticRes.init();
-        ctx.setDebugger(StaticRes.debugger);
+//        ctx.setDebugger(StaticRes.debugger);
         readBin(progFile);
 
         //永不停机
         new Thread(() -> {
-            while (true) {
-                try {
+            try {
+                while (true) {
                     Thread.sleep(100000);
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
                 }
+            } catch (InterruptedException e) {
+                e.printStackTrace();
             }
         }).start();
 

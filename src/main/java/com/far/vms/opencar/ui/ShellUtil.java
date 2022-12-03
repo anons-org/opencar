@@ -1,4 +1,4 @@
-package com.far.vms.opencar.utils;
+package com.far.vms.opencar.ui;
 
 import java.io.BufferedReader;
 import java.io.IOException;

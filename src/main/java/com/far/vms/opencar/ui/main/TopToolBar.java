@@ -2,12 +2,9 @@ package com.far.vms.opencar.ui.main;
 
 import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.core.util.StrUtil;
-import com.far.vms.opencar.OpenCarApplication;
 import com.far.vms.opencar.OpenCarWindos;
 import com.far.vms.opencar.ui.SettingUI;
-import com.far.vms.opencar.utils.ShellUtil;
-import javafx.collections.FXCollections;
-import javafx.collections.ObservableList;
+import com.far.vms.opencar.ui.DchUtil;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.scene.control.MenuBar;
@@ -44,37 +41,42 @@ public class TopToolBar {
         OpenCarWindos ctxmain = ctx;
         menuBar.getMenus().forEach(e -> {
             e.getItems().forEach(e2 -> {
-                if ("open".equals(e2.getId())) {
+                if ("open".equals(e2.getId())) {//调试文件
                     e2.setOnAction(new EventHandler<ActionEvent>() {
                         @Override
                         public void handle(ActionEvent event) {
                             System.out.println("选择文件");
                             //打开选择镜像的窗口
                             FileChooser fileChooser = new FileChooser();
-                            if (!StrUtil.isEmpty(ctx.getSettingDatas().getBuild().getProgFilePath())) {
+                            if (!ObjectUtil.isNull(ctx.getSettingDatas())
+                                    && !ObjectUtil.isNull(ctx.getSettingDatas().getBuild())
+                                    && !StrUtil.isEmpty(ctx.getSettingDatas().getBuild().getProgFilePath())){
                                 fileChooser.setInitialDirectory(new File(ctx.getSettingDatas().getBuild().getProgFilePath()));
                             }
 
-                            fileChooser.getExtensionFilters().addAll(
-                                    new FileChooser.ExtensionFilter("elf or image file", "*.img")
+                            fileChooser.getExtensionFilters().addAll(new FileChooser.ExtensionFilter("elf or image file", "*.img")
 //                ,new FileChooser.ExtensionFilter("HTML Files", "*.htm")
                             );
-                            File selectedFile = fileChooser.showOpenDialog(ctx.getPrimaryStage());
 
+                            File selectedFile = fileChooser.showOpenDialog(ctx.getPrimaryStage());
                             if (selectedFile == null) return;
                             String pt = selectedFile.getParent();
-
-
                             String[] pathArs = selectedFile.getPath().replaceAll("\\\\", "\\/").split("\\/");
-                            String fileName = pathArs[pathArs.length-1];
+                            String fileName = pathArs[pathArs.length - 1];
                             pathArs = fileName.split("\\.");
-                            fileName =  pathArs[0];
-                            String fileSuifx = pathArs[pathArs.length-1];
+                            fileName = pathArs[0];
+                            String fileSuifx = pathArs[pathArs.length - 1];
                             ctx.getSettingDatas().getBuild().setProgFilePath(pt);
                             ctx.getSettingDatas().getBuild().setProgName(fileName);
                             ctx.getSettingDatas().getBuild().setProgSufix(fileSuifx);
                             ctx.saveSettingData();
-                            ctxmain.addCode(selectedFile.getPath());
+
+                            if(   ctxmain.addCode(selectedFile.getPath())){
+                                ctxmain.setDchUtil(DchUtil.create());
+                            }
+
+
+
 
 
 //                            ObservableList<OpenCarWindos.CodeData> data = FXCollections.observableArrayList();
@@ -103,33 +105,43 @@ public class TopToolBar {
                         }
                     });
                 } else if ("openProgFile".equals(e2.getId())) {
-                    //打开执行文件 启动模拟器
-                    e2.setOnAction(new EventHandler<ActionEvent>() {
-                        @Override
-                        public void handle(ActionEvent event) {
-
-                            FileChooser fileChooser = new FileChooser();
-//                            if (!StrUtil.isEmpty(ctx.getSettingDatas().getBuild().getProgFilePath())) {
-//                                fileChooser.setInitialDirectory(new File(ctx.getSettingDatas().getBuild().getProgFilePath()));
-//                            }
-
-                            fileChooser.getExtensionFilters().addAll(new FileChooser.ExtensionFilter("elf or image file", "*.*"));
-                            File selectedFile = fileChooser.showOpenDialog(ctx.getPrimaryStage());
-
-                            if (selectedFile == null) return;
-//                            String pt = selectedFile.getParent();
-//                            ctx.getSettingDatas().getBuild().setProgFilePath(pt);
-//                            ctx.saveSettingData();
+//                    //打开执行文件 启动模拟器
+//                    e2.setOnAction(new EventHandler<ActionEvent>() {
+//                        @Override
+//                        public void handle(ActionEvent event) {
 //
-//                            ctxmain.addCode(selectedFile.getPath());
-
-                            new Thread(() -> {
-                                OpenCarApplication.run(ctx, selectedFile.getPath());
-                            }).start();
-
-                            System.out.println("openProgFile");
-                        }
-                    });
+//                            FileChooser fileChooser = new FileChooser();
+////                            if (!StrUtil.isEmpty(ctx.getSettingDatas().getBuild().getProgFilePath())) {
+////                                fileChooser.setInitialDirectory(new File(ctx.getSettingDatas().getBuild().getProgFilePath()));
+////                            }
+//                            fileChooser.getExtensionFilters().addAll(new FileChooser.ExtensionFilter("elf or image file", "*.*"));
+//                            File selectedFile = fileChooser.showOpenDialog(ctx.getPrimaryStage());
+//
+//                            if (selectedFile == null) return;
+////                            String pt = selectedFile.getParent();
+////                            ctx.getSettingDatas().getBuild().setProgFilePath(pt);
+////                            ctx.saveSettingData();
+////
+////                            ctxmain.addCode(selectedFile.getPath());
+//
+//                            new Thread(() -> {
+//                                //模拟器内部的通讯和调试器没有任何关系，他们之间的通讯，只能依靠socket
+//                                OpenCarApplication.run(selectedFile.getPath());
+//                            }).start();
+//
+//                            //等待模拟器的server启动完成，这个实现很蠢 后面完善
+//                            System.out.println("debug  server init......");
+//
+//                            try {
+//                                Thread.sleep(8000);
+//                            } catch (InterruptedException e) {
+//                                e.printStackTrace();
+//                            }
+//
+//                            System.out.println("debug  server InitComplete .....");
+//
+//                        }
+//                    });
 
                 }
             });

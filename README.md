@@ -27,6 +27,7 @@
 > 希望有懂javafx也喜欢虚拟技术的朋友一起开发简单的汇编编辑器和汇编调试器 联系Q184377367
 > 
 ## 想法
+- 完美运行rvos
 - 完美运行xv6
 - 完美运行linux
 - 在opencar上开发一款NES模拟器
@@ -36,6 +37,12 @@
 - java11
 ```js
  ./java --module-path javafx-sdk-16\lib --add-modules javafx.controls,javafx.fxml -jar opencar-0.0.1-SNAPSHOT.jar
+```
+
+- 如果出现 cannot access class jdk.internal.misc.Unsafe 还需要运行增加
+```
+--add-opens java.base/jdk.internal.misc=ALL-UNNAMED
+-Dio.netty.tryReflectionSetAccessible=true
 ```
 
 

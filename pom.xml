@@ -22,8 +22,6 @@
             <artifactId>jSerialComm</artifactId>
             <version>[2.0.0,3.0.0)</version>
         </dependency>
-
-
         <dependency>
             <groupId>org.openjfx</groupId>
             <artifactId>javafx-controls</artifactId>
@@ -34,21 +32,21 @@
             <artifactId>javafx-fxml</artifactId>
             <version>17.0.1</version>
         </dependency>
-
         <dependency>
             <groupId>org.openjfx</groupId>
             <artifactId>javafx-web</artifactId>
             <version>17.0.1</version>
         </dependency>
-
         <dependency>
             <groupId>cn.hutool</groupId>
             <artifactId>hutool-all</artifactId>
             <version>5.8.0.M3</version>
-
         </dependency>
-
-
+        <dependency>
+            <groupId>com.far</groupId>
+            <artifactId>far-net</artifactId>
+            <version>0.0.2</version>
+        </dependency>
     </dependencies>
 
     <build>
@@ -88,8 +86,6 @@
                     <mainClass>com.far.vms.opencar.Run</mainClass>
                 </configuration>
             </plugin>
-
-
 
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>

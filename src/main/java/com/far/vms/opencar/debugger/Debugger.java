@@ -1,6 +1,7 @@
 package com.far.vms.opencar.debugger;
 
 import com.far.vms.opencar.board.Cpu;
+import com.far.vms.opencar.debugger.server.DServer;
 
 import java.util.*;
 
@@ -31,11 +32,8 @@ public class Debugger implements IDebuger {
     //监视opcode执行
     private boolean opcMonitor = false;
 
-
     //pc中断
-
     private List<Integer> pcBreaks = new ArrayList<>();
-
 
     //断点所在的行 有哪些？ 记录 调式器发送过来的断点
     List<Integer> breakLines;
@@ -65,9 +63,8 @@ public class Debugger implements IDebuger {
     public Debugger() {
         this.setStat(Stat.NONE);
         breakLines = new ArrayList<>();
-
-
-
+        //开启调试服务
+        DServer.startDserver();
     }
 
 
@@ -146,11 +143,9 @@ public class Debugger implements IDebuger {
         }
 
 
-        while (stat == Stat.DEBUG){
+        while (stat == Stat.DEBUG) {
 
         }
-
-
 
 
 //        Scanner scanner = new Scanner(System.in);
