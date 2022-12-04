@@ -95,9 +95,7 @@ public class OpBne {
         }
 
 
-        if (Debugger.Stat.DEBUG == StaticRes.debugger.getStat()) {
 
-        }
 
     }
 }

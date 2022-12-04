@@ -7,6 +7,10 @@ import com.far.net.server.core.FarSockServer;
 import com.far.net.server.handler.FarSockChannelHandler;
 import com.far.net.server.session.Session;
 
+import com.far.vms.opencar.debugger.Debugger;
+import com.far.vms.opencar.debugger.IDebugQuest;
+import com.far.vms.opencar.debugger.IDebuger;
+import com.far.vms.opencar.utils.exception.FarException;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
 import io.netty.channel.ChannelInitializer;
@@ -27,20 +31,39 @@ public class DServer {
     private static SessionManager sessionManager;
 
     public static FarSockServer farSockServer;
-    
-    
+
+    /**
+     * debug请求对象，需要先设置
+     * 终于可以保证，模拟器没有启动的时候记录下断点信息!
+     */
+    public static IDebugQuest iDebugQuest;
+
+
     static {
         sessionManager = new SessionManager();
+        iDebugQuest = new Debugger();
+
+
+//        //开启调试模式
+        iDebugQuest.getDebugger().setStat(Debugger.Stat.DEBUG);
+//        //开启指令执行监视
+        iDebugQuest.getDebugger().setOpcMonitor(true);
+//        //关注ra寄存器的写
+//        debugger.addRegWriteOf("ra");
+
+
     }
 
 
-    public static void startDserver () {
+
+
+    public static void startDserver() {
         IProcessHandler<Object> iProcessHandler = new IProcessHandler<Object>() {
             @Override
             public IProcessAgent<Object> onOpen(Session e) {
                 //自行管理连接
                 sessionManager.addSeesion(e);
-                System.out.println("连接来了？");
+
                 return null;
             }
 
@@ -65,28 +88,22 @@ public class DServer {
                 byte[] bytes = new byte[length];
                 byteBuf.readBytes(bytes, 0, length);
                 String request = new String(bytes, StandardCharsets.UTF_8);
-                String info = String.format("数据长度:%s,数据类型:%d  报文:%s", length, 11, request);
-                logger.info(info);
-
+//                String info = String.format("数据长度:%s,数据类型:%d  报文:%s", length, 11, request);
+//                logger.info(info);
 
 
                 //ctx.writeAndFlush(Unpooled.wrappedBuffer(text.getBytes())
 
 
+                IProcessAgent<SessionManager.SessionAgent> sessionAgent = sessionManager.getSesssionAgent(id);
 
+                //sessionAgent.sendMessage("asdsa");
 
-                IProcessAgent<SessionManager.SessionAgent> sessionAgent =  sessionManager.getSesssionAgent(id);
+                if (null == iDebugQuest) {
+                    throw new FarException(FarException.Code.RUNNABLE, "模拟器调试接口还没有设置！");
+                }
+                iDebugQuest.onDebugRequest(request, sessionAgent);
 
-                sessionAgent.sendMessage("asdsa");
-
-
-                IClient client = new IClient() {
-                    @Override
-                    public void onRequest(int type, String msg, IProcessAgent<SessionManager.SessionAgent> sessionAgent) {
-                        System.out.println("");
-                    }
-                };
-                client.onRequest(11,request,sessionAgent);
 
             }
 
@@ -122,7 +139,7 @@ public class DServer {
             }
         };
 
-         farSockServer =  new FarSockServer("127.0.0.1", 1234, "", new ChannelInitializer<SocketChannel>() {
+        farSockServer = new FarSockServer("127.0.0.1", 1234, "", new ChannelInitializer<SocketChannel>() {
             @Override
             protected void initChannel(SocketChannel socketChannel) throws Exception {
 

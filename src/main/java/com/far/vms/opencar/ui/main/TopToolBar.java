@@ -72,7 +72,7 @@ public class TopToolBar {
                             ctx.saveSettingData();
 
                             if(   ctxmain.addCode(selectedFile.getPath())){
-                                ctxmain.setDchUtil(DchUtil.create());
+
                             }
 
 

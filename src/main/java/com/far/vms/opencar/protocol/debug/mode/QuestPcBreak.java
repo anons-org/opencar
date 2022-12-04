@@ -1,6 +1,6 @@
-package com.far.vms.opencar.ui.proto;
+package com.far.vms.opencar.protocol.debug.mode;
 
-public class DGBPTPcBreak {
+public class QuestPcBreak {
     String pc;
     int line;
 

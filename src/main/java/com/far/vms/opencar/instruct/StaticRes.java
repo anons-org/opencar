@@ -31,17 +31,11 @@ public class StaticRes {
 
     public static Uart0 uart0;
 
-    public static Debugger debugger;
+   // public static Debugger debugger;
 
     static {
 
-        debugger = new Debugger();
-        //开启调试模式
-        debugger.setStat(Debugger.Stat.DEBUG);
-        //开启指令执行监视
-        debugger.setOpcMonitor(true);
-        //关注ra寄存器的写
-        debugger.addRegWriteOf("ra");
+
 
 
         //串口

@@ -131,7 +131,7 @@ public class Register {
     public void setRegVal(int rid, long val) {
         //x0不能修改
         if (rid == 0) return;
-        StaticRes.debugger.onWriteReg(ctx, rid, val);
+        //StaticRes.debugger.onWriteReg(ctx, rid, val);
         regs.put(rid, val);
         int x = 01;
     }

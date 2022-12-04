@@ -2,6 +2,7 @@ package com.far.vms.opencar.instruct.inst;
 
 import com.far.vms.opencar.board.Cpu;
 import com.far.vms.opencar.debugger.Debugger;
+import com.far.vms.opencar.debugger.server.DServer;
 import com.far.vms.opencar.instruct.StaticRes;
 
 public class OpLd {
@@ -68,7 +69,7 @@ public class OpLd {
 
         ctx.register.setRegVal(rd, mVal);
 
-        if (StaticRes.debugger.isOpcMonitor()) {
+        if (DServer.iDebugQuest.getDebugger().isOpcMonitor()) {
             String info = String.format("read and load mem 0x%x val:%x", mAddr, mVal);
             System.out.println(info);
         }

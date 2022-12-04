@@ -20,7 +20,9 @@ public class OpenCarApplication {
 
 
         StaticRes.init();
-//        ctx.setDebugger(StaticRes.debugger);
+
+
+
         readBin(progFile);
 
         //永不停机

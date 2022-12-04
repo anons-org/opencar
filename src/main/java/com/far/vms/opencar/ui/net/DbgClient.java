@@ -56,10 +56,7 @@ public class DbgClient {
     public void start() {
         try {
 
-
             if (null == onMessageCall) throw new FarException(FarException.Code.RUNNABLE, "需要设置消息回调函数!");
-
-
             InetAddress inet = InetAddress.getByName("127.0.0.1");
             socket = new Socket(inet, 1234);//inet是服务端ip
             //有数据立刻输出
@@ -97,6 +94,7 @@ public class DbgClient {
 
                 }
             });
+            takeMessageThread.setName("takeMessageThread");
             takeMessageThread.start();
 
         } catch (Exception e) {

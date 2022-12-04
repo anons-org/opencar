@@ -13,11 +13,13 @@ public class FarException extends RuntimeException {
 
     public FarException(int code, String message, Throwable cause) {
         super(message, cause);
+        System.out.println(message);
         cause.printStackTrace();
     }
 
     public FarException(int code, String message) {
         super(message);
+        System.out.println(message);
 
     }
 

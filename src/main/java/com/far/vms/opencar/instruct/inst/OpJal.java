@@ -1,6 +1,7 @@
 package com.far.vms.opencar.instruct.inst;
 
 import com.far.vms.opencar.debugger.Debugger;
+import com.far.vms.opencar.debugger.server.DServer;
 import com.far.vms.opencar.instruct.StaticRes;
 
 public class OpJal extends OpBase<OpJal> {
@@ -41,7 +42,7 @@ public class OpJal extends OpBase<OpJal> {
         //存储跳转指令之后的地址,因为jal 常被用做调用子程序，子程序返回时，需要从
         //jal指令之后的指令开始执行
         ctx.register.setRegVal(rd, curPc + 4);
-        if (StaticRes.debugger.isOpcMonitor()) {
+        if (DServer.iDebugQuest.getDebugger().isOpcMonitor()) {
             String s = String.format("jal target addr to %x, the imm 0x%x", targetAddr, imm);
             System.out.println(s);
         }

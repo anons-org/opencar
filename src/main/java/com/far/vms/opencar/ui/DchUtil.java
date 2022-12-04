@@ -1,9 +1,11 @@
 package com.far.vms.opencar.ui;
 
 import cn.hutool.json.JSONUtil;
+import com.far.vms.opencar.protocol.debug.QuestData;
+import com.far.vms.opencar.protocol.debug.mode.QuestStep;
 import com.far.vms.opencar.ui.net.DbgClient;
-import com.far.vms.opencar.ui.proto.DGBPTPcBreak;
-import com.far.vms.opencar.ui.proto.DbgType;
+import com.far.vms.opencar.protocol.debug.mode.QuestPcBreak;
+import com.far.vms.opencar.protocol.debug.QuestType;
 
 /*
  * @description: 调试器工具
@@ -11,36 +13,6 @@ import com.far.vms.opencar.ui.proto.DbgType;
  * @data 2022/12/3
  */
 public class DchUtil {
-
-
-    static class SendData {
-        private int dt;
-        private Object data;
-
-        public int getDt() {
-            return dt;
-        }
-
-        public SendData setDt(int dt) {
-            this.dt = dt;
-            return this;
-        }
-
-        public Object getData() {
-            return data;
-        }
-
-        public SendData setData(Object data) {
-            this.data = data;
-            return this;
-        }
-
-
-        public static SendData create() {
-            return new SendData();
-        }
-
-    }
 
 
     /**
@@ -72,19 +44,36 @@ public class DchUtil {
     }
 
     /**
-     * @param pc
-     * @description: 添加断点 就会让dbgServer存储一个数据包
+     * @description: 单步调试 遇到函数 进入函数
      * @return: void
      * @author mike/Fang.J
-     * @data 2022/12/3
+     * @data 2022/12/4
      */
-    public void addPcBreakLine(String pc, int line) {
-        DGBPTPcBreak dgbptPcBreak = new DGBPTPcBreak();
-        dgbptPcBreak.setLine(line);
-        dgbptPcBreak.setPc(pc);
-        String dpt = JSONUtil.toJsonStr(SendData.create().setDt(DbgType.BPC).setData(dgbptPcBreak));
+    public void step() {
+        String dpt = JSONUtil.toJsonStr(QuestData.create().setDt(QuestType.STEP).setData(""));
         dbgClient.sendMessage(dpt);
     }
+
+
+    public void addPcBreakLine(String pc, int line) {
+        QuestPcBreak dgbptPcBreak = new QuestPcBreak();
+        dgbptPcBreak.setLine(line);
+        dgbptPcBreak.setPc(pc);
+        String data = JSONUtil.toJsonStr(dgbptPcBreak);
+        String dpt = JSONUtil.toJsonStr(QuestData.create().setDt(QuestType.BPC).setData(data));
+        dbgClient.sendMessage(dpt);
+    }
+
+
+    public void removePcBreakLine(String pc, int line) {
+        QuestPcBreak dgbptPcBreak = new QuestPcBreak();
+        dgbptPcBreak.setLine(line);
+        dgbptPcBreak.setPc(pc);
+        String data = JSONUtil.toJsonStr(dgbptPcBreak);
+        String dpt = JSONUtil.toJsonStr(QuestData.create().setDt(QuestType.RBPC).setData(data));
+        dbgClient.sendMessage(dpt);
+    }
+
 }
 
 

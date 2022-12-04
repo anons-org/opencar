@@ -2,6 +2,7 @@ package com.far.vms.opencar.instruct.inst;
 
 import com.far.vms.opencar.board.Cpu;
 import com.far.vms.opencar.debugger.Debugger;
+import com.far.vms.opencar.debugger.server.DServer;
 import com.far.vms.opencar.instruct.StaticRes;
 
 public class OpLw {
@@ -79,7 +80,7 @@ public class OpLw {
 
         ctx.register.setRegVal( rd,memVal );
 
-        if (Debugger.Stat.DEBUG == StaticRes.debugger.getStat()) {
+        if (DServer.iDebugQuest.getDebugger().isOpcMonitor()) {
             String info = String.format("lw : read mem 0x%x to reg ",mAddr);
             System.out.println(info);
         }

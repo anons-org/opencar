@@ -2,6 +2,7 @@ package com.far.vms.opencar.instruct.inst;
 
 import com.far.vms.opencar.board.Cpu;
 import com.far.vms.opencar.debugger.Debugger;
+import com.far.vms.opencar.debugger.server.DServer;
 import com.far.vms.opencar.instruct.StaticRes;
 
 public class OpSd {
@@ -93,7 +94,7 @@ public class OpSd {
 
         StaticRes.bus.storeDDw(mAddr, val);
 
-        if (StaticRes.debugger.isOpcMonitor()) {
+        if (DServer.iDebugQuest.getDebugger().isOpcMonitor()) {
             String info = String.format("write mem 0x%x val:%x", mAddr, val);
             System.out.println(info);
         }

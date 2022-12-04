@@ -13,6 +13,7 @@ import com.far.vms.opencar.utils.EnvUtil;
 import com.far.vms.opencar.ui.ShellUtil;
 import com.far.vms.opencar.utils.exception.FarException;
 import javafx.application.Application;
+import javafx.application.Platform;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
@@ -36,6 +37,8 @@ import javafx.stage.Stage;
 import java.io.*;
 import java.nio.charset.StandardCharsets;
 import java.util.Objects;
+import java.util.Timer;
+import java.util.TimerTask;
 
 
 public class OpenCarWindos extends Application {
@@ -302,14 +305,21 @@ public class OpenCarWindos extends Application {
                     CodeData rowData = row.getItem();
                     if (!Parser.canBreakForCode(rowData.getCodeLine())) {
                         setTxtAlertMessage("此处不能设置断点,因为该行代码不是指令");
+                        //清空
+                        Parser.getCodeForPc();
                         return;
                     }
+
+                    String pc = "";
                     if (rowData.getCircle().isVisible()) {
+                        //删除断点
                         rowData.getCircle().setVisible(false);
-                        this.getDchUtil().addPcBreakLine("xxx", row.getIndex() + 1);
+                        pc = Parser.getCodeForPc();
+                        this.getDchUtil().removePcBreakLine(pc, row.getIndex() + 1);
                     } else {
                         rowData.getCircle().setVisible(true);
-                        this.getDchUtil().addPcBreakLine("xxx", row.getIndex() + 1);
+                        pc = Parser.getCodeForPc();
+                        this.getDchUtil().addPcBreakLine(pc, row.getIndex() + 1);
                     }
                 }
             });
@@ -373,6 +383,7 @@ public class OpenCarWindos extends Application {
         KeyCombination kb_f6 = new KeyCodeCombination(KeyCode.F6);
         KeyCombination kb_f5 = new KeyCodeCombination(KeyCode.F5);
         primaryStage.getScene().getAccelerators().put(kb_f6, () -> {
+            this.getDchUtil().step();
             System.out.println("快捷键F6");
             System.out.println(Thread.currentThread().getName());
         });
@@ -423,6 +434,20 @@ public class OpenCarWindos extends Application {
 
     public void setTxtAlertMessage(String message) {
         this.txtAlertMessage.setText(message);
+
+        Timer timer = new Timer();
+        timer.schedule(new TimerTask() {
+            @Override
+            public void run() {
+                Platform.runLater(new Runnable() {
+                    @Override
+                    public void run() {
+                        txtAlertMessage.setText("");
+                    }
+                });
+            }
+        }, 2600);
+
     }
 
     /**
@@ -459,18 +484,18 @@ public class OpenCarWindos extends Application {
     }
 
 
-    public void buildElfToBin() {
+    public String buildElfToBin() {
 
 
         if (Objects.isNull(settingDatas) || Objects.isNull(settingDatas.getBuild())) {
             setTxtAlertMessage("还没有设置编译配置!");
-            return;
+            return "";
         }
 
 
         if (StrUtil.isEmpty(settingDatas.getBuild().getProgFilePath())) {
             setTxtAlertMessage("需要先选择调式程序!");
-            return;
+            return "";
         }
 
 
@@ -495,8 +520,26 @@ public class OpenCarWindos extends Application {
         });
 
         setTxtAlertMessage("bin编译完成!");
+        return outFile;
 
+    }
 
+    /**
+     * @param
+     * @description: 由于模拟器是个无限循环，所以需要在线程中开启模拟器
+     * @return: void
+     * @author mike/Fang.J
+     * @data 2022/12/4
+     */
+    public void startSimulator(final String progFile) {
+        System.out.println("连接调式器服务端....");
+        setDchUtil(DchUtil.create());
+        System.out.println("连接调式器服务端 ok....");
+        Thread simulatorThread = new Thread(() -> {
+            OpenCarApplication.run(progFile);
+        });
+        simulatorThread.setName("startSimulator");
+        simulatorThread.start();
     }
 
 

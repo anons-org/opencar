@@ -52,7 +52,12 @@ public class DebugBtns {
                                 ((Button) e3).setOnAction(new EventHandler<ActionEvent>() {
                                     @Override
                                     public void handle(ActionEvent event) {
-                                        ctx.buildElfToBin();
+                                        String pFile = ctx.buildElfToBin();
+                                        if (!"".equals(pFile)) {
+                                            //启动模拟器
+                                            ctx.startSimulator(pFile);
+                                        }
+
                                     }
                                 });
                             }

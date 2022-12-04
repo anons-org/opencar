@@ -2,6 +2,7 @@ package com.far.vms.opencar.instruct.inst;
 
 import com.far.vms.opencar.board.Cpu;
 import com.far.vms.opencar.debugger.Debugger;
+import com.far.vms.opencar.debugger.server.DServer;
 import com.far.vms.opencar.instruct.StaticRes;
 
 /*
@@ -81,7 +82,7 @@ public class OpSlli {
         long v = ctx.register.getRegVal(rs1);
         v = v << shamt;
         ctx.register.setRegVal(rd, v);
-        if (StaticRes.debugger.isOpcMonitor()) {
+        if (DServer.iDebugQuest.getDebugger().isOpcMonitor()) {
 
         }
 

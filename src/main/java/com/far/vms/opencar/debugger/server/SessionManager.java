@@ -23,6 +23,10 @@ public class SessionManager {
         Optional<SessionAgent> sessionAgent = sessionAgentMap.entrySet().stream().filter((entry) -> {
             return entry.getKey().equals(sessionId);
         }).map(entry -> entry.getValue()).findFirst();
+
+        if (!sessionAgent.isPresent()) {
+            return null;
+        }
         return sessionAgent.get();
     }
 

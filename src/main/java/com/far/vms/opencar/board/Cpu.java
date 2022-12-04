@@ -1,6 +1,7 @@
 package com.far.vms.opencar.board;
 
 
+import com.far.vms.opencar.debugger.server.DServer;
 import com.far.vms.opencar.instruct.StaticRes;
 
 import com.far.vms.opencar.instruct.opcodeType.*;
@@ -51,10 +52,22 @@ public class Cpu extends CpuBase {
                 String str = String.format("curPc:0x%x \t parseing code 0x%s, opcode 0x%s ", getCurPC(), Integer.toHexString(code), Integer.toHexString(opcode));
                 System.out.print(str);
                 if (opct[opcode] == null) continue;
+
+                if( DServer.iDebugQuest.getDebugger().simIsStep()){
+                    DServer.iDebugQuest.getDebugger().simInformStep(this,curPC);
+                }
+
+                if (DServer.iDebugQuest.getDebugger().simIsChkPcBreak()) {
+                    DServer.iDebugQuest.getDebugger().simInformPcBreak(this, curPC);
+                }
+
+                DServer.iDebugQuest.getDebugger().monitor();
+
                 opct[opcode].eval(this, code, opcode);
                 curLine++;
                 //监测断点
-                StaticRes.debugger.monitor();
+
+
             }
         } catch (Throwable e) {
             e.printStackTrace();

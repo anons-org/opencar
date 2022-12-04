@@ -73,9 +73,6 @@ public class OpCsrrs {
             ctx.register.setCSRVal(csr, t | t1);
         }
         ctx.register.setRegVal(rd, t);
-        if (Debugger.Stat.DEBUG == StaticRes.debugger.getStat()) {
 
-
-        }
     }
 }
