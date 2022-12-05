@@ -75,9 +75,9 @@ public class DbgClient {
                     if (!finalSocket.isConnected()) continue;
                     try {
                         if (finalIns.read(pckHead) != -1) {//read 进入阻塞状态
-                            System.out.println("服务端数据的长度" + pckHead);
+//                            System.out.println("服务端数据的长度" + pckHead);
                             int dataLen = ByteUtil.bytesToInt(pckHead, ByteOrder.BIG_ENDIAN);
-                            if (dataLen > 2048) {
+                            if (dataLen > 8092) {
                                 System.out.println("服务端发送的包太长！");
                                 continue;
                             }

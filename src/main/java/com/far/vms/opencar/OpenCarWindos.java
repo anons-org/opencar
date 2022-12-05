@@ -5,6 +5,7 @@ import cn.hutool.core.util.StrUtil;
 import cn.hutool.json.JSONUtil;
 import com.far.vms.opencar.complier.Parser;
 import com.far.vms.opencar.debugger.server.DServer;
+import com.far.vms.opencar.protocol.debug.mode.QuestPcBreak;
 import com.far.vms.opencar.ui.entity.SettingDatas;
 import com.far.vms.opencar.ui.main.DebugBtns;
 import com.far.vms.opencar.ui.main.TopToolBar;
@@ -36,9 +37,7 @@ import javafx.stage.Stage;
 
 import java.io.*;
 import java.nio.charset.StandardCharsets;
-import java.util.Objects;
-import java.util.Timer;
-import java.util.TimerTask;
+import java.util.*;
 
 
 public class OpenCarWindos extends Application {
@@ -58,7 +57,7 @@ public class OpenCarWindos extends Application {
 
     private TopToolBar topToolBar;
 
-
+    //调式按钮区域
     private DebugBtns debugBtns;
 
 
@@ -90,6 +89,21 @@ public class OpenCarWindos extends Application {
     Stage primaryStage;
 
 
+    TableView tvCodeEditor = null;
+
+    /**
+     * @description: 用于代码和行的映射关系
+     * @param null
+     * @return:
+     * @author mike/Fang.J
+     * @data 2022/12/5
+     */
+    Map<String, Short> codeLineRef = new HashMap<>();
+
+
+    private List<QuestPcBreak> pcBreakList = new ArrayList<>();
+
+
     ObservableList<CodeData> editorData = FXCollections.observableArrayList();
 
 
@@ -101,10 +115,35 @@ public class OpenCarWindos extends Application {
         this.dchUtil = dchUtil;
     }
 
+
+    public Map<String, Short> getCodeLineRef() {
+        return codeLineRef;
+    }
+
+    public void setCodeLineRef(Map<String, Short> codeLineRef) {
+        this.codeLineRef = codeLineRef;
+    }
+
+    public TableView getTvCodeEditor() {
+        return tvCodeEditor;
+    }
+
+    public void setTvCodeEditor(TableView tvCodeEditor) {
+        this.tvCodeEditor = tvCodeEditor;
+    }
+
     public Stage getPrimaryStage() {
         return primaryStage;
     }
 
+
+    public DebugBtns getDebugBtns() {
+        return debugBtns;
+    }
+
+    public void setDebugBtns(DebugBtns debugBtns) {
+        this.debugBtns = debugBtns;
+    }
 
     public Parent getRootMain() {
         return rootMain;
@@ -251,7 +290,7 @@ public class OpenCarWindos extends Application {
 
         SplitPane splitPane = (SplitPane) rootMain.lookup("#spbox");//#ta是textarea的id号
         var scrollPane = splitPane.getItems();
-        TableView tv = null;
+
 
         for (var e : scrollPane) {
             if (e instanceof ScrollPane) {
@@ -261,7 +300,7 @@ public class OpenCarWindos extends Application {
 //                btnGccPath = (Button) ((AnchorPane) scrollPane1.getContent()).lookup("#btnGccPath");
 //                tabGroupConsole = (TabPane) ((AnchorPane) scrollPane1.getContent()).lookup("#groupConsole");
             } else if (e instanceof AnchorPane) {
-                tv = (TableView) e.lookup("#text-edit");
+                tvCodeEditor = (TableView) e.lookup("#text-edit");
                 int xx = 1;
             }
         }
@@ -272,8 +311,8 @@ public class OpenCarWindos extends Application {
 //        initTabGroupConsole();
 
 
-        TableView finalTv = tv;
-        tv.widthProperty().addListener(new ChangeListener<Number>() {
+        TableView finalTv = tvCodeEditor;
+        tvCodeEditor.widthProperty().addListener(new ChangeListener<Number>() {
             @Override
             public void changed(ObservableValue<? extends Number> ov, Number t, Number t1) {
                 // Get the table header
@@ -287,11 +326,15 @@ public class OpenCarWindos extends Application {
                 }
             }
         });
+
+
         //设置为只能单选
-        tv.getSelectionModel().setSelectionMode(SelectionMode.SINGLE);
+        tvCodeEditor.getSelectionModel().setSelectionMode(SelectionMode.SINGLE);
         //设置点击方法
-        tv.setRowFactory(tview -> {
+        tvCodeEditor.setRowFactory(tview -> {
             TableRow<CodeData> row = new TableRow<>();
+
+
             row.setOnMouseClicked(event -> {
                 //  System.out.println(event.getClickCount() % 2 + "次");
                 // 点击两次 且 row不为空
@@ -301,6 +344,9 @@ public class OpenCarWindos extends Application {
 //                }// for
 
 
+                // row.setTextFill(Color.RED);
+//                String bakColr = row.getStyle();
+//                row.setStyle("-fx-background-color:rgb(38,38,38)");
                 if (event.getClickCount() % 1 == 0 && (!row.isEmpty())) {
                     CodeData rowData = row.getItem();
                     if (!Parser.canBreakForCode(rowData.getCodeLine())) {
@@ -315,11 +361,29 @@ public class OpenCarWindos extends Application {
                         //删除断点
                         rowData.getCircle().setVisible(false);
                         pc = Parser.getCodeForPc();
-                        this.getDchUtil().removePcBreakLine(pc, row.getIndex() + 1);
+                        if (this.getDchUtil() != null) {
+                            this.getDchUtil().removePcBreakLine(pc, row.getIndex() + 1);
+                        } else {
+                            String finalPc = pc;
+                            this.pcBreakList.removeIf(v -> {
+                                return v.getPc().equals(finalPc);
+                            });
+                        }
                     } else {
+
                         rowData.getCircle().setVisible(true);
                         pc = Parser.getCodeForPc();
-                        this.getDchUtil().addPcBreakLine(pc, row.getIndex() + 1);
+
+                        if (this.getDchUtil() != null) {
+                            this.getDchUtil().addPcBreakLine(pc, row.getIndex() + 1);
+                        } else {
+                            QuestPcBreak questPcBreak = new QuestPcBreak();
+                            questPcBreak.setLine(row.getIndex() + 1);
+                            questPcBreak.setPc(pc);
+                            this.pcBreakList.add(questPcBreak);
+                        }
+
+
                     }
                 }
             });
@@ -352,12 +416,12 @@ public class OpenCarWindos extends Application {
         lineCol.setCellValueFactory(new PropertyValueFactory<>("circle"));
         codeCol.setCellValueFactory(new PropertyValueFactory<>("codeLine"));
         //添加到tableview
-        tv.getColumns().addAll(lineNum, lineCol, codeCol);
-        tv.setItems(editorData);
-        lineNum.setPrefWidth(tv.getPrefWidth() * 0.05);
-        lineCol.setPrefWidth(tv.getPrefWidth() * 0.02);
-        codeCol.setPrefWidth(tv.getPrefWidth() * 1.2);
-        var ok = tv.getColumns().size();
+        tvCodeEditor.getColumns().addAll(lineNum, lineCol, codeCol);
+        tvCodeEditor.setItems(editorData);
+        lineNum.setPrefWidth(tvCodeEditor.getPrefWidth() * 0.05);
+        lineCol.setPrefWidth(tvCodeEditor.getPrefWidth() * 0.02);
+        codeCol.setPrefWidth(tvCodeEditor.getPrefWidth() * 1.2);
+        //  var ok = tvCodeEditor.getColumns().size();
 
 
         //自定义列的数据格式？？
@@ -383,9 +447,7 @@ public class OpenCarWindos extends Application {
         KeyCombination kb_f6 = new KeyCodeCombination(KeyCode.F6);
         KeyCombination kb_f5 = new KeyCodeCombination(KeyCode.F5);
         primaryStage.getScene().getAccelerators().put(kb_f6, () -> {
-            this.getDchUtil().step();
-            System.out.println("快捷键F6");
-            System.out.println(Thread.currentThread().getName());
+            keyF6();
         });
 
         primaryStage.getScene().getAccelerators().put(kb_f5, () -> {
@@ -396,6 +458,7 @@ public class OpenCarWindos extends Application {
 
         //primaryStage.setMaximized(true);
         primaryStage.show();
+
 
 //
 //
@@ -415,6 +478,13 @@ public class OpenCarWindos extends Application {
 //        root.getChildren().add(btn);
 //        primaryStage.setScene(new Scene(root, 300, 250));
 //        primaryStage.show();
+    }
+
+
+    public void keyF6() {
+        this.getDchUtil().step();
+        System.out.println("快捷键F6");
+        System.out.println(Thread.currentThread().getName());
     }
 
     public Circle getCircle() {
@@ -474,7 +544,15 @@ public class OpenCarWindos extends Application {
         String buildTool = settingDatas.getBuild().getGccPath() + "\\riscv64-unknown-elf-objdump.exe";
 
         ShellUtil.runShell(buildTool, new String[]{buildTool, filePath, "-d"}, cmdInf -> {
-            editorData.add(new CodeData(getCodeLineNumber(), getCircle(), cmdInf));
+
+            short line = getCodeLineNumber();
+
+            //通过此处来处理 PC和行的关系
+            if (Parser.canBreakForCode(cmdInf)) {
+                String pc = Parser.getCodeForPc();
+                codeLineRef.put(pc, line);
+            }
+            editorData.add(new CodeData(line, getCircle(), cmdInf));
             //  System.out.println(cmdInf);
             return 0;
         });
@@ -533,13 +611,27 @@ public class OpenCarWindos extends Application {
      */
     public void startSimulator(final String progFile) {
         System.out.println("连接调式器服务端....");
-        setDchUtil(DchUtil.create());
+        setDchUtil(DchUtil.create(this));
+
         System.out.println("连接调式器服务端 ok....");
         Thread simulatorThread = new Thread(() -> {
             OpenCarApplication.run(progFile);
         });
         simulatorThread.setName("startSimulator");
         simulatorThread.start();
+
+
+        //发送没启动模拟器之前的断点信息
+        this.pcBreakList.forEach(e -> {
+            dchUtil.addPcBreakLine(e.getPc(), e.getLine());
+        });
+
+
+    }
+
+
+    public void codeEditorScrollTo(int i) {
+        tvCodeEditor.scrollTo(i);
     }
 
 

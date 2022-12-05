@@ -8,6 +8,7 @@ import com.far.vms.opencar.ui.DchUtil;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.scene.control.MenuBar;
+import javafx.scene.control.TablePosition;
 import javafx.stage.FileChooser;
 
 import java.io.File;
@@ -50,7 +51,7 @@ public class TopToolBar {
                             FileChooser fileChooser = new FileChooser();
                             if (!ObjectUtil.isNull(ctx.getSettingDatas())
                                     && !ObjectUtil.isNull(ctx.getSettingDatas().getBuild())
-                                    && !StrUtil.isEmpty(ctx.getSettingDatas().getBuild().getProgFilePath())){
+                                    && !StrUtil.isEmpty(ctx.getSettingDatas().getBuild().getProgFilePath())) {
                                 fileChooser.setInitialDirectory(new File(ctx.getSettingDatas().getBuild().getProgFilePath()));
                             }
 
@@ -71,12 +72,12 @@ public class TopToolBar {
                             ctx.getSettingDatas().getBuild().setProgSufix(fileSuifx);
                             ctx.saveSettingData();
 
-                            if(   ctxmain.addCode(selectedFile.getPath())){
+                            if (ctxmain.addCode(selectedFile.getPath())) {
+//                                ctxmain.getTvCodeEditor().getSelectionModel().select(1);
 
+//                                var tp = ctxmain.getTvCodeEditor().getFocusModel().getFocusedCell();
+//                                tp.getRow()
                             }
-
-
-
 
 
 //                            ObservableList<OpenCarWindos.CodeData> data = FXCollections.observableArrayList();

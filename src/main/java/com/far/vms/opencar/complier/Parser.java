@@ -15,9 +15,7 @@ public class Parser {
     private static String pc = "";
 
 
-    private String nextChar() {
-        return code.substring(idx++);
-    }
+
 
     public String getCode() {
         return code;
@@ -42,13 +40,18 @@ public class Parser {
     public static boolean canBreakForCode(String code) {
         int idx = 0;
         //当前捕获的代码
-
+        pc="";
         String prevChar = "", testChar = "";
         while (idx < code.length()) {
             testChar = code.substring(idx, ++idx);
             pc += testChar;
             if (":".equals(testChar)) {
-                return !">".equals(prevChar);
+
+                String nchar = "";
+                if( idx < code.length()-1  ){
+                     nchar = code.substring(idx, idx+1);
+                }
+                return !">".equals(prevChar) && !"\\".equals(nchar);
             } else {
                 prevChar = testChar;
             }

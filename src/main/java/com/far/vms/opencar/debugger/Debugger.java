@@ -36,12 +36,18 @@ public class Debugger implements IDebuger, IDebugQuest {
         public static short NONE = 0x00;
         //调试态
         public static short DEBUG = 0x01;
+        //关闭调试状态
+        public static short SLEEP = 0x02;
+
         //单步执行态 0 否 1 是
-        public static short STEP = 0x00;
+        public static short STEP = 0x03;
+
+        public static short PAUSE = 0x04;
+
     }
 
     //状态
-    private short stat;
+    private volatile short stat;
     //是否进入单步状态
     private boolean step = false;
 
@@ -79,7 +85,7 @@ public class Debugger implements IDebuger, IDebugQuest {
 
     @Override
     public boolean simIsStep() {
-        return step;
+        return stat == Stat.STEP;
     }
 
 
@@ -117,12 +123,49 @@ public class Debugger implements IDebuger, IDebugQuest {
      */
     @Override
     public void simInformPcBreak(final Cpu ctx, final long pc) {
-        System.out.println(ctx.getRegister().regs);
+        //System.out.println(ctx.getRegister().regs);
+        QuestPcBreak questPcBreak = null;
+        if (pcBreaks.containsKey(pc)) {
+            stat = Stat.PAUSE;
+            questPcBreak = pcBreaks.get(pc);
+            String data = JSONUtil.toJsonStr(questPcBreak);
+            QuestData questData = new QuestData();
+            questData.setData(data);
+            questData.setDt(QuestType.BPC);
+            System.out.println(  JSONUtil.toJsonStr(ctx.getRegister()) );
+            DServer.toClient(JSONUtil.toJsonStr(questData));
+        } else {
+//            questPcBreak = new QuestPcBreak();
+//            questPcBreak.setPc(Long.toHexString(pc));
+        }
+
+
+
     }
 
+    /*
+     * @description:
+     * CPU发送单步后，添加PC断点，调试器客户端收到PC断点时，判断有没有line数据 没有的话就用PC号作为索引 在编辑器中进行查找和标记
+     * @author mike/Fang.J
+     * @data 2022/12/5
+     */
     @Override
     public void simInformStep(Cpu ctx, long pc) {
 
+
+        if (!pcBreaks.containsKey(pc)) {
+            QuestPcBreak questPcBreak = new QuestPcBreak();
+            questPcBreak.setPc(Long.toHexString(pc));
+            String data = JSONUtil.toJsonStr(questPcBreak);
+            QuestData questData = new QuestData();
+            questData.setData(data);
+            questData.setDt(QuestType.BPC);
+            onQuestaddPcBreak(questData);
+        }
+
+        this.setStep(false);
+        this.stat = Stat.PAUSE;
+//        DServer.toClient(JSONUtil.toJsonStr(questData));
 
     }
 
@@ -164,7 +207,8 @@ public class Debugger implements IDebuger, IDebugQuest {
      * @data 2022/12/4
      */
     private void onQuestStep() {
-        this.setStep(true);
+        System.out.println("当前线程-->" + Thread.currentThread().getName());
+        this.stat = Stat.STEP;
     }
 
 
@@ -173,7 +217,6 @@ public class Debugger implements IDebuger, IDebugQuest {
 
         //找出name
         String rname = ctx.getRegister().getRegNames().get(rid);
-
         if (monitorRegWrite.contains(rname)) {
             int x = 11;
             System.out.println(x + "有修改");
@@ -192,10 +235,13 @@ public class Debugger implements IDebuger, IDebugQuest {
             System.out.println(startInf + ", Enter 'h to view all debug instructions");
         }
 
+//
+//        if (stat == Stat.DEBUG) {
+//            System.out.println("当前线程-->" + Thread.currentThread().getName());
+//        }
 
-        while (stat == Stat.DEBUG) {
 
-        }
+        while (stat == Stat.PAUSE) ;
 
 
 //        Scanner scanner = new Scanner(System.in);
@@ -244,14 +290,16 @@ public class Debugger implements IDebuger, IDebugQuest {
     @Override
     public void monitor() {
         String cmd = "";
-
-
-        while (stat == Stat.DEBUG) ;
-
-
         if (stat == Stat.DEBUG) {
+            System.out.println("当前线程-->" + Thread.currentThread().getName());
+        }
 
-            //onDbgCmd("Start pause to enter debugging mode");
+        while (stat == Stat.PAUSE) ;
+
+
+//        if (stat == Stat.DEBUG) {
+
+        //onDbgCmd("Start pause to enter debugging mode");
 
 //            System.out.println("调试模式开启!");
 //            Scanner scanner = new Scanner(System.in);
@@ -284,7 +332,7 @@ public class Debugger implements IDebuger, IDebugQuest {
 //                    }
 //                }
 //            }
-        }
+//        }
     }
 
     /**
@@ -298,7 +346,6 @@ public class Debugger implements IDebuger, IDebugQuest {
     @Override
     public void onDebugRequest(String msg, IProcessAgent<SessionManager.SessionAgent> sessionAgent) {
         QuestData quest = JSONUtil.toBean(msg, QuestData.class);
-
         switch (quest.getDt()) {
             case QuestType.BPC:
                 onQuestaddPcBreak(quest);
@@ -308,7 +355,6 @@ public class Debugger implements IDebuger, IDebugQuest {
                 onQuestRemovePcBreak(qpc);
                 break;
             case QuestType.STEP:
-
                 onQuestStep();
                 break;
             default:

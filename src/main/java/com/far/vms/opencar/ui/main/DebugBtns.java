@@ -21,6 +21,9 @@ public class DebugBtns {
     private OpenCarWindos ctx;
 
 
+    private Button btnStepIn;
+
+
     public OpenCarWindos getCtx() {
         return ctx;
     }
@@ -28,6 +31,11 @@ public class DebugBtns {
     public DebugBtns setCtx(OpenCarWindos ctx) {
         this.ctx = ctx;
         return this;
+    }
+
+
+    public void activeBtnStepIn() {
+        btnStepIn.setDisable(false);
     }
 
 
@@ -57,7 +65,15 @@ public class DebugBtns {
                                             //启动模拟器
                                             ctx.startSimulator(pFile);
                                         }
-
+                                    }
+                                });
+                            } else if ("btnStepIn".equals(e3.getId())) {
+                                btnStepIn = ((Button) e3);
+                                btnStepIn.setDisable(true);
+                                btnStepIn.setOnAction(new EventHandler<ActionEvent>() {
+                                    @Override
+                                    public void handle(ActionEvent event) {
+                                        ctx.keyF6();
                                     }
                                 });
                             }

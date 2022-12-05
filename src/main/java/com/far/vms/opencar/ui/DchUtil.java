@@ -1,6 +1,7 @@
 package com.far.vms.opencar.ui;
 
 import cn.hutool.json.JSONUtil;
+import com.far.vms.opencar.OpenCarWindos;
 import com.far.vms.opencar.protocol.debug.QuestData;
 import com.far.vms.opencar.protocol.debug.mode.QuestStep;
 import com.far.vms.opencar.ui.net.DbgClient;
@@ -32,11 +33,26 @@ public class DchUtil {
     }
 
 
-    public static DchUtil create() {
+    public static DchUtil create(OpenCarWindos ctx) {
         DchUtil dchUtil = new DchUtil();
         dchUtil.setDbgClient(new DbgClient());
         dchUtil.getDbgClient().setOnMessageCall((s) -> {
-            System.out.println(s);
+            System.out.println("调试服务端的信息 ->" + s);
+            QuestData questData = JSONUtil.toBean(s, QuestData.class);
+            if (questData.getDt() == QuestType.BPC) {
+
+                ctx.getDebugBtns().activeBtnStepIn();
+                QuestPcBreak questPcBreak = JSONUtil.toBean(questData.getData(), QuestPcBreak.class);
+                if (questPcBreak.getLine() > 0) {
+                    ctx.getTvCodeEditor().getSelectionModel().select(questPcBreak.getLine() - 1);
+                } else {
+                    short line = ctx.getCodeLineRef().get(questPcBreak.getPc());
+                    line = (short) (line - 1);
+                    ctx.getTvCodeEditor().getSelectionModel().select(line);
+                    //调整显示的位置
+                    ctx.codeEditorScrollTo(line);
+                }
+            }
             return true;
         });
         dchUtil.getDbgClient().start();
@@ -53,7 +69,6 @@ public class DchUtil {
         String dpt = JSONUtil.toJsonStr(QuestData.create().setDt(QuestType.STEP).setData(""));
         dbgClient.sendMessage(dpt);
     }
-
 
     public void addPcBreakLine(String pc, int line) {
         QuestPcBreak dgbptPcBreak = new QuestPcBreak();

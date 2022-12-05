@@ -39,13 +39,16 @@ public class DServer {
     public static IDebugQuest iDebugQuest;
 
 
+    private static String sessionId;
+
+
     static {
         sessionManager = new SessionManager();
         iDebugQuest = new Debugger();
 
 
 //        //开启调试模式
-        iDebugQuest.getDebugger().setStat(Debugger.Stat.DEBUG);
+     //   iDebugQuest.getDebugger().setStat(Debugger.Stat.DEBUG);
 //        //开启指令执行监视
         iDebugQuest.getDebugger().setOpcMonitor(true);
 //        //关注ra寄存器的写
@@ -54,8 +57,18 @@ public class DServer {
 
     }
 
-
-
+    /**
+     * @param message
+     * @description: 消息发送给当前连接的有效客户端
+     * @return: void
+     * @author mike/Fang.J
+     * @data 2022/12/5
+     */
+    public static void toClient(String message) {
+        IProcessAgent<SessionManager.SessionAgent> sessionAgent = sessionManager.getSesssionAgent(sessionId);
+        if (null == sessionAgent) throw new FarException(FarException.Code.RUNNABLE, "没有找到有效的连接！");
+        sessionAgent.sendMessage(message);
+    }
 
     public static void startDserver() {
         IProcessHandler<Object> iProcessHandler = new IProcessHandler<Object>() {
@@ -63,7 +76,7 @@ public class DServer {
             public IProcessAgent<Object> onOpen(Session e) {
                 //自行管理连接
                 sessionManager.addSeesion(e);
-
+                sessionId = e.getSeesionId();
                 return null;
             }
 
@@ -120,6 +133,7 @@ public class DServer {
 
             @Override
             public void onClose(String id) {
+                sessionId = "";
                 sessionManager.removeSessionAgent(id);
             }
 
@@ -135,6 +149,7 @@ public class DServer {
 
             @Override
             public void onError(String id) {
+                sessionId = "";
                 sessionManager.removeSessionAgent(id);
             }
         };

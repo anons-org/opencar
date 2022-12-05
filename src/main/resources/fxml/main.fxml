@@ -120,7 +120,7 @@
                               <Insets left="20.0" />
                            </HBox.margin>
                         </Button>
-                        <Button contentDisplay="CENTER" mnemonicParsing="false" prefHeight="23.0" prefWidth="71.0" text="单步(F6)">
+                        <Button id="btnStepIn" contentDisplay="CENTER" mnemonicParsing="false" prefHeight="23.0" prefWidth="71.0" text="单步(F6)">
                            <HBox.margin>
                               <Insets left="20.0" />
                            </HBox.margin>

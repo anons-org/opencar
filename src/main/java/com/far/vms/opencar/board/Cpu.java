@@ -53,8 +53,8 @@ public class Cpu extends CpuBase {
                 System.out.print(str);
                 if (opct[opcode] == null) continue;
 
-                if( DServer.iDebugQuest.getDebugger().simIsStep()){
-                    DServer.iDebugQuest.getDebugger().simInformStep(this,curPC);
+                if (DServer.iDebugQuest.getDebugger().simIsStep()) {
+                    DServer.iDebugQuest.getDebugger().simInformStep(this, curPC);
                 }
 
                 if (DServer.iDebugQuest.getDebugger().simIsChkPcBreak()) {
