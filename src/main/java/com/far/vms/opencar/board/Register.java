@@ -20,11 +20,11 @@ public class Register {
     public static class RegAddr {
         public static int
                 PC = 999999999,
-                //用于返回的寄存器
-                RA = 0b00_001,
+        //用于返回的寄存器
+        RA = 0b00_001,
                 SP = 0b00_010,
-                //x0
-                T0 = 0b00_101,
+        //x0
+        T0 = 0b00_101,
                 S0 = 0b01_000,
                 A4 = 0b01_110,
                 A5 = 0b01_111,
@@ -53,6 +53,21 @@ public class Register {
 
     public String[] csrRegNames = new String[4096];
 
+    public long[] getCsrRegs() {
+        return csrRegs;
+    }
+
+    public void setCsrRegs(long[] csrRegs) {
+        this.csrRegs = csrRegs;
+    }
+
+    public String[] getCsrRegNames() {
+        return csrRegNames;
+    }
+
+    public void setCsrRegNames(String[] csrRegNames) {
+        this.csrRegNames = csrRegNames;
+    }
 
     public Register() {
         //寄存器的值
@@ -163,4 +178,8 @@ public class Register {
     public void setRegNames(Map<Integer, String> regNames) {
         this.regNames = regNames;
     }
+
+
+
+
 }

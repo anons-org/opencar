@@ -26,10 +26,13 @@ public interface IDebuger {
 
     // 发送PC断点
     public void simInformPcBreak(final Cpu ctx, final long pc);
+
     //发送一下单步触发 具体的事件由调式器完成
     public void simInformStep(final Cpu ctx, final long pc);
 
     public boolean simIsStep();
+
+    public void setCtx(Cpu ctx);
 
 
 }

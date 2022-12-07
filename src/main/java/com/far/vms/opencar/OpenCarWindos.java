@@ -8,6 +8,8 @@ import com.far.vms.opencar.debugger.server.DServer;
 import com.far.vms.opencar.protocol.debug.mode.QuestPcBreak;
 import com.far.vms.opencar.ui.entity.SettingDatas;
 import com.far.vms.opencar.ui.main.DebugBtns;
+import com.far.vms.opencar.ui.main.RightTablePanle.RegData;
+import com.far.vms.opencar.ui.main.RightTablePanle.RightTablePanle;
 import com.far.vms.opencar.ui.main.TopToolBar;
 import com.far.vms.opencar.ui.DchUtil;
 import com.far.vms.opencar.utils.EnvUtil;
@@ -19,6 +21,7 @@ import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.event.EventHandler;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
@@ -27,6 +30,7 @@ import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyCodeCombination;
 import javafx.scene.input.KeyCombination;
+import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
@@ -34,6 +38,7 @@ import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Circle;
 import javafx.stage.Stage;
+import javafx.util.Callback;
 
 import java.io.*;
 import java.nio.charset.StandardCharsets;
@@ -45,8 +50,7 @@ public class OpenCarWindos extends Application {
 
     Button btnBinSelect = null;
     Button btnGccPath = null;
-    //控制台输出区域
-    TabPane tabGroupConsole = null;
+
 
     TextArea buildConsole = null;
     TextArea sysConsole = null;
@@ -90,6 +94,17 @@ public class OpenCarWindos extends Application {
 
 
     TableView tvCodeEditor = null;
+
+    //右边TAB
+    RightTablePanle rightTablePanle;
+
+    public RightTablePanle getRightTablePanle() {
+        return rightTablePanle;
+    }
+
+    public void setRightTablePanle(RightTablePanle rightTablePanle) {
+        this.rightTablePanle = rightTablePanle;
+    }
 
     /**
      * @description: 用于代码和行的映射关系
@@ -209,8 +224,8 @@ public class OpenCarWindos extends Application {
 
 
     public void initTabGroupConsole() {
-        buildConsole = (TextArea) tabGroupConsole.lookup("#txtBuild");
-        sysConsole = (TextArea) tabGroupConsole.lookup("#txtSys");
+//        buildConsole = (TextArea) tabGroupConsole.lookup("#txtBuild");
+//        sysConsole = (TextArea) tabGroupConsole.lookup("#txtSys");
     }
 
 
@@ -275,6 +290,10 @@ public class OpenCarWindos extends Application {
 
         topToolBar.setCtx(this).initControl();
 
+        rightTablePanle = new RightTablePanle();
+        rightTablePanle.setCtx(this).initControl();
+
+
         debugBtns = new DebugBtns();
         debugBtns.setCtx(this).initControl();
 
@@ -298,7 +317,8 @@ public class OpenCarWindos extends Application {
 
 //                btnBinSelect = (Button) ((AnchorPane) scrollPane1.getContent()).lookup("#btnBinSelect");
 //                btnGccPath = (Button) ((AnchorPane) scrollPane1.getContent()).lookup("#btnGccPath");
-//                tabGroupConsole = (TabPane) ((AnchorPane) scrollPane1.getContent()).lookup("#groupConsole");
+                //   rightTabPane = (TabPane) ((AnchorPane) scrollPane1.getContent()).lookup("#tabRightGroup");
+                int x = 1;
             } else if (e instanceof AnchorPane) {
                 tvCodeEditor = (TableView) e.lookup("#text-edit");
                 int xx = 1;
@@ -312,6 +332,7 @@ public class OpenCarWindos extends Application {
 
 
         TableView finalTv = tvCodeEditor;
+        //隐藏表头
         tvCodeEditor.widthProperty().addListener(new ChangeListener<Number>() {
             @Override
             public void changed(ObservableValue<? extends Number> ov, Number t, Number t1) {
@@ -330,23 +351,21 @@ public class OpenCarWindos extends Application {
 
         //设置为只能单选
         tvCodeEditor.getSelectionModel().setSelectionMode(SelectionMode.SINGLE);
+
+
         //设置点击方法
         tvCodeEditor.setRowFactory(tview -> {
             TableRow<CodeData> row = new TableRow<>();
 
 
             row.setOnMouseClicked(event -> {
-                //  System.out.println(event.getClickCount() % 2 + "次");
-                // 点击两次 且 row不为空
-//                ObservableList<TablePosition> cells = finalTv1.getSelectionModel().;
-//                for (TablePosition<?, ?> cell : cells) {
-//                    System.out.println(cell.getColumn());
-//                }// for
+                //此处只能选择一个 也就是当前选中的第一个单元格
+                TablePosition tp = (TablePosition) tvCodeEditor.getSelectionModel().getSelectedCells().get(0);
+                //只处理 断点标记的列
+                if( tp.getColumn()!=1 ){
+                    return;
+                }
 
-
-                // row.setTextFill(Color.RED);
-//                String bakColr = row.getStyle();
-//                row.setStyle("-fx-background-color:rgb(38,38,38)");
                 if (event.getClickCount() % 1 == 0 && (!row.isEmpty())) {
                     CodeData rowData = row.getItem();
                     if (!Parser.canBreakForCode(rowData.getCodeLine())) {
@@ -391,18 +410,6 @@ public class OpenCarWindos extends Application {
         });
 
 
-//        ObservableList<CodeData> data = FXCollections.observableArrayList();
-//        String kr = "D:\\AAAA_WORK\\RISC-V-Tools\\os\\riscv-operating-system-mooc\\code\\os\\01-helloRVOS\\build\\kernel-img.img";
-//        String buildTool = "D:\\AAAA_WORK\\RISC-V-Tools\\riscv64-unknown-elf-toolchain-10.2.0-2020.12.8-x86_64-w64-mingw32\\bin\\riscv64-unknown-elf-objdump.exe";
-//
-//
-//        ShellUtil.runShell(buildTool, new String[]{buildTool, kr, "-d"}, cmdInf -> {
-//            data.add(new CodeData(getCodeLineNumber(), getCircle(), cmdInf));
-//            //  System.out.println(cmdInf);
-//            return 0;
-//        });
-
-
         // https://blog.csdn.net/m0_58015306/article/details/123033003
         //创建表格的列
         TableColumn lineNum = new TableColumn<>("lineNum");
@@ -421,6 +428,85 @@ public class OpenCarWindos extends Application {
         lineNum.setPrefWidth(tvCodeEditor.getPrefWidth() * 0.05);
         lineCol.setPrefWidth(tvCodeEditor.getPrefWidth() * 0.02);
         codeCol.setPrefWidth(tvCodeEditor.getPrefWidth() * 1.2);
+
+        final OpenCarWindos self = this;
+
+//        lineCol.setCellFactory(new Callback<TableColumn, TableCell>() {
+//            @Override
+//            public TableCell call(TableColumn tableColumn) {
+//                final TableCell<CodeData, Circle> cell = new TableCell<>();
+//
+//
+//                cell.setOnMouseClicked(new EventHandler<MouseEvent>() {
+//                    @Override
+//                    public void handle(MouseEvent mouseEvent) {
+//                        TableRow<CodeData> rowData = cell.getTableRow();
+//                        CodeData codeData = rowData.getItem();
+//                        codeData.getCircle().setVisible(true);
+//                        cell.itemProperty().set(codeData.getCircle());
+//                        cell.itemProperty().setValue(codeData.getCircle());
+//                        cell.getTableRow().getItem().setCircle(codeData.getCircle());
+//
+//                        tvCodeEditor.getSelectionModel().getSelectedCells().forEach(e->{
+//                            TablePosition tp = (TablePosition) e;
+//                            int x,y;
+//                            x = tp.getRow();
+//                            y = tp.getColumn();
+//
+//                            CodeData xxx = (CodeData) tvCodeEditor.getSelectionModel().getSelectedItem();
+//                            xxx.getCircle().setVisible(true);
+//                            System.out.println(e);
+//                        });
+//
+//
+//
+//
+//
+//                        if (!Parser.canBreakForCode(rowData.getItem().getCodeLine())) {
+//                            setTxtAlertMessage("此处不能设置断点,因为该行代码不是指令");
+//                            //清空
+//                            Parser.getCodeForPc();
+//                            return;
+//                        }
+//
+//                        String pc = "";
+//                        if (codeData.getCircle().isVisible()) {
+//                            //删除断点
+//                            codeData.getCircle().setVisible(false);
+//                            pc = Parser.getCodeForPc();
+//                            if (self.getDchUtil() != null) {
+//                                self.getDchUtil().removePcBreakLine(pc, rowData.getIndex() + 1);
+//                            } else {
+//                                String finalPc = pc;
+//                                self.pcBreakList.removeIf(v -> {
+//                                    return v.getPc().equals(finalPc);
+//                                });
+//                            }
+//                        } else {
+//
+//                            codeData.getCircle().setVisible(true);
+//                            pc = Parser.getCodeForPc();
+//
+//                            if (self.getDchUtil() != null) {
+//                                self.getDchUtil().addPcBreakLine(pc, rowData.getIndex() + 1);
+//                            } else {
+//                                QuestPcBreak questPcBreak = new QuestPcBreak();
+//                                questPcBreak.setLine(rowData.getIndex() + 1);
+//                                questPcBreak.setPc(pc);
+//                                self.pcBreakList.add(questPcBreak);
+//                            }
+//                        }
+//                        cell.itemProperty().setValue(codeData.getCircle());
+//                        cell.updateSelected(true);
+//
+//                    }
+//                });
+//
+//                return cell;
+//            }
+//        });
+
+
         //  var ok = tvCodeEditor.getColumns().size();
 
 
@@ -486,6 +572,12 @@ public class OpenCarWindos extends Application {
         System.out.println("快捷键F6");
         System.out.println(Thread.currentThread().getName());
     }
+
+
+    public void testSim() {
+        this.getDchUtil().test();
+    }
+
 
     public Circle getCircle() {
         Color c = Color.rgb(199, 84, 80);

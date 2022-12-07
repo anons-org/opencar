@@ -41,17 +41,25 @@ public class Cpu extends CpuBase {
 
     }
 
+    //计算CPU处理次数
+    private long executeCount = 0;
+
     //时序电路
     public void execute() {
 
         this.setPC(predict = StaticRes.krStart);
         try {
+            long startTime = System.currentTimeMillis();
             while (true) {
+
+
                 int code = getCode();
                 int opcode = getOpCode();
                 String str = String.format("curPc:0x%x \t parseing code 0x%s, opcode 0x%s ", getCurPC(), Integer.toHexString(code), Integer.toHexString(opcode));
                 System.out.print(str);
                 if (opct[opcode] == null) continue;
+                //绑定当前执行的CPU
+                DServer.iDebugQuest.getDebugger().setCtx(this);
 
                 if (DServer.iDebugQuest.getDebugger().simIsStep()) {
                     DServer.iDebugQuest.getDebugger().simInformStep(this, curPC);
@@ -64,10 +72,16 @@ public class Cpu extends CpuBase {
                 DServer.iDebugQuest.getDebugger().monitor();
 
                 opct[opcode].eval(this, code, opcode);
+
+
+                if (System.currentTimeMillis() - startTime >= 1000) {
+                    startTime = System.currentTimeMillis();
+                    System.out.println(executeCount + "hz");
+                    executeCount = 0;
+                } else {
+                    executeCount++;
+                }
                 curLine++;
-                //监测断点
-
-
             }
         } catch (Throwable e) {
             e.printStackTrace();

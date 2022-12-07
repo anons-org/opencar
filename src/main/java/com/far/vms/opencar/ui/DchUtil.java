@@ -3,10 +3,15 @@ package com.far.vms.opencar.ui;
 import cn.hutool.json.JSONUtil;
 import com.far.vms.opencar.OpenCarWindos;
 import com.far.vms.opencar.protocol.debug.QuestData;
+import com.far.vms.opencar.protocol.debug.mode.QuestRegInfo;
 import com.far.vms.opencar.protocol.debug.mode.QuestStep;
+import com.far.vms.opencar.ui.main.RightTablePanle.RegData;
 import com.far.vms.opencar.ui.net.DbgClient;
 import com.far.vms.opencar.protocol.debug.mode.QuestPcBreak;
 import com.far.vms.opencar.protocol.debug.QuestType;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /*
  * @description: 调试器工具
@@ -43,6 +48,9 @@ public class DchUtil {
 
                 ctx.getDebugBtns().activeBtnStepIn();
                 QuestPcBreak questPcBreak = JSONUtil.toBean(questData.getData(), QuestPcBreak.class);
+
+                ctx.getRightTablePanle().setPcval(questPcBreak.getPc());
+
                 if (questPcBreak.getLine() > 0) {
                     ctx.getTvCodeEditor().getSelectionModel().select(questPcBreak.getLine() - 1);
                 } else {
@@ -52,6 +60,18 @@ public class DchUtil {
                     //调整显示的位置
                     ctx.codeEditorScrollTo(line);
                 }
+            } else if (questData.getDt() == QuestType.REG) {
+                QuestRegInfo questRegInfo = JSONUtil.toBean(questData.getData(), QuestRegInfo.class);
+                List<RegData> regDataList = new ArrayList<>();
+                questRegInfo.getRegInfoList().forEach(e -> {
+                    RegData regData = new RegData();
+                    regData.setRegName( e.getName());
+                    regData.setAddr(e.getAddr());
+                    regData.setVal(e.getVal());
+                    regData.setViewVal(regData.toHexStr());
+                    regDataList.add(regData);
+                });
+                ctx.getRightTablePanle().addDataToGeneralRegisterTv(regDataList);
             }
             return true;
         });
@@ -69,6 +89,13 @@ public class DchUtil {
         String dpt = JSONUtil.toJsonStr(QuestData.create().setDt(QuestType.STEP).setData(""));
         dbgClient.sendMessage(dpt);
     }
+
+
+    public void test() {
+        String dpt = JSONUtil.toJsonStr(QuestData.create().setDt(QuestType.TEST).setData(""));
+        dbgClient.sendMessage(dpt);
+    }
+
 
     public void addPcBreakLine(String pc, int line) {
         QuestPcBreak dgbptPcBreak = new QuestPcBreak();

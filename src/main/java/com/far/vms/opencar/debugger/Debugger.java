@@ -11,6 +11,7 @@ import com.far.vms.opencar.debugger.server.SessionManager;
 import com.far.vms.opencar.protocol.debug.QuestData;
 import com.far.vms.opencar.protocol.debug.QuestType;
 import com.far.vms.opencar.protocol.debug.mode.QuestPcBreak;
+import com.far.vms.opencar.protocol.debug.mode.QuestRegInfo;
 import com.far.vms.opencar.utils.exception.FarException;
 import io.netty.handler.codec.mqtt.MqttMessageBuilders;
 
@@ -46,6 +47,10 @@ public class Debugger implements IDebuger, IDebugQuest {
 
     }
 
+    //需要考虑多核的情况
+    private Cpu ctx;
+
+
     //状态
     private volatile short stat;
     //是否进入单步状态
@@ -78,6 +83,13 @@ public class Debugger implements IDebuger, IDebugQuest {
         breakLines = new ArrayList<>();
     }
 
+    public Cpu getCpu() {
+        return ctx;
+    }
+
+    public void setCpu(Cpu cpu) {
+        this.ctx = cpu;
+    }
 
     public short getStat() {
         return stat;
@@ -86,6 +98,11 @@ public class Debugger implements IDebuger, IDebugQuest {
     @Override
     public boolean simIsStep() {
         return stat == Stat.STEP;
+    }
+
+    @Override
+    public void setCtx(Cpu ctx) {
+        this.ctx = ctx;
     }
 
 
@@ -132,13 +149,56 @@ public class Debugger implements IDebuger, IDebugQuest {
             QuestData questData = new QuestData();
             questData.setData(data);
             questData.setDt(QuestType.BPC);
-            System.out.println(  JSONUtil.toJsonStr(ctx.getRegister()) );
+
             DServer.toClient(JSONUtil.toJsonStr(questData));
+
+
+
+            QuestRegInfo generalRegInfo = new QuestRegInfo();
+            generalRegInfo.setTag(QuestRegInfo.Tag.A);
+            generalRegInfo.setSlaveTag("general");
+            generalRegInfo.setRegInfoList(new ArrayList<>());
+
+            //普通寄存器
+            ctx.getRegister().regs.entrySet().stream().forEach(e -> {
+                String rName = "";
+                long rVal = 0;
+                if (ctx.getRegister().getRegNames().containsKey(e.getKey())) {
+                    QuestRegInfo.InnerInfo regInfo = new QuestRegInfo.InnerInfo();
+                    rName = ctx.getRegister().getRegNames().get(e.getKey());
+                    rVal = e.getValue();
+                    regInfo.setAddr(e.getKey());
+                    regInfo.setName( rName);
+                    regInfo.setVal(rVal);
+                    generalRegInfo.getRegInfoList().add( regInfo  );
+                }
+            });
+
+            questData.setData(JSONUtil.toJsonStr(generalRegInfo));
+            questData.setDt(QuestType.REG);
+
+            DServer.toClient(JSONUtil.toJsonStr(questData));
+
+
+
+
+
+            //csr寄存器
+            long[] csrReg = ctx.getRegister().getCsrRegs();
+            String[] csrRegName = ctx.getRegister().getCsrRegNames();
+
+
+            for (int i = 0; i < csrRegName.length; i++) {
+                if (csrRegName[i]==null || "".equals(csrRegName[i])) continue;
+                System.out.println(csrRegName[i] + ":" + csrReg[i]);
+            }
+
+
+
         } else {
 //            questPcBreak = new QuestPcBreak();
 //            questPcBreak.setPc(Long.toHexString(pc));
         }
-
 
 
     }
@@ -356,6 +416,11 @@ public class Debugger implements IDebuger, IDebugQuest {
                 break;
             case QuestType.STEP:
                 onQuestStep();
+                break;
+            case QuestType.TEST:
+
+                System.out.println(JSONUtil.toJsonStr(this.ctx));
+
                 break;
             default:
 

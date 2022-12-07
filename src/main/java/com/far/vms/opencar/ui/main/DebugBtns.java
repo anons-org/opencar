@@ -23,6 +23,8 @@ public class DebugBtns {
 
     private Button btnStepIn;
 
+    private Button btnDelAllBreak;
+
 
     public OpenCarWindos getCtx() {
         return ctx;
@@ -74,6 +76,15 @@ public class DebugBtns {
                                     @Override
                                     public void handle(ActionEvent event) {
                                         ctx.keyF6();
+                                    }
+                                });
+                            }else if("btnDelAllBreak".equals(e3.getId())){
+                                btnDelAllBreak = ((Button) e3);
+
+                                btnDelAllBreak.setOnAction(new EventHandler<ActionEvent>() {
+                                    @Override
+                                    public void handle(ActionEvent event) {
+                                        ctx.testSim();
                                     }
                                 });
                             }

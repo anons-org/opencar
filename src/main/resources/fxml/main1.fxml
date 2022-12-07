@@ -97,7 +97,7 @@
     </MenuBar>
     <SplitPane id="spbox" dividerPositions="0.5211267605633803" focusTraversable="true" prefHeight="-1.0" prefWidth="-1.0" VBox.vgrow="ALWAYS">
       <items>
-        <AnchorPane id="leftAp" maxWidth="691.0" prefWidth="691.0">
+        <AnchorPane id="leftAp" maxWidth="691.0" prefHeight="807.0" prefWidth="691.0">
                <children>
                   <TabPane layoutX="-1.0" layoutY="43.0" prefHeight="713.0" prefWidth="704.0" tabClosingPolicy="UNAVAILABLE">
                     <tabs>
@@ -147,48 +147,18 @@
           <content>
             <AnchorPane id="Content" maxWidth="10.0" minHeight="-1.0" minWidth="-1.0" prefHeight="715.0" prefWidth="10.0">
               <children>
-                        <TabPane id="tabRightGroup" layoutX="1.0" maxWidth="569.0" prefHeight="781.0" prefWidth="561.0" tabClosingPolicy="UNAVAILABLE">
+                        <TabPane layoutX="1.0" maxWidth="569.0" prefHeight="781.0" prefWidth="561.0" tabClosingPolicy="UNAVAILABLE">
                           <tabs>
-                              <Tab text="控制台">
-                                 <content>
-                                    <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="752.0" prefWidth="505.0">
-                                       <children>
-                                          <TabPane id="groupConsole" layoutY="-1.0" prefHeight="694.0" prefWidth="554.0" tabClosingPolicy="UNAVAILABLE">
-                                            <tabs>
-                                              <Tab text="Console">
-                                                <content>
-                                                  <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
-                                                         <children>
-                                                            <TextArea id="txtSys" layoutX="4.0" layoutY="7.0" prefHeight="649.0" prefWidth="547.0" text="sys" wrapText="true" />
-                                                         </children>
-                                                      </AnchorPane>
-                                                </content>
-                                              </Tab>
-                                              <Tab text="Build">
-                                                <content>
-                                                  <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="171.0" prefWidth="284.0">
-                                                         <children>
-                                                            <TextArea id="txtBuild" layoutX="6.0" layoutY="9.0" prefHeight="648.0" prefWidth="543.0" text="bd" wrapText="true" />
-                                                         </children>
-                                                      </AnchorPane>
-                                                </content>
-                                              </Tab>
-                                            </tabs>
-                                          </TabPane>
-                                       </children>
-                                    </AnchorPane>
-                                 </content>
-                              </Tab>
-                            <Tab id="tabItemRegInfo" text="寄存器">
+                            <Tab text="PC">
                               <content>
-                                <AnchorPane id="anPane" minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
+                                <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
                                        <children>
                                           <Label layoutX="14.0" layoutY="66.0" text="通用寄存器" underline="true">
                                              <font>
                                                 <Font size="14.0" />
                                              </font>
                                           </Label>
-                                          <TextField id="txtPcVal" layoutX="40.0" layoutY="32.0" prefHeight="26.0" prefWidth="187.0">
+                                          <TextField layoutX="40.0" layoutY="32.0" prefHeight="23.0" prefWidth="176.0">
                                              <font>
                                                 <Font size="13.0" />
                                              </font>
@@ -198,13 +168,18 @@
                                                 <Font size="14.0" />
                                              </font>
                                           </Label>
-                                          <TableView id="tvGeneralRegister" layoutX="8.0" layoutY="89.0" prefHeight="283.0" prefWidth="530.0" />
-                                          <Label layoutX="14.0" layoutY="376.0" text="控制寄存器(CSR)" underline="true">
+                                          <TableView layoutX="8.0" layoutY="89.0" prefHeight="580.0" prefWidth="248.0">
+                                            <columns>
+                                              <TableColumn prefWidth="75.0" text="C1" />
+                                              <TableColumn prefWidth="75.0" text="C2" />
+                                            </columns>
+                                          </TableView>
+                                          <Label layoutX="270.0" layoutY="66.0" text="控制寄存器(CSR)" underline="true">
                                              <font>
                                                 <Font size="14.0" />
                                              </font>
                                           </Label>
-                                          <TableView layoutX="10.0" layoutY="405.0" prefHeight="286.0" prefWidth="531.0">
+                                          <TableView layoutX="270.0" layoutY="89.0" prefHeight="581.0" prefWidth="248.0">
                                              <columns>
                                                 <TableColumn prefWidth="76.0" text="C1" />
                                                 <TableColumn prefWidth="74.0" text="C2" />
@@ -213,19 +188,6 @@
                                        </children></AnchorPane>
                               </content>
                             </Tab>
-                              <Tab text="网卡数据">
-                                 <content>
-                                    <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="367.0" prefWidth="340.0">
-                                       <children>
-                                          <Label layoutX="14.0" layoutY="47.0" text="内存地址" />
-                                          <Label layoutX="213.0" layoutY="47.0" text="几个单元" />
-                                          <TextField layoutX="69.0" layoutY="43.0" prefHeight="23.0" prefWidth="135.0" />
-                                          <TextField layoutX="268.0" layoutY="43.0" prefHeight="23.0" prefWidth="29.0" />
-                                          <Label layoutX="15.0" layoutY="7.0" text="查看各个特权下的中断信号" underline="true" />
-                                       </children>
-                                    </AnchorPane>
-                                 </content>
-                              </Tab>
                               <Tab text="内存和寄存器断点">
                                  <content>
                                     <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="303.0" prefWidth="141.0">
@@ -267,6 +229,53 @@
                                           <TextField layoutX="69.0" layoutY="43.0" prefHeight="23.0" prefWidth="135.0" />
                                           <TextField layoutX="268.0" layoutY="43.0" prefHeight="23.0" prefWidth="29.0" />
                                           <Label layoutX="15.0" layoutY="7.0" text="查看各个特权下的中断信号" underline="true" />
+                                       </children>
+                                    </AnchorPane>
+                                 </content>
+                              </Tab>
+                              <Tab text="网卡数据">
+                                 <content>
+                                    <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="367.0" prefWidth="340.0">
+                                       <children>
+                                          <Label layoutX="14.0" layoutY="47.0" text="内存地址" />
+                                          <Label layoutX="213.0" layoutY="47.0" text="几个单元" />
+                                          <TextField layoutX="69.0" layoutY="43.0" prefHeight="23.0" prefWidth="135.0" />
+                                          <TextField layoutX="268.0" layoutY="43.0" prefHeight="23.0" prefWidth="29.0" />
+                                          <Label layoutX="15.0" layoutY="7.0" text="查看各个特权下的中断信号" underline="true" />
+                                       </children>
+                                    </AnchorPane>
+                                 </content>
+                              </Tab>
+                              <Tab text="控制台">
+                                 <content>
+                                    <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="752.0" prefWidth="505.0">
+                                       <children>
+                                          <TabPane id="groupConsole" layoutX="21.0" layoutY="150.0" prefHeight="200.0" prefWidth="453.0" tabClosingPolicy="UNAVAILABLE">
+                                            <tabs>
+                                              <Tab text="编译">
+                                                <content>
+                                                  <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="171.0" prefWidth="284.0">
+                                                         <children>
+                                                            <TextArea id="txtBuild" layoutX="6.0" layoutY="9.0" prefHeight="153.0" prefWidth="390.0" text="bd" wrapText="true" />
+                                                         </children>
+                                                      </AnchorPane>
+                                                </content>
+                                              </Tab>
+                                              <Tab text="控制台">
+                                                <content>
+                                                  <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
+                                                         <children>
+                                                            <TextArea id="txtSys" prefHeight="153.0" prefWidth="390.0" text="sys" wrapText="true" />
+                                                         </children>
+                                                      </AnchorPane>
+                                                </content>
+                                              </Tab>
+                                            </tabs>
+                                          </TabPane>
+                                          <Label layoutX="24.0" layoutY="109.0" text="Gcc-riscv" underline="true" />
+                                          <Label layoutX="27.0" layoutY="77.0" text="progBin" underline="true" />
+                                          <TextField id="txtGccPath" layoutX="86.0" layoutY="108.0" prefHeight="23.0" prefWidth="274.0" />
+                                          <TextField id="txtBinFile" layoutX="86.0" layoutY="73.0" prefHeight="23.0" prefWidth="274.0" />
                                        </children>
                                     </AnchorPane>
                                  </content>
