@@ -351,13 +351,9 @@ public class OpenCarWindos extends Application {
 
         //设置为只能单选
         tvCodeEditor.getSelectionModel().setSelectionMode(SelectionMode.SINGLE);
-
-
         //设置点击方法
         tvCodeEditor.setRowFactory(tview -> {
             TableRow<CodeData> row = new TableRow<>();
-
-
             row.setOnMouseClicked(event -> {
                 //此处只能选择一个 也就是当前选中的第一个单元格
                 TablePosition tp = (TablePosition) tvCodeEditor.getSelectionModel().getSelectedCells().get(0);
@@ -401,8 +397,6 @@ public class OpenCarWindos extends Application {
                             questPcBreak.setPc(pc);
                             this.pcBreakList.add(questPcBreak);
                         }
-
-
                     }
                 }
             });
@@ -527,7 +521,7 @@ public class OpenCarWindos extends Application {
         //禁止调整窗口大小
         primaryStage.setResizable(false);
         primaryStage.setTitle("opencar riscv64 emulation - dev version");
-        primaryStage.setScene(new Scene(rootMain, 1280, 840));
+        primaryStage.setScene(new Scene(rootMain, 1440, 840));
 
         KeyCombination ctrl_c = new KeyCodeCombination(KeyCode.C, KeyCombination.CONTROL_DOWN);
         KeyCombination kb_f6 = new KeyCodeCombination(KeyCode.F6);

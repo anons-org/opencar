@@ -17,7 +17,6 @@ public class RegData {
     }
 
 
-
     public String toHexStr() {
         return "0x" + Long.toHexString(val);
     }
@@ -52,6 +51,10 @@ public class RegData {
         this.viewAddr = String.valueOf(addr);
     }
 
+    public void setViewAddr(String viewAddr) {
+        this.viewAddr = viewAddr;
+    }
+
     public long getVal() {
         return val;
     }
@@ -59,5 +62,10 @@ public class RegData {
     public void setVal(long val) {
         this.val = val;
 
+    }
+
+    @Override
+    public String toString() {
+        return regName + " " + " " + viewAddr + " " + viewVal;
     }
 }

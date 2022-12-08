@@ -71,7 +71,15 @@ public class DchUtil {
                     regData.setViewVal(regData.toHexStr());
                     regDataList.add(regData);
                 });
-                ctx.getRightTablePanle().addDataToGeneralRegisterTv(regDataList);
+
+
+                if( "general".equals(questRegInfo.getSlaveTag()) ){
+                    ctx.getRightTablePanle().addDataToGeneralRegisterTv(regDataList);
+                }else{//csr
+                    ctx.getRightTablePanle().addDataToCsrRegisterTv(regDataList);
+                }
+
+
             }
             return true;
         });

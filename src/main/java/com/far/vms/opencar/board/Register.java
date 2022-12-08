@@ -122,7 +122,14 @@ public class Register {
         csrRegs[CsrRegAddr.mtvec] = 0x00L;
         //默认打开M模式的全局中断
         csrRegs[CsrRegAddr.mie] = 0b00000000_00000000_00000000_00001000;
+
+
         csrRegNames[CsrRegAddr.mhartid] = "mhartid";
+        csrRegNames[CsrRegAddr.mcause] = "mcause";
+        csrRegNames[CsrRegAddr.mepc] = "mepc";
+        csrRegNames[CsrRegAddr.mtvec] = "mtvec";
+        csrRegNames[CsrRegAddr.mie] = "mie";
+
     }
 
 

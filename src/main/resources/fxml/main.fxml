@@ -53,7 +53,7 @@
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 
-<VBox id="vbox" prefHeight="768.0" prefWidth="1280.0" xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1">
+<VBox id="vbox" prefHeight="768.0" prefWidth="1440.0" xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1">
   <children>
     <MenuBar id="mBar" VBox.vgrow="NEVER">
       <menus>
@@ -120,7 +120,7 @@
                               <Insets left="20.0" />
                            </HBox.margin>
                         </Button>
-                        <Button id="btnStepIn" contentDisplay="CENTER" mnemonicParsing="false" prefHeight="23.0" prefWidth="71.0" text="单步(F6)">
+                        <Button id="btnStepIn" contentDisplay="CENTER" mnemonicParsing="false" prefHeight="23.0" prefWidth="85.0" text="单步(IN)(F6)">
                            <HBox.margin>
                               <Insets left="20.0" />
                            </HBox.margin>
@@ -147,7 +147,7 @@
           <content>
             <AnchorPane id="Content" maxWidth="10.0" minHeight="-1.0" minWidth="-1.0" prefHeight="715.0" prefWidth="10.0">
               <children>
-                        <TabPane id="tabRightGroup" layoutX="1.0" maxWidth="569.0" prefHeight="781.0" prefWidth="561.0" tabClosingPolicy="UNAVAILABLE">
+                        <TabPane id="tabRightGroup" layoutX="1.0" maxWidth="720.0" prefHeight="738.0" prefWidth="720.0" tabClosingPolicy="UNAVAILABLE">
                           <tabs>
                               <Tab text="控制台">
                                  <content>
@@ -204,12 +204,7 @@
                                                 <Font size="14.0" />
                                              </font>
                                           </Label>
-                                          <TableView layoutX="10.0" layoutY="405.0" prefHeight="286.0" prefWidth="531.0">
-                                             <columns>
-                                                <TableColumn prefWidth="76.0" text="C1" />
-                                                <TableColumn prefWidth="74.0" text="C2" />
-                                             </columns>
-                                          </TableView>
+                                          <TableView id="tvCsrRegister" layoutX="10.0" layoutY="405.0" prefHeight="286.0" prefWidth="531.0" />
                                        </children></AnchorPane>
                               </content>
                             </Tab>
@@ -246,7 +241,7 @@
                                     </AnchorPane>
                                  </content>
                               </Tab>
-                            <Tab text="内存查看">
+                            <Tab id="tabMemory" text="内存查看">
                               <content>
                                 <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="367.0" prefWidth="340.0">
                                        <children>
@@ -255,6 +250,7 @@
                                           <TextField layoutX="69.0" layoutY="43.0" prefHeight="23.0" prefWidth="135.0" />
                                           <TextField layoutX="268.0" layoutY="43.0" prefHeight="23.0" prefWidth="29.0" />
                                           <Label layoutX="15.0" layoutY="7.0" text="查看内存仅在断点状态下有效" underline="true" />
+                                          <TableView id="tvMemoryGrid" layoutX="14.0" layoutY="83.0" prefHeight="609.0" prefWidth="703.0" />
                                        </children></AnchorPane>
                               </content>
                             </Tab>

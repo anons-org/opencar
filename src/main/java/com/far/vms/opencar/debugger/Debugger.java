@@ -176,24 +176,32 @@ public class Debugger implements IDebuger, IDebugQuest {
 
             questData.setData(JSONUtil.toJsonStr(generalRegInfo));
             questData.setDt(QuestType.REG);
-
             DServer.toClient(JSONUtil.toJsonStr(questData));
 
 
 
 
+            //csr寄存器-------------------------------------------------
+            QuestRegInfo csrRegInfo = new QuestRegInfo();
+            csrRegInfo.setTag(QuestRegInfo.Tag.A);
+            csrRegInfo.setSlaveTag("csr");
+            csrRegInfo.setRegInfoList(new ArrayList<>());
 
-            //csr寄存器
             long[] csrReg = ctx.getRegister().getCsrRegs();
             String[] csrRegName = ctx.getRegister().getCsrRegNames();
 
 
             for (int i = 0; i < csrRegName.length; i++) {
                 if (csrRegName[i]==null || "".equals(csrRegName[i])) continue;
-                System.out.println(csrRegName[i] + ":" + csrReg[i]);
+                QuestRegInfo.InnerInfo regInfo = new QuestRegInfo.InnerInfo();
+                regInfo.setAddr(i);
+                regInfo.setVal( csrReg[i]);
+                regInfo.setName(csrRegName[i]);
+                csrRegInfo.getRegInfoLists().add(regInfo);
             }
-
-
+            questData.setData(JSONUtil.toJsonStr(csrRegInfo));
+            questData.setDt(QuestType.REG);
+            DServer.toClient(JSONUtil.toJsonStr(questData));
 
         } else {
 //            questPcBreak = new QuestPcBreak();
