@@ -7,6 +7,10 @@
 - 不用买开发板就可以在openCar上测试和跟踪软件在riscv上的运行情况。
 - 可以在opencar上使用C语言进行操作系统开发以及裸机开发，然后移植到真机
 
+![img_1.png](img_1.png)
+
+
+
 ## openCar目标
 
 * 支持rv64 ( I M D F A L  Zicsr) 指令集
@@ -32,12 +36,25 @@
 - 完美运行linux
 - 在opencar上开发一款NES模拟器
 
+## 相关配置
+### java
+- jdk11
+### 编译器
+- gcc riscv64-unknown-elf-toolchain-10.2.0-2020.12.8
+
+### 开发时JVM参数配置
+![img_2.png](img_2.png)
+
+
+
 
 ## 运行
 - java11
 ```js
  ./java --module-path javafx-sdk-16\lib --add-modules javafx.controls,javafx.fxml -jar opencar-0.0.1-SNAPSHOT.jar
 ```
+
+
 
 - 如果出现 cannot access class jdk.internal.misc.Unsafe 还需要运行增加
 ```
@@ -52,8 +69,10 @@
 
 
 
-## 临时todo
-- 验证模拟器暂停的情况下，通过netty线程读取模拟器相关数据
+## 记录更新
+- 2022/12/9 
+  - 优化寄存器面板，数据格进制格式化后，下次显示的格式和之前的设置一致
+  - 支持寄存器设置写前断点
 
 
 

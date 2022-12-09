@@ -1,5 +1,6 @@
 package com.far.vms.opencar.ui.main.RightTablePanle;
 
+import cn.hutool.core.util.StrUtil;
 import com.far.vms.opencar.OpenCarWindos;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -84,8 +85,8 @@ public class RightTablePanle {
                         txtPcVal = (TextField) item.getContent().lookup("#txtPcVal");
                         tvGeneralRegister = (TableView) item.getContent().lookup("#tvGeneralRegister");
                         tvCsrRegister = (TableView) item.getContent().lookup("#tvCsrRegister");
-                    }else if("tabMemory".equals(item.getId())){
-                        tabMemoryInfo.setTvMemoryGrid( (TableView) item.getContent().lookup("#tvMemoryGrid"));
+                    } else if ("tabMemory".equals(item.getId())) {
+                        tabMemoryInfo.setTvMemoryGrid((TableView) item.getContent().lookup("#tvMemoryGrid"));
                     }
                 });
             }
@@ -147,7 +148,6 @@ public class RightTablePanle {
             regData.setViewVal(vv);
         }
     }
-
 
 
     public <T> String formmatData(long val, String type) {
@@ -288,6 +288,7 @@ public class RightTablePanle {
             }
         });
 
+
         //将表格的列和类的属性进行绑定
         regName.setCellValueFactory(new PropertyValueFactory<>("regName"));
         viewAddr.setCellValueFactory(new PropertyValueFactory<>("viewAddr"));
@@ -304,6 +305,7 @@ public class RightTablePanle {
         TableColumn viewAddr = new TableColumn<>("地址");
         TableColumn viewVal = new TableColumn<>("值");
 
+
         viewAddr.setCellFactory(new Callback<TableColumn, TableCell>() {
             @Override
             public TableCell call(TableColumn tableColumn) {
@@ -312,17 +314,6 @@ public class RightTablePanle {
                 //简单说 必须有这句，才会把值显示出来
                 cell.textProperty().bind(cell.itemProperty());
 
-//                cell.setOnKeyPressed(new EventHandler<KeyEvent>() {
-//                    @Override
-//                    public void handle(KeyEvent keyEvent) {
-//
-//                        if (keyEvent.getCode() == KeyCode.C) {
-//                            // final Clipboard clipboard = Clipboard.getSystemClipboard();
-//                            final ClipboardContent content = new ClipboardContent();
-//                            content.putString(cell.getItem());
-//                        }
-//                    }
-//                });
 
                 cell.setOnMouseClicked(new EventHandler<MouseEvent>() {
                     @Override
@@ -340,6 +331,8 @@ public class RightTablePanle {
                             hex.setOnAction(new EventHandler<ActionEvent>() {
                                 @Override
                                 public void handle(ActionEvent event) {
+
+                                    csrColFormat.put("viewAddr", FormatType.HEX);
                                     String vv = formmatData(regData.getAddr(), FormatType.HEX);
                                     cell.itemProperty().setValue(vv);
                                     setCsrColCopy(vv, ColSelect.VIEW_ADDR);
@@ -352,6 +345,7 @@ public class RightTablePanle {
                             bin.setOnAction(new EventHandler<ActionEvent>() {
                                 @Override
                                 public void handle(ActionEvent event) {
+                                    csrColFormat.put("viewAddr", FormatType.BIN);
                                     String vv = formmatData(regData.getAddr(), FormatType.BIN);
                                     cell.itemProperty().setValue(vv);
                                     setCsrColCopy(vv, ColSelect.VIEW_ADDR);
@@ -361,6 +355,7 @@ public class RightTablePanle {
                             orc.setOnAction(new EventHandler<ActionEvent>() {
                                 @Override
                                 public void handle(ActionEvent event) {
+                                    csrColFormat.put("viewAddr", FormatType.DEC);
                                     String vv = formmatData(regData.getAddr(), FormatType.DEC);
                                     cell.itemProperty().setValue(vv);
                                     setCsrColCopy(vv, ColSelect.VIEW_ADDR);
@@ -400,6 +395,7 @@ public class RightTablePanle {
                             hex.setOnAction(new EventHandler<ActionEvent>() {
                                 @Override
                                 public void handle(ActionEvent event) {
+                                    csrColFormat.put("viewVal", FormatType.HEX);
                                     String vv = formmatData(regData.getVal(), FormatType.HEX);
                                     cell.itemProperty().setValue(vv);
                                     setCsrColCopy(vv, ColSelect.VIEW_VAL);
@@ -410,6 +406,7 @@ public class RightTablePanle {
                             bin.setOnAction(new EventHandler<ActionEvent>() {
                                 @Override
                                 public void handle(ActionEvent event) {
+                                    csrColFormat.put("viewVal", FormatType.BIN);
                                     String vv = formmatData(regData.getVal(), FormatType.BIN);
                                     cell.itemProperty().setValue(vv);
                                     setCsrColCopy(vv, ColSelect.VIEW_VAL);
@@ -419,6 +416,7 @@ public class RightTablePanle {
                             orc.setOnAction(new EventHandler<ActionEvent>() {
                                 @Override
                                 public void handle(ActionEvent event) {
+                                    csrColFormat.put("viewVal", FormatType.DEC);
                                     String vv = formmatData(regData.getVal(), FormatType.DEC);
                                     cell.itemProperty().setValue(vv);
                                     setCsrColCopy(vv, ColSelect.VIEW_VAL);
@@ -440,14 +438,31 @@ public class RightTablePanle {
         //添加到tableview
         tvCsrRegister.getColumns().addAll(regName, viewAddr, viewVal);
         tvCsrRegister.setItems(tvCsrRegisterDataWrapper);
-
-
     }
 
+
+    public <T> void formatColOfRender(Map<String, String> map, RegData e) {
+        if (!StrUtil.isEmpty(map.get("viewVal"))) {
+            if (map.get("viewVal").equals(FormatType.HEX)) {
+                e.setViewVal(formmatData(e.getVal(), FormatType.HEX));
+            } else if (map.get("viewVal").equals(FormatType.BIN)) {
+                e.setViewVal(formmatData(e.getVal(), FormatType.BIN));
+            }
+        }
+
+        if (!StrUtil.isEmpty(map.get("viewAddr"))) {
+            if (map.get("viewAddr").equals(FormatType.HEX)) {
+                e.setViewAddr(formmatData(e.getAddr(), FormatType.HEX));
+            } else if (map.get("viewAddr").equals(FormatType.BIN)) {
+                e.setViewAddr(formmatData(e.getAddr(), FormatType.BIN));
+            }
+        }
+    }
 
     public void addDataToGeneralRegisterTv(List<RegData> regData) {
         tvGeneralRegisterDataWrapper.clear();
         regData.forEach(e -> {
+            formatColOfRender(generalColFormat, e);
             tvGeneralRegisterDataWrapper.add(e);
         });
     }
@@ -456,6 +471,7 @@ public class RightTablePanle {
     public void addDataToCsrRegisterTv(List<RegData> regData) {
         tvCsrRegisterDataWrapper.clear();
         regData.forEach(e -> {
+            formatColOfRender(csrColFormat, e);
             tvCsrRegisterDataWrapper.add(e);
         });
     }
