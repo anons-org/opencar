@@ -3,6 +3,7 @@ package com.far.vms.opencar.ui;
 import cn.hutool.json.JSONUtil;
 import com.far.vms.opencar.OpenCarWindos;
 import com.far.vms.opencar.protocol.debug.QuestData;
+import com.far.vms.opencar.protocol.debug.mode.QuestMemoryData;
 import com.far.vms.opencar.protocol.debug.mode.QuestRegInfo;
 import com.far.vms.opencar.protocol.debug.mode.QuestStep;
 import com.far.vms.opencar.ui.main.RightTablePanle.RegData;
@@ -65,7 +66,7 @@ public class DchUtil {
                 List<RegData> regDataList = new ArrayList<>();
                 questRegInfo.getRegInfoList().forEach(e -> {
                     RegData regData = new RegData();
-                    regData.setRegName( e.getName());
+                    regData.setRegName(e.getName());
                     regData.setAddr(e.getAddr());
                     regData.setVal(e.getVal());
                     regData.setViewVal(regData.toHexStr());
@@ -73,9 +74,9 @@ public class DchUtil {
                 });
 
 
-                if( "general".equals(questRegInfo.getSlaveTag()) ){
+                if ("general".equals(questRegInfo.getSlaveTag())) {
                     ctx.getRightTablePanle().addDataToGeneralRegisterTv(regDataList);
-                }else{//csr
+                } else {//csr
                     ctx.getRightTablePanle().addDataToCsrRegisterTv(regDataList);
                 }
 
@@ -123,6 +124,18 @@ public class DchUtil {
         String dpt = JSONUtil.toJsonStr(QuestData.create().setDt(QuestType.RBPC).setData(data));
         dbgClient.sendMessage(dpt);
     }
+
+    //查看内存数据
+    public void findMemData(long addr, int unit) {
+        QuestData questData = new QuestData();
+        questData.setDt(QuestType.READ_MEMORY);
+        QuestMemoryData questMemoryData = new QuestMemoryData();
+        questMemoryData.setFindAddr(addr);
+        questMemoryData.setUnit(unit);
+        questData.setData(JSONUtil.toJsonStr(questMemoryData));
+        dbgClient.sendMessage(JSONUtil.toJsonStr(questData));
+    }
+
 
 }
 

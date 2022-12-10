@@ -1,5 +1,6 @@
 package com.far.vms.opencar.board;
 
+import com.far.vms.opencar.debugger.server.DServer;
 import com.far.vms.opencar.instruct.StaticRes;
 
 import java.util.HashMap;
@@ -151,11 +152,13 @@ public class Register {
     }
 
     public void setRegVal(int rid, long val) {
+
+        DServer.iDebugQuest.getDebugger().simCallerRegWriteBefore(rid,val);
         //x0不能修改
         if (rid == 0) return;
-        //StaticRes.debugger.onWriteReg(ctx, rid, val);
+
         regs.put(rid, val);
-        int x = 01;
+
     }
 
 

@@ -247,8 +247,8 @@
                                        <children>
                                           <Label layoutX="14.0" layoutY="47.0" text="内存地址" />
                                           <Label layoutX="213.0" layoutY="47.0" text="几个单元" />
-                                          <TextField layoutX="69.0" layoutY="43.0" prefHeight="23.0" prefWidth="135.0" />
-                                          <TextField layoutX="268.0" layoutY="43.0" prefHeight="23.0" prefWidth="29.0" />
+                                          <TextField id="findMemAddr" layoutX="69.0" layoutY="43.0" prefHeight="23.0" prefWidth="135.0" />
+                                          <TextField id="findMemUnit" layoutX="268.0" layoutY="43.0" prefHeight="23.0" prefWidth="29.0" />
                                           <Label layoutX="15.0" layoutY="7.0" text="查看内存仅在断点状态下有效" underline="true" />
                                           <TableView id="tvMemoryGrid" layoutX="14.0" layoutY="83.0" prefHeight="609.0" prefWidth="703.0" />
                                        </children></AnchorPane>

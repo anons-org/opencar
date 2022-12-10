@@ -7,7 +7,7 @@ import java.util.List;
  * @author mike/Fang.J
  * @data 2022/12/9
  */
-public class QuestRegRegBreak {
+public class QuestRegBreak {
 
 
     List<InnerData> innerDataList;

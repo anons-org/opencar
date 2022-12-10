@@ -5,13 +5,20 @@ import cn.hutool.json.JSON;
 import cn.hutool.json.JSONObject;
 import cn.hutool.json.JSONUtil;
 import com.far.net.interf.IProcessAgent;
+import com.far.vms.opencar.board.Bus;
 import com.far.vms.opencar.board.Cpu;
 import com.far.vms.opencar.debugger.server.DServer;
 import com.far.vms.opencar.debugger.server.SessionManager;
+import com.far.vms.opencar.instruct.StaticRes;
+import com.far.vms.opencar.protocol.debug.Opportun;
 import com.far.vms.opencar.protocol.debug.QuestData;
 import com.far.vms.opencar.protocol.debug.QuestType;
+import com.far.vms.opencar.protocol.debug.mode.QuestMemoryData;
 import com.far.vms.opencar.protocol.debug.mode.QuestPcBreak;
+import com.far.vms.opencar.protocol.debug.mode.QuestRegBreak;
 import com.far.vms.opencar.protocol.debug.mode.QuestRegInfo;
+import com.far.vms.opencar.ui.main.RightTablePanle.MemoryData;
+import com.far.vms.opencar.utils.ByteUtil;
 import com.far.vms.opencar.utils.exception.FarException;
 import io.netty.handler.codec.mqtt.MqttMessageBuilders;
 
@@ -62,6 +69,10 @@ public class Debugger implements IDebuger, IDebugQuest {
 
     //pc断点
     private Map<Long, QuestPcBreak> pcBreaks = new HashMap<>();
+
+    //寄存器写前断点
+
+    private Map<Integer, QuestData> regWriteBefore = new HashMap<>();
 
     //断点所在的行 有哪些？ 记录 调式器发送过来的断点
     List<Integer> breakLines;
@@ -130,6 +141,67 @@ public class Debugger implements IDebuger, IDebugQuest {
         return pcBreaks.size() > 0;
     }
 
+
+    public QuestData getPcData() {
+        QuestPcBreak questPcBreak = new QuestPcBreak();
+        questPcBreak.setPc(Long.toHexString(ctx.getCurPC()));
+        String data = JSONUtil.toJsonStr(questPcBreak);
+        QuestData questData = new QuestData();
+        questData.setData(data);
+        questData.setDt(QuestType.BPC);
+        return questData;
+    }
+
+    public QuestData getAllGeneralRegData() {
+
+        QuestRegInfo generalRegInfo = new QuestRegInfo();
+        generalRegInfo.setTag(QuestRegInfo.Tag.A);
+        generalRegInfo.setSlaveTag("general");
+        generalRegInfo.setRegInfoList(new ArrayList<>());
+        //普通寄存器
+        ctx.getRegister().regs.entrySet().stream().forEach(e -> {
+            String rName = "";
+            long rVal = 0;
+            if (ctx.getRegister().getRegNames().containsKey(e.getKey())) {
+                QuestRegInfo.InnerInfo regInfo = new QuestRegInfo.InnerInfo();
+                rName = ctx.getRegister().getRegNames().get(e.getKey());
+                rVal = e.getValue();
+                regInfo.setAddr(e.getKey());
+                regInfo.setName(rName);
+                regInfo.setVal(rVal);
+                generalRegInfo.getRegInfoList().add(regInfo);
+            }
+        });
+        QuestData questData = new QuestData();
+        questData.setData(JSONUtil.toJsonStr(generalRegInfo));
+        questData.setDt(QuestType.REG);
+        return questData;
+    }
+
+
+    public QuestData getAllCrsRegData() {
+
+        QuestRegInfo csrRegInfo = new QuestRegInfo();
+        csrRegInfo.setTag(QuestRegInfo.Tag.A);
+        csrRegInfo.setSlaveTag("csr");
+        csrRegInfo.setRegInfoList(new ArrayList<>());
+        long[] csrReg = ctx.getRegister().getCsrRegs();
+        String[] csrRegName = ctx.getRegister().getCsrRegNames();
+        for (int i = 0; i < csrRegName.length; i++) {
+            if (csrRegName[i] == null || "".equals(csrRegName[i])) continue;
+            QuestRegInfo.InnerInfo regInfo = new QuestRegInfo.InnerInfo();
+            regInfo.setAddr(i);
+            regInfo.setVal(csrReg[i]);
+            regInfo.setName(csrRegName[i]);
+            csrRegInfo.getRegInfoLists().add(regInfo);
+        }
+        QuestData questData = new QuestData();
+        questData.setData(JSONUtil.toJsonStr(csrRegInfo));
+        questData.setDt(QuestType.REG);
+        return questData;
+    }
+
+
     /**
      * @param ctx
      * @param pc
@@ -153,7 +225,6 @@ public class Debugger implements IDebuger, IDebugQuest {
             DServer.toClient(JSONUtil.toJsonStr(questData));
 
 
-
             QuestRegInfo generalRegInfo = new QuestRegInfo();
             generalRegInfo.setTag(QuestRegInfo.Tag.A);
             generalRegInfo.setSlaveTag("general");
@@ -168,17 +239,15 @@ public class Debugger implements IDebuger, IDebugQuest {
                     rName = ctx.getRegister().getRegNames().get(e.getKey());
                     rVal = e.getValue();
                     regInfo.setAddr(e.getKey());
-                    regInfo.setName( rName);
+                    regInfo.setName(rName);
                     regInfo.setVal(rVal);
-                    generalRegInfo.getRegInfoList().add( regInfo  );
+                    generalRegInfo.getRegInfoList().add(regInfo);
                 }
             });
 
             questData.setData(JSONUtil.toJsonStr(generalRegInfo));
             questData.setDt(QuestType.REG);
             DServer.toClient(JSONUtil.toJsonStr(questData));
-
-
 
 
             //csr寄存器-------------------------------------------------
@@ -192,10 +261,10 @@ public class Debugger implements IDebuger, IDebugQuest {
 
 
             for (int i = 0; i < csrRegName.length; i++) {
-                if (csrRegName[i]==null || "".equals(csrRegName[i])) continue;
+                if (csrRegName[i] == null || "".equals(csrRegName[i])) continue;
                 QuestRegInfo.InnerInfo regInfo = new QuestRegInfo.InnerInfo();
                 regInfo.setAddr(i);
-                regInfo.setVal( csrReg[i]);
+                regInfo.setVal(csrReg[i]);
                 regInfo.setName(csrRegName[i]);
                 csrRegInfo.getRegInfoLists().add(regInfo);
             }
@@ -219,8 +288,6 @@ public class Debugger implements IDebuger, IDebugQuest {
      */
     @Override
     public void simInformStep(Cpu ctx, long pc) {
-
-
         if (!pcBreaks.containsKey(pc)) {
             QuestPcBreak questPcBreak = new QuestPcBreak();
             questPcBreak.setPc(Long.toHexString(pc));
@@ -230,11 +297,28 @@ public class Debugger implements IDebuger, IDebugQuest {
             questData.setDt(QuestType.BPC);
             onQuestaddPcBreak(questData);
         }
-
         this.setStep(false);
         this.stat = Stat.PAUSE;
 //        DServer.toClient(JSONUtil.toJsonStr(questData));
 
+    }
+
+    /**
+     * @param regAddr
+     * @param val
+     * @description: 寄存器写之前暂停
+     * @return: void
+     * @author mike/Fang.J
+     * @data 2022/12/9
+     */
+    @Override
+    public void simCallerRegWriteBefore(int regAddr, long val) {
+
+        if (regWriteBefore.size() < 0 || !regWriteBefore.containsKey(regAddr)) return;
+        //此处发送消息的目的，是让客户端接收到信息后更新UI的数据
+        DServer.toClient(JSONUtil.toJsonStr(regWriteBefore.get(regAddr)));
+        //暂停
+        this.stat = Stat.PAUSE;
     }
 
 
@@ -246,6 +330,46 @@ public class Debugger implements IDebuger, IDebugQuest {
     //删除监视写操作的寄存器
     public void removeRegWriteOf(String rname) {
 
+    }
+
+    /**
+     * @param questData
+     * @description: 寄存器断点信号
+     * @return: void
+     * @author mike/Fang.J
+     * @data 2022/12/9
+     */
+    private void OnQuestAddRegBreak(QuestData questData) {
+        QuestRegBreak questRegBreak = JSONUtil.toBean(questData.getData(), QuestRegBreak.class);
+        if (Objects.isNull(questRegBreak.getInnerDataList()) || questRegBreak.getInnerDataList().size() <= 0) return;
+        questRegBreak.getInnerDataList().forEach(e -> {
+            if (e.getOpportun() == Opportun.W_BEFORE) {
+                //写之前
+                regWriteBefore.put(e.getAddr(), questData);
+            } else if (e.getOpportun() == Opportun.R_BEFORE) {
+                //读之前
+            }
+        });
+    }
+
+    /**
+     * @param questData
+     * @description:删除寄存器断点
+     * @return: void
+     * @author mike/Fang.J
+     * @data 2022/12/9
+     */
+    private void OnQuestRemoveRegBreak(QuestData questData) {
+        QuestRegBreak questRegBreak = JSONUtil.toBean(questData.getData(), QuestRegBreak.class);
+        if (Objects.isNull(questRegBreak.getInnerDataList()) || questRegBreak.getInnerDataList().size() <= 0) return;
+        questRegBreak.getInnerDataList().forEach(e -> {
+            if (e.getOpportun() == Opportun.W_BEFORE) {
+                //写之前
+                regWriteBefore.remove(e.getAddr());
+            } else if (e.getOpportun() == Opportun.R_BEFORE) {
+                //读之前
+            }
+        });
     }
 
     //添加PC断点
@@ -263,6 +387,44 @@ public class Debugger implements IDebuger, IDebugQuest {
         long pcl = Long.valueOf(HexUtil.hexToLong(questPcBreak.getPc()));
         pcBreaks.remove(pcl);
     }
+
+    //读取指定内存的地址
+    private void onQuestReadMemory(QuestData questData) {
+        QuestMemoryData questMemoryData = JSONUtil.toBean(questData.getData(), QuestMemoryData.class);
+        long addr = questMemoryData.getFindAddr();
+        //从指定的地址开始读取多少个字节
+        int offset = questMemoryData.getUnit();
+        Map<String, MemoryData.InnerMemVal> viewTable = null;
+
+        for (int i = 0, j =0; i < offset; i++,j++) {
+
+            if (i % 16 == 0) {
+                j=0;
+                viewTable = new HashMap<>();
+                questMemoryData.getMapList().add(viewTable);
+                MemoryData.InnerMemVal innerMemVal = new MemoryData.InnerMemVal();
+                innerMemVal.setViewVal(Long.toHexString(addr+i));
+                viewTable.put("offset", innerMemVal);
+
+                int noffset = i;
+                byte mval = ((Bus) StaticRes.bus).getDram().loadByte(addr + noffset);
+                MemoryData.InnerMemVal innerMemVal2 = new MemoryData.InnerMemVal();
+                innerMemVal2.setVal(mval);
+                innerMemVal2.setViewVal(Integer.toHexString(0xF & mval));
+                viewTable.put(String.valueOf(j), innerMemVal2);
+            } else {
+                MemoryData.InnerMemVal innerMemVal = new MemoryData.InnerMemVal();
+                int noffset = i;
+                byte mval = ((Bus) StaticRes.bus).getDram().loadByte(addr + noffset);
+                innerMemVal.setVal(mval);
+                innerMemVal.setViewVal(Integer.toHexString(0xF & mval));
+                viewTable.put(String.valueOf(j), innerMemVal);
+            }
+        }
+        questData.setData( JSONUtil.toJsonStr(questMemoryData) );
+        DServer.toClient(JSONUtil.toJsonStr(questData));
+    }
+
 
     /**
      * @param
@@ -303,46 +465,8 @@ public class Debugger implements IDebuger, IDebugQuest {
             System.out.println(startInf + ", Enter 'h to view all debug instructions");
         }
 
-//
-//        if (stat == Stat.DEBUG) {
-//            System.out.println("当前线程-->" + Thread.currentThread().getName());
-//        }
-
 
         while (stat == Stat.PAUSE) ;
-
-
-//        Scanner scanner = new Scanner(System.in);
-//        while (scanner.hasNext()) {
-//            String[] cmds = scanner.nextLine().split(" ");
-//            cmd = cmds[0];
-//            if ("next".equals(cmd)) {
-//                //跳出循环 执行下一段代码
-//                break;
-//            } else if ("delete".equals(cmd)) {//清除所有断点
-//
-//            } else if ("disable".equals(cmd)) {
-//                stat = Stat.NONE;
-//                break;
-//            } else if ("info".equals(cmd)) {
-//                if ("all-reg".equals(cmds[1])) {//显示所有寄存器的信息
-//                    Debug.printRegister(1);
-//                }
-//            } else if ("x".equals(cmds[0])) {// x /nfu <addr>
-//                String fmt = cmds[1];
-//                long addr = Long.decode(cmds[2]);
-//                Debug.printMemoryVal(addr);
-//            } else if ("h".equals(cmd)) {
-//                Arrays.stream(this.cmdsDesc).forEach(e -> {
-//                    System.out.println(e);
-//                });
-//            } else if ("b".equals(cmd)) {
-//                if ("pc".equals(cmds[1])) {
-//
-//                }
-//            }
-//        }
-//
 
 
     }
@@ -364,43 +488,6 @@ public class Debugger implements IDebuger, IDebugQuest {
 
         while (stat == Stat.PAUSE) ;
 
-
-//        if (stat == Stat.DEBUG) {
-
-        //onDbgCmd("Start pause to enter debugging mode");
-
-//            System.out.println("调试模式开启!");
-//            Scanner scanner = new Scanner(System.in);
-//            while (scanner.hasNext()) {
-//                String[] cmds = scanner.nextLine().split(" ");
-//                cmd = cmds[0];
-//                if ("next".equals(cmd)) {
-//                    //跳出循环 执行下一段代码
-//                    break;
-//                } else if ("delete".equals(cmd)) {//清除所有断点
-//
-//                } else if ("disable".equals(cmd)) {
-//                    stat = Stat.NONE;
-//                    break;
-//                } else if ("info".equals(cmd)) {
-//                    if ("all-reg".equals(cmds[1])) {//显示所有寄存器的信息
-//                        Debug.printRegister(1);
-//                    }
-//                } else if ("x".equals(cmds[0])) {// x /nfu <addr>
-//                    String fmt = cmds[1];
-//                    long addr = Long.decode(cmds[2]);
-//                    Debug.printMemoryVal(addr);
-//                } else if ("h".equals(cmd)) {
-//                    Arrays.stream(this.cmdsDesc).forEach(e -> {
-//                        System.out.println(e);
-//                    });
-//                } else if ("b".equals(cmd)) {
-//                    if ("pc".equals(cmds[1])) {
-//
-//                    }
-//                }
-//            }
-//        }
     }
 
     /**
@@ -424,6 +511,9 @@ public class Debugger implements IDebuger, IDebugQuest {
                 break;
             case QuestType.STEP:
                 onQuestStep();
+                break;
+            case QuestType.READ_MEMORY:
+                onQuestReadMemory(quest);
                 break;
             case QuestType.TEST:
 

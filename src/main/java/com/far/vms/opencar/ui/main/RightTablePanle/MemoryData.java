@@ -16,14 +16,15 @@ public class MemoryData {
 
     public static class InnerMemVal{
         //字节数据
-        int val;
+        byte val;
         String viewVal;
 
-        public int getVal() {
+
+        public byte getVal() {
             return val;
         }
 
-        public void setVal(int val) {
+        public void setVal(byte val) {
             this.val = val;
         }
 

@@ -30,6 +30,11 @@ public interface IDebuger {
     //发送一下单步触发 具体的事件由调式器完成
     public void simInformStep(final Cpu ctx, final long pc);
 
+
+    //寄存器写入时
+    public void simCallerRegWriteBefore(int regAddr,long val);
+
+
     public boolean simIsStep();
 
     public void setCtx(Cpu ctx);

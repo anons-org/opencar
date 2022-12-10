@@ -10,6 +10,8 @@ import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.input.*;
 import javafx.scene.layout.AnchorPane;
+import javafx.scene.paint.Color;
+import javafx.scene.shape.Circle;
 import javafx.util.Callback;
 
 import java.util.HashMap;
@@ -30,7 +32,7 @@ public class RightTablePanle {
 
 
     TabMemoryInfo tabMemoryInfo;
-
+    Tab tabItemRegInfo ;
 
     //csr每列的数值显示格式
     Map<String, String> csrColFormat = new HashMap<>();
@@ -72,6 +74,21 @@ public class RightTablePanle {
         this.rightTabPane = rightTabPane;
     }
 
+
+    public Circle getCircle() {
+        Color c = Color.rgb(199, 84, 80);
+        Circle circle = new Circle();
+        //Setting the properties of the circle
+        circle.setCenterX(1.0f);
+        circle.setCenterY(1.0f);
+        circle.setRadius(4.0f);
+        circle.setFill(c);
+        //新圆形默认是隐藏的
+        circle.setVisible(false);
+        return circle;
+
+    }
+
     public void initControl() {
         tabMemoryInfo = new TabMemoryInfo();
         SplitPane splitPane = (SplitPane) ctx.getRootMain().lookup("#spbox");//#ta是textarea的id号
@@ -81,12 +98,24 @@ public class RightTablePanle {
                 ScrollPane scrollPane1 = ((ScrollPane) e);
                 rightTabPane = (TabPane) ((AnchorPane) scrollPane1.getContent()).lookup("#tabRightGroup");
                 rightTabPane.getTabs().forEach(item -> {
+
                     if ("tabItemRegInfo".equals(item.getId())) {
+
+                        item.setGraphic(getCircle());
+                        item.getTabPane().setOnMouseClicked(new EventHandler<MouseEvent>() {
+                            @Override
+                            public void handle(MouseEvent mouseEvent) {
+                                item.getGraphic().setVisible(false);
+                            }
+                        });
+
+                        tabItemRegInfo = item;
                         txtPcVal = (TextField) item.getContent().lookup("#txtPcVal");
                         tvGeneralRegister = (TableView) item.getContent().lookup("#tvGeneralRegister");
                         tvCsrRegister = (TableView) item.getContent().lookup("#tvCsrRegister");
                     } else if ("tabMemory".equals(item.getId())) {
-                        tabMemoryInfo.setTvMemoryGrid((TableView) item.getContent().lookup("#tvMemoryGrid"));
+                        tabMemoryInfo.setCtx(ctx);
+                        tabMemoryInfo.setTabInstance(item);
                     }
                 });
             }

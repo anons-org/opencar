@@ -46,9 +46,7 @@ public class StaticRes {
         cpus[0] = new Cpu();
 
         Dram dram = new Dram();
-
         dram.init();
-
         ((Bus) bus).setDram(dram);
         //添加需要监控内存地址的设备
         ((Bus) bus).addEdmm(uart0);
