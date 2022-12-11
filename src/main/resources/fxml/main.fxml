@@ -43,7 +43,6 @@
 <?import javafx.scene.control.SplitPane?>
 <?import javafx.scene.control.Tab?>
 <?import javafx.scene.control.TabPane?>
-<?import javafx.scene.control.TableColumn?>
 <?import javafx.scene.control.TableView?>
 <?import javafx.scene.control.TextArea?>
 <?import javafx.scene.control.TextField?>
@@ -208,48 +207,15 @@
                                        </children></AnchorPane>
                               </content>
                             </Tab>
-                              <Tab text="网卡数据">
-                                 <content>
-                                    <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="367.0" prefWidth="340.0">
-                                       <children>
-                                          <Label layoutX="14.0" layoutY="47.0" text="内存地址" />
-                                          <Label layoutX="213.0" layoutY="47.0" text="几个单元" />
-                                          <TextField layoutX="69.0" layoutY="43.0" prefHeight="23.0" prefWidth="135.0" />
-                                          <TextField layoutX="268.0" layoutY="43.0" prefHeight="23.0" prefWidth="29.0" />
-                                          <Label layoutX="15.0" layoutY="7.0" text="查看各个特权下的中断信号" underline="true" />
-                                       </children>
-                                    </AnchorPane>
-                                 </content>
-                              </Tab>
-                              <Tab text="内存和寄存器断点">
-                                 <content>
-                                    <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="303.0" prefWidth="141.0">
-                                       <children>
-                                          <TableView layoutY="35.0" prefHeight="243.0" prefWidth="199.0">
-                                            <columns>
-                                              <TableColumn prefWidth="61.0" text="C1" />
-                                              <TableColumn prefWidth="89.0" text="C2" />
-                                            </columns>
-                                          </TableView>
-                                          <TableView layoutX="232.0" layoutY="35.0" prefHeight="243.0" prefWidth="150.0">
-                                             <columns>
-                                                <TableColumn prefWidth="75.0" text="C1" />
-                                                <TableColumn prefWidth="75.0" text="C2" />
-                                             </columns>
-                                          </TableView>
-                                       </children>
-                                    </AnchorPane>
-                                 </content>
-                              </Tab>
                             <Tab id="tabMemory" text="内存查看">
                               <content>
                                 <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="367.0" prefWidth="340.0">
                                        <children>
                                           <Label layoutX="14.0" layoutY="47.0" text="内存地址" />
                                           <Label layoutX="213.0" layoutY="47.0" text="几个单元" />
-                                          <TextField id="findMemAddr" layoutX="69.0" layoutY="43.0" prefHeight="23.0" prefWidth="135.0" />
-                                          <TextField id="findMemUnit" layoutX="268.0" layoutY="43.0" prefHeight="23.0" prefWidth="56.0" />
-                                          <Label layoutX="15.0" layoutY="7.0" text="查看内存仅在断点状态下有效" underline="true" />
+                                          <TextField id="findMemAddr" layoutX="69.0" layoutY="43.0" prefHeight="23.0" prefWidth="135.0" promptText="输入地址回车" />
+                                          <TextField id="findMemUnit" layoutX="268.0" layoutY="43.0" prefHeight="23.0" prefWidth="56.0" text="4" />
+                                          <Label layoutX="14.0" layoutY="20.0" text="查看内存仅在断点状态下有效" underline="true" />
                                           <TableView id="tvMemoryGrid" layoutX="14.0" layoutY="83.0" prefHeight="609.0" prefWidth="703.0" />
                                           <Label layoutX="340.0" layoutY="47.0" text="每单元一字节" />
                                        </children></AnchorPane>

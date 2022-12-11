@@ -224,11 +224,6 @@ public class OpenCarWindos extends Application {
     }
 
 
-    public void initTabGroupConsole() {
-//        buildConsole = (TextArea) tabGroupConsole.lookup("#txtBuild");
-//        sysConsole = (TextArea) tabGroupConsole.lookup("#txtSys");
-    }
-
 
     @Override
     public void start(Stage primaryStage) {
@@ -238,7 +233,6 @@ public class OpenCarWindos extends Application {
         EnvUtil.initEvn();
 
         EnvUtil.loadConf(this);
-
 
         DServer.startDserver();
 
