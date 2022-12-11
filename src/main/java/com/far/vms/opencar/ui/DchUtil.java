@@ -79,8 +79,9 @@ public class DchUtil {
                 } else {//csr
                     ctx.getRightTablePanle().addDataToCsrRegisterTv(regDataList);
                 }
-
-
+            } else if (questData.getDt() == QuestType.READ_MEMORY) {
+                QuestMemoryData questMemoryData = JSONUtil.toBean(questData.getData(), QuestMemoryData.class);
+                ctx.updateMemoryData(questMemoryData);
             }
             return true;
         });

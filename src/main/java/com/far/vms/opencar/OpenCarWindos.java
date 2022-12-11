@@ -5,6 +5,7 @@ import cn.hutool.core.util.StrUtil;
 import cn.hutool.json.JSONUtil;
 import com.far.vms.opencar.complier.Parser;
 import com.far.vms.opencar.debugger.server.DServer;
+import com.far.vms.opencar.protocol.debug.mode.QuestMemoryData;
 import com.far.vms.opencar.protocol.debug.mode.QuestPcBreak;
 import com.far.vms.opencar.ui.entity.SettingDatas;
 import com.far.vms.opencar.ui.main.DebugBtns;
@@ -358,7 +359,7 @@ public class OpenCarWindos extends Application {
                 //此处只能选择一个 也就是当前选中的第一个单元格
                 TablePosition tp = (TablePosition) tvCodeEditor.getSelectionModel().getSelectedCells().get(0);
                 //只处理 断点标记的列
-                if( tp.getColumn()!=1 ){
+                if (tp.getColumn() != 1) {
                     return;
                 }
 
@@ -720,5 +721,9 @@ public class OpenCarWindos extends Application {
         tvCodeEditor.scrollTo(i);
     }
 
+
+    public void updateMemoryData(QuestMemoryData questMemoryData) {
+        rightTablePanle.updateMemoryData(questMemoryData);
+    }
 
 }

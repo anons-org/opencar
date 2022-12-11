@@ -18,11 +18,7 @@ public class OpenCarApplication {
 
     public static void run(String progFile) {
 
-
         StaticRes.init();
-
-
-
         readBin(progFile);
 
         //永不停机

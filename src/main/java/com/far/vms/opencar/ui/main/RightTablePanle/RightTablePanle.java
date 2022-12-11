@@ -2,6 +2,7 @@ package com.far.vms.opencar.ui.main.RightTablePanle;
 
 import cn.hutool.core.util.StrUtil;
 import com.far.vms.opencar.OpenCarWindos;
+import com.far.vms.opencar.protocol.debug.mode.QuestMemoryData;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
@@ -30,9 +31,9 @@ public class RightTablePanle {
     //特殊寄存器
     TableView tvCsrRegister;
 
-
+    //内存显示和查找
     TabMemoryInfo tabMemoryInfo;
-    Tab tabItemRegInfo ;
+    Tab tabItemRegInfo;
 
     //csr每列的数值显示格式
     Map<String, String> csrColFormat = new HashMap<>();
@@ -509,5 +510,11 @@ public class RightTablePanle {
     public void setPcval(String pc) {
         txtPcVal.setText(pc);
     }
+
+
+    public void updateMemoryData(QuestMemoryData questMemoryData) {
+        tabMemoryInfo.updateMemoryData(questMemoryData);
+    }
+
 
 }
