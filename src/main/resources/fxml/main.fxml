@@ -148,13 +148,13 @@
               <children>
                         <TabPane id="tabRightGroup" layoutX="1.0" maxWidth="720.0" prefHeight="738.0" prefWidth="720.0" tabClosingPolicy="UNAVAILABLE">
                           <tabs>
-                              <Tab text="控制台">
+                              <Tab id="tabConsoleAndBuild" text="控制台">
                                  <content>
                                     <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="752.0" prefWidth="505.0">
                                        <children>
                                           <TabPane id="groupConsole" layoutY="-1.0" prefHeight="694.0" prefWidth="554.0" tabClosingPolicy="UNAVAILABLE">
                                             <tabs>
-                                              <Tab text="Console">
+                                              <Tab id="tabConsole" text="Console">
                                                 <content>
                                                   <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
                                                          <children>

@@ -3,6 +3,7 @@ package com.far.vms.opencar.ui.main.RightTablePanle;
 import cn.hutool.core.util.StrUtil;
 import com.far.vms.opencar.OpenCarWindos;
 import com.far.vms.opencar.protocol.debug.mode.QuestMemoryData;
+import com.far.vms.opencar.ui.main.RightTablePanle.console.TabGroupConsoleAndBuild;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
@@ -34,6 +35,8 @@ public class RightTablePanle {
     //内存显示和查找
     TabMemoryInfo tabMemoryInfo;
     Tab tabItemRegInfo;
+
+    TabGroupConsoleAndBuild tabGroupConsoleAndBuild;
 
     //csr每列的数值显示格式
     Map<String, String> csrColFormat = new HashMap<>();
@@ -92,6 +95,7 @@ public class RightTablePanle {
 
     public void initControl() {
         tabMemoryInfo = new TabMemoryInfo();
+        tabGroupConsoleAndBuild = new TabGroupConsoleAndBuild();
         SplitPane splitPane = (SplitPane) ctx.getRootMain().lookup("#spbox");//#ta是textarea的id号
         var scrollPane = splitPane.getItems();
         for (var e : scrollPane) {
@@ -117,6 +121,9 @@ public class RightTablePanle {
                     } else if ("tabMemory".equals(item.getId())) {
                         tabMemoryInfo.setCtx(ctx);
                         tabMemoryInfo.setTabInstance(item);
+                    } else if ("tabConsoleAndBuild".equals(item.getId())) {
+                        tabGroupConsoleAndBuild.setCtx(ctx);
+                        tabGroupConsoleAndBuild.setTabInstance(item);
                     }
                 });
             }
@@ -127,9 +134,8 @@ public class RightTablePanle {
         initCopy(tvGeneralRegister);
         initGeneralRegisterTv();
         initCsrRegisterTv();
-
         tabMemoryInfo.initControl();
-
+        tabGroupConsoleAndBuild.initControl();
     }
 
     public void initCopy(TableView tableView) {

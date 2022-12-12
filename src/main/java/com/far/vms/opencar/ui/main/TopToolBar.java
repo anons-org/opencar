@@ -18,6 +18,8 @@ public class TopToolBar {
 
     private OpenCarWindos ctx;
 
+    private SettingUI settingUI;
+
 
     public OpenCarWindos getCtx() {
         return ctx;
@@ -46,7 +48,7 @@ public class TopToolBar {
                     e2.setOnAction(new EventHandler<ActionEvent>() {
                         @Override
                         public void handle(ActionEvent event) {
-                            System.out.println("选择文件");
+
                             //打开选择镜像的窗口
                             FileChooser fileChooser = new FileChooser();
                             if (!ObjectUtil.isNull(ctx.getSettingDatas())
@@ -99,7 +101,11 @@ public class TopToolBar {
                         @Override
                         public void handle(ActionEvent event) {
                             try {
-                                SettingUI.create().createFxmlStage(ctx);
+                                if (ObjectUtil.isEmpty(settingUI)) {
+                                    settingUI = SettingUI.create().createFxmlStage(ctx);
+                                }
+                                settingUI.show();
+
                             } catch (IOException e) {
                                 e.printStackTrace();
                             }

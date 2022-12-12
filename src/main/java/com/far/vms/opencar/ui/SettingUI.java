@@ -3,27 +3,24 @@ package com.far.vms.opencar.ui;
 import cn.hutool.core.util.StrUtil;
 import com.far.vms.opencar.OpenCarWindos;
 import com.far.vms.opencar.ui.entity.SettingDatas;
+import com.far.vms.opencar.ui.event.Notify;
 import com.far.vms.opencar.utils.EnvUtil;
+import javafx.application.Platform;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.fxml.FXMLLoader;
-import javafx.scene.Group;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.SplitPane;
 import javafx.scene.control.TabPane;
-import javafx.scene.effect.Lighting;
-import javafx.scene.layout.AnchorPane;
-import javafx.scene.paint.Color;
-import javafx.scene.text.Font;
-import javafx.scene.text.Text;
+import javafx.scene.control.TextField;
 import javafx.stage.DirectoryChooser;
 import javafx.stage.Stage;
+import javafx.stage.WindowEvent;
 
 import java.io.File;
 import java.io.IOException;
-import java.net.URL;
 import java.util.Arrays;
 import java.util.Objects;
 import java.util.Optional;
@@ -39,6 +36,10 @@ public class SettingUI {
     Button btnGccPathSelect;
 
     OpenCarWindos ctx;
+
+    TextField txtGccPath;
+
+
 
     //gccpath用
     DirectoryChooser directoryChooser = new DirectoryChooser();
@@ -79,7 +80,7 @@ public class SettingUI {
     /**
      * 创建一个Stage，这个Stage使用fxml描绘
      */
-    public void createFxmlStage(final OpenCarWindos ctx) throws IOException {
+    public SettingUI createFxmlStage(final OpenCarWindos ctx) throws IOException {
         stage = new Stage();
         //   URL path = this.getClass().getClassLoader().getResource("fxml/settingUI.fxml"); // 注意路径不带/开头
         File file = new File(EnvUtil.appAtPath + "/config/fxml/settingUI.fxml");
@@ -88,9 +89,28 @@ public class SettingUI {
         initControl();
         stage.setTitle("new Stage");
         stage.setScene(new Scene(settingUIRoot, 640, 480));
+        stage.setOnCloseRequest(new EventHandler<WindowEvent>() {
+            @Override
+            public void handle(WindowEvent windowEvent) {
+                stage.hide();
+            }
+        });
+        return this;
+    }
+
+    public void show(){
         stage.show();
     }
 
+    public void hide(){
+        stage.hide();
+    }
+
+
+    public void setGccPathToTxt(String path) {
+
+        txtGccPath.setText(path);
+    }
 
     public void initControl() {
 
@@ -98,7 +118,7 @@ public class SettingUI {
         splitPane.getItems().forEach(e -> {
             if (e instanceof TabPane) {
                 btnGccPathSelect = (Button) e.lookup("#tabBuild").lookup("#btnGccPathSelect");
-                System.out.println(e);
+                txtGccPath = (TextField) e.lookup("#tabBuild").lookup("#txtGccPath");
             }
         });
 
@@ -127,13 +147,25 @@ public class SettingUI {
                     return findFile.equals("riscv64-unknown-elf-objdump.exe");
                 }).findFirst();
 
-                if (!binPath.isPresent()) {
-                    openCarWindos.setTxtAlertMessage("没有找到gcc编译组件...");
-                    return;
-                }
                 openCarWindos.setTxtAlertMessage("选择完成");
+                setGccPathToTxt(selectedDirectory.getPath());
                 ctx.getSettingDatas().getBuild().setGccPath(selectedDirectory.getPath());
                 ctx.saveSettingData();
+            }
+        });
+
+
+        //接受配置文件加载完成的通知
+        Notify.on(Notify.SysType.LOAD_CONF_AFTER, new Notify.INotifyHandler<SettingDatas>() {
+            @Override
+            public void onEvent(int evtType, Notify.NotifyData<?> data) {
+                Platform.runLater(new Runnable() {
+                    @Override
+                    public void run() {
+                        SettingDatas d = (SettingDatas) data.getData();
+                        setGccPathToTxt(d.getBuild().getGccPath());
+                    }
+                });
             }
         });
 

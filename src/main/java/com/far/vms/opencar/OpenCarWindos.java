@@ -8,8 +8,9 @@ import com.far.vms.opencar.debugger.server.DServer;
 import com.far.vms.opencar.protocol.debug.mode.QuestMemoryData;
 import com.far.vms.opencar.protocol.debug.mode.QuestPcBreak;
 import com.far.vms.opencar.ui.entity.SettingDatas;
+import com.far.vms.opencar.ui.event.Notify;
+import com.far.vms.opencar.ui.event.NotifyType;
 import com.far.vms.opencar.ui.main.DebugBtns;
-import com.far.vms.opencar.ui.main.RightTablePanle.RegData;
 import com.far.vms.opencar.ui.main.RightTablePanle.RightTablePanle;
 import com.far.vms.opencar.ui.main.TopToolBar;
 import com.far.vms.opencar.ui.DchUtil;
@@ -22,7 +23,6 @@ import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
-import javafx.event.EventHandler;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
@@ -31,7 +31,6 @@ import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyCodeCombination;
 import javafx.scene.input.KeyCombination;
-import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
@@ -39,7 +38,6 @@ import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Circle;
 import javafx.stage.Stage;
-import javafx.util.Callback;
 
 import java.io.*;
 import java.nio.charset.StandardCharsets;
@@ -52,9 +50,6 @@ public class OpenCarWindos extends Application {
     Button btnBinSelect = null;
     Button btnGccPath = null;
 
-
-    TextArea buildConsole = null;
-    TextArea sysConsole = null;
 
     //底部信息提示
     Label txtAlertMessage;
@@ -224,9 +219,10 @@ public class OpenCarWindos extends Application {
     }
 
 
-
     @Override
     public void start(Stage primaryStage) {
+
+        Notify.startBackstageLoop();
 
         primaryStage = primaryStage;
 
@@ -623,22 +619,25 @@ public class OpenCarWindos extends Application {
         }
 
         String buildTool = settingDatas.getBuild().getGccPath() + "\\riscv64-unknown-elf-objdump.exe";
+        try {
+            ShellUtil.runShell(buildTool, new String[]{buildTool, filePath, "-d"}, cmdInf -> {
 
-        ShellUtil.runShell(buildTool, new String[]{buildTool, filePath, "-d"}, cmdInf -> {
+                short line = getCodeLineNumber();
 
-            short line = getCodeLineNumber();
-
-            //通过此处来处理 PC和行的关系
-            if (Parser.canBreakForCode(cmdInf)) {
-                String pc = Parser.getCodeForPc();
-                codeLineRef.put(pc, line);
-            }
-            editorData.add(new CodeData(line, getCircle(), cmdInf));
-            //  System.out.println(cmdInf);
-            return 0;
-        });
-
-        return true;
+                //通过此处来处理 PC和行的关系
+                if (Parser.canBreakForCode(cmdInf)) {
+                    String pc = Parser.getCodeForPc();
+                    codeLineRef.put(pc, line);
+                }
+                editorData.add(new CodeData(line, getCircle(), cmdInf));
+                //  System.out.println(cmdInf);
+                return 0;
+            });
+            return true;
+        } catch (Exception e) {
+            Notify.emit(NotifyType.UI.APPEND_CONSOLE_TXT, new Notify.NotifyData<>(e.getMessage()));
+        }
+        return false;
 
     }
 

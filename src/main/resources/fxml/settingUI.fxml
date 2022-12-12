@@ -22,7 +22,7 @@
                               <Font size="13.0" />
                            </font>
                         </Label>
-                        <TextField layoutX="109.0" layoutY="79.0" prefHeight="23.0" prefWidth="386.0" />
+                        <TextField id="txtGccPath" layoutX="109.0" layoutY="79.0" prefHeight="23.0" prefWidth="386.0" />
                         <Button id="btnGccPathSelect" layoutX="514.0" layoutY="80.0" mnemonicParsing="false" prefHeight="23.0" prefWidth="78.0" text="选择" />
                         <Button layoutX="488.0" layoutY="393.0" mnemonicParsing="false" prefHeight="23.0" prefWidth="89.0" text="保存" />
                      </children>

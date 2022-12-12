@@ -6,7 +6,7 @@ import cn.hutool.json.JSONException;
 import cn.hutool.json.JSONUtil;
 import com.far.vms.opencar.OpenCarWindos;
 import com.far.vms.opencar.ui.entity.SettingDatas;
-import com.far.vms.opencar.utils.exception.FarException;
+import com.far.vms.opencar.ui.event.Notify;
 
 public class EnvUtil {
     //jar所在的目录
@@ -38,6 +38,9 @@ public class EnvUtil {
             ctx.setSettingDatas(cnf);
             // throw new FarException(FarException.Code.CRASH, e.getMessage(), e);
         }
+
+        Notify.emit(Notify.SysType.LOAD_CONF_AFTER,new Notify.NotifyData<>(cnf));
+
 
     }
 

@@ -87,7 +87,7 @@ public class ShellUtil {
             new Thread(new RunShellThread().setCaller(caller).setInputStream(p.getErrorStream())).start();
             p.waitFor();
         } catch (Exception e) {
-            e.printStackTrace();
+            throw new RuntimeException(e);
         }
 
     }
