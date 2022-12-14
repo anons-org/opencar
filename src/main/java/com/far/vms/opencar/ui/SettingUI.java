@@ -125,7 +125,6 @@ public class SettingUI {
         OpenCarWindos openCarWindos = ctx;
         //设置默认
 
-
         if (!StrUtil.isEmpty(openCarWindos.getSettingDatas().getBuild().getGccPath())) {
             File defaultGccPathFile = new File(openCarWindos.getSettingDatas().getBuild().getGccPath());
             directoryChooser.setInitialDirectory(defaultGccPathFile);

@@ -19,9 +19,6 @@
 * 支持rv机器码反汇编
 * 硬件支持:
   - 串口 (ns16550A)
-    - 硬件资料和操作串口的jar包连接
-      >  链接：https://pan.baidu.com/s/1bjR84lC-w3SL-SPsKtLqXQ?pwd=brp8 
-        - 提取码：brp8
   - 网络 
   - 硬盘
   - LCD
@@ -45,7 +42,11 @@
 ### 开发时JVM参数配置
 ![img_2.png](img_2.png)
 
+### 其他依赖的jar包
+链接：https://pan.baidu.com/s/1LkXvZFmGi5Y1RtT9HO9_7g?pwd=i3eg
+提取码：i3eg
 
+### UI编辑器 JavaFX Scene Builder 17.0.0 自行下载
 
 
 ## 运行
