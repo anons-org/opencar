@@ -45,6 +45,13 @@
 ### 其他依赖的jar包
 链接：https://pan.baidu.com/s/1LkXvZFmGi5Y1RtT9HO9_7g?pwd=i3eg
 提取码：i3eg
+包含 
+- far-net-0.0.2.jar
+- scenic-view
+- riscv64-unknown-elf-toolchain-10.2.0-2020.12.8-x86_64-w64-mingw32
+
+
+
 
 ### UI编辑器 JavaFX Scene Builder 17.0.0 自行下载
 
